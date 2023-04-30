@@ -1,0 +1,45 @@
+<style>
+  .btn-smaller {
+    font-size: 12px; /* or any other size you prefer */
+  }
+</style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      
+      {% if category == 'success' %}
+
+        <div class="alert alert-success" role="alert">
+          <button class="btn-close btn-smaller"
+            onclick="this.parentElement.style.display='none';">
+          </button>
+          {{ message }}
+        </div>
+
+      {% elif category == 'error' %}
+
+        <div class="alert alert-danger" role="alert">
+          <button class="btn-close btn-smaller"
+            onclick="this.parentElement.style.display='none';">
+          </button>
+          {{ message }}
+        </div>
+
+      {% elif category == 'warning' %}
+
+
+        <div class="alert alert-warning" role="alert">
+
+          <button class="btn-close btn-smaller"
+            onclick="this.parentElement.style.display='none';">
+          </button>
+
+          {{ message }}
+        </div>
+
+      {% endif %}
+
+    {% endfor %}
+  {% endif %}
+{% endwith %}

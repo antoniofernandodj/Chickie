@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ~/volumes/flask-sqlalchemy-postgres:/var/lib/postgresql/data
+    env_file:
+      - infra.secrets.toml
+    ports:
+      - "5432:5432"
+
+volumes:
+  flask-sqlalchemy-postgres:
