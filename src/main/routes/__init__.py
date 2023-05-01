@@ -1,7 +1,7 @@
 from flask import Flask
-from . import auth
-from . import content
+from . import loja, usuario, api
 
 def init_app(app: Flask) -> None:
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(content.bp)
+    app.register_blueprint(loja.bp)
+    app.register_blueprint(usuario.bp)
+    app.register_blueprint(api.bp)
