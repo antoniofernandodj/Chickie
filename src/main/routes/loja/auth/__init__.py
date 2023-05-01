@@ -5,9 +5,11 @@ from flask import (Blueprint, render_template, redirect,
 
 bp = Blueprint('auth', __name__)
 
+
 @bp.get('/loja/login/')
 def login_get():
     return render_template('/loja/login.html')
+
 
 @bp.post('/loja/login/')
 def login_post():
@@ -20,6 +22,7 @@ def login_post():
 @bp.get('/loja/signin/')
 def signin_get():
     return render_template('/loja/signin.html')
+
 
 @bp.post('/loja/signin/')
 def sign_post():

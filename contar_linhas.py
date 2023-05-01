@@ -16,13 +16,6 @@ def document_in_list_of_directories(document, directories):
     return check
 
 LIBS = [
-    'src/static/scripts/bibliotecas/jquery.mask.min.js',
-    'src/static/scripts/bibliotecas/cookiealert.js',
-    'src/static/scripts/bibliotecas/messages_pt_BR.min.js',
-    'src/static/scripts/bibliotecas/jquery.min.js',
-    'src/static/scripts/bibliotecas/bootstrap.bundle.min.js',
-    'src/static/scripts/bibliotecas/jquery.validate.min.js',
-    'src/static/scripts/bibliotecas/sweetalert2.all.min.js',
     'contar_linhas.py',
 ]
 

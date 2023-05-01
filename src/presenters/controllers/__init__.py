@@ -1,1 +1,1 @@
-from . import usuario
+from . import usuario, loja, api
