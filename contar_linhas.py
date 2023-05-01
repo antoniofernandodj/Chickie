@@ -15,6 +15,15 @@ def document_in_list_of_directories(document, directories):
 
     return check
 
+def document_in_list_of_files(document, files):
+    document = document.split('/')[-1]
+    check = False
+    for file in files:
+        if file == document:
+            check = True
+
+    return check
+
 LIBS = [
     'contar_linhas.py',
 ]
@@ -27,6 +36,7 @@ def contar_linhas(documento: str) -> int:
         content = f.readlines()
         content = [line.strip() for line in content if line.strip() != '']
         len_content = len(content)
+
     return len_content
 
 
@@ -48,14 +58,14 @@ for GLOB in GLOBS:
         if GLOB:
             for i, documento in enumerate(GLOB):
                 if not document_in_list_of_directories(documento, DIRECTORIES): 
-                    print(documento)
-                    numero_de_linhas += contar_linhas(documento)
-                    l += contar_linhas(documento)
-                    n += 1
+                    if not document_in_list_of_files(documento, LIBS):
+                        
+                        numero_de_linhas += contar_linhas(documento)
+                        l += contar_linhas(documento)
+                        n += 1
 
         dic[formato] = l
     except IndexError:
         pass
         
-# pprint(dic)
 print(f"O número total de linhas em todos os {n} arquivos é {numero_de_linhas}.")
