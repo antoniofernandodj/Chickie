@@ -1,4 +1,4 @@
-from flask_login import login_user, login_url
+from flask_login import login_user
 from src.infra.database import repository as r
 from src.presenters.models.http import HTTPResponse
 

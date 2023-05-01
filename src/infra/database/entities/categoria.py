@@ -13,7 +13,6 @@ class Categoria(Base, BaseEntityClass):
     nome = Col(Str(40))
 
     descricao = Col(Text)
-    imagem_url = Col(Text)
 
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
     loja = rel(Loja, back_populates='produtos')

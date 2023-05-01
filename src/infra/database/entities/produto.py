@@ -23,5 +23,3 @@ class Produto(Base, BaseEntityClass):
 
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
     loja = rel(Loja, back_populates='produtos')
-
-    imagem_url = Col(Text)

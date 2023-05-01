@@ -38,10 +38,6 @@ class Loja(Base, BaseEntityClass, UserMixin):
     
     grupo = Col(Enum(Grupo))
 
-    logo_url = Col(Text)
-    image_url = Col(Text)
-    background_url = Col(Text)
-
     def vincular_comprador(self, comprador: Usuario):
         from src.infra.database import entities as e
 
