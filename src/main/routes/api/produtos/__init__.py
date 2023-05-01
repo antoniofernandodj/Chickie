@@ -39,4 +39,3 @@ def remover_produto():
     data = request.form.to_dict()
     response = controllers.api.produtos.remover.handle(data=data)
     return response
-

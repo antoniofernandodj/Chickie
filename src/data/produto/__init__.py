@@ -5,8 +5,10 @@ from uuid import uuid4
 
 def cadastrar(dados: ProdutoDados) -> dict:
 
+    uuid = uuid4()
+
     produto = e.Produto(
-        uuid = uuid4(),
+        uuid = uuid,
         nome = dados.nome,
         descricao = dados.descricao,
         categoria = dados.categoria,
@@ -17,7 +19,8 @@ def cadastrar(dados: ProdutoDados) -> dict:
 
     response = {
         'message': '',
-        'status': ''
+        'status': '',
+        'uuid': uuid
     }
 
     return response

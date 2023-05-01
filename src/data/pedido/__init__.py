@@ -7,8 +7,10 @@ from uuid import uuid4
 
 def cadastrar_pedido(dados: PedidoDados) -> dict:
 
+    uuid = uuid4()
+
     pedido = e.Pedido(
-        uuid = uuid4(),
+        uuid = uuid,
         dados_hora = datetime.utcnow(),
         status = dados.status,
         frete = dados.frete,
@@ -20,7 +22,8 @@ def cadastrar_pedido(dados: PedidoDados) -> dict:
 
     response = {
         'message': '',
-        'status': ''
+        'status': '',
+        'uuid': uuid
     }
 
     return response
