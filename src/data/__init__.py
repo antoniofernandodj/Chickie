@@ -1,10 +1,10 @@
 from . import (
     categoria,
     cliente,
-    item_de_pedido,
-    loja,
-    pedido,
-    preco,
+    usuario,
     produto,
-    usuario
+    pedido,
+    loja,
+    item,
+    preco
 )

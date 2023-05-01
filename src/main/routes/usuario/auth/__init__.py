@@ -5,11 +5,11 @@ from flask import (Blueprint, render_template, redirect,
 
 bp = Blueprint('auth', __name__)
 
-@bp.get('/login/')
+@bp.get('/user/login/')
 def login_get():
-    return render_template('auth/login.html')
+    return render_template('/user/auth/login.html')
 
-@bp.post('/login/')
+@bp.post('/user/login/')
 def login_post():
     form = request.form.to_dict()
     response = controllers.usuario.auth.login.handle(data=form)
@@ -17,13 +17,14 @@ def login_post():
     if response['redirect']:
         return redirect(response['redirect'])
 
-    return redirect('/login/')
+    return redirect('/user/login/')
 
-@bp.get('/signin/')
+
+@bp.get('/user/signin/')
 def signin_get():
-    return render_template('auth/signin.html')
+    return render_template('/user/auth/signin.html')
 
-@bp.post('/signin/')
+@bp.post('/user/signin/')
 def sign_post():
     form = request.form.to_dict()
     response = controllers.usuario.auth.signin.handle(data=form)
@@ -31,4 +32,4 @@ def sign_post():
     if response['redirect']:
         return redirect(response['redirect'])
 
-    return redirect('/signin/')
+    return redirect('/user/signin/')

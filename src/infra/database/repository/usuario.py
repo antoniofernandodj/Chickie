@@ -21,3 +21,5 @@ class UsuarioRepository(BaseRepositoryClass):
 
         item = cls.model_class(**kwargs)
         item.save()
+
+        return item
