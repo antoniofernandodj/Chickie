@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Este arquivo foi criado para realizar o setup
+# do ambiente de desenvovlimento
+
 echo "Installing libpq-dev..."
 sudo apt-get install libpq-dev
 

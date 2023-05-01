@@ -1,6 +1,5 @@
-from src.infra.database.entities import User
-from src.infra.database.repository import User as UserRepository
-
+from src.infra.database.entities import Usuario
+from src.infra.database.repository import UsuarioRepository
 
 user_data_1 = {
     'uuid': 'test-uuid-1',
@@ -19,8 +18,8 @@ user_data_2 = {
 def test_create_user():
 
     # When
-    user_uuid = UserRepository.create(**user_data_1)
-    user = UserRepository.find_one(uuid=user_uuid)
+    user_uuid = UsuarioRepository.create(**user_data_1)
+    user = UsuarioRepository.find_one(uuid=user_uuid)
 
     # Then
     assert user.uuid == user_data_1['uuid']
@@ -31,7 +30,7 @@ def test_create_user():
 def test_find_one_user():
 
     # When
-    user = UserRepository.find_one(uuid=user_data_1['uuid'])
+    user = UsuarioRepository.find_one(uuid=user_data_1['uuid'])
 
     # Then
     assert user is not None
@@ -39,10 +38,10 @@ def test_find_one_user():
 
 def test_find_all_users():
     # Given
-    UserRepository.create(**user_data_2)
+    UsuarioRepository.create(**user_data_2)
 
     # When
-    users = UserRepository.find_all()
+    users = UsuarioRepository.find_all()
 
     # Then
     assert len(users) == 2
@@ -62,14 +61,14 @@ def test_remove_created_users():
     uuid1 = 'test-uuid-1'
     uuid2 = 'test-uuid-2'
 
-    user1 = UserRepository.find_one(uuid=uuid1)
-    user2 = UserRepository.find_one(uuid=uuid2)
+    user1 = UsuarioRepository.find_one(uuid=uuid1)
+    user2 = UsuarioRepository.find_one(uuid=uuid2)
 
     user1.delete()
     user2.delete()
 
-    user1 = UserRepository.find_one(uuid=uuid1)
-    user2 = UserRepository.find_one(uuid=uuid2)
+    user1 = UsuarioRepository.find_one(uuid=uuid1)
+    user2 = UsuarioRepository.find_one(uuid=uuid2)
 
     assert user1 is None
     assert user2 is None

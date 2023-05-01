@@ -10,8 +10,8 @@ def init_app(app: Flask) -> None:
     login_manager.init_app(app=app)
 
     @login_manager.user_loader
-    def get_user(user_uuid) -> e.User:
-        user = r.User.find_one(uuid=user_uuid)
+    def get_user(user_uuid) -> e.Usuario:
+        user = r.UsuarioRepository.find_one(uuid=user_uuid)
         if user:
             return user
         

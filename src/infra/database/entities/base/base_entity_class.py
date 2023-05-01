@@ -36,10 +36,10 @@ class BaseEntityClass:
         
         with database.session.get() as db:
             try:
-                user = db.query(cls).filter_by(uuid=self.uuid).first()
+                item = db.query(cls).filter_by(uuid=self.uuid).first()
                 for key, value in kwargs.items():
                     if key != '_sa_instance_state':
-                        setattr(user, key, value)
+                        setattr(item, key, value)
                     
                 db.commit()
             except:
@@ -52,8 +52,8 @@ class BaseEntityClass:
         
         with database.session.get() as db:
             try:
-                user = db.query(cls).filter_by(uuid=self.uuid).first()
-                db.delete(user)
+                item = db.query(cls).filter_by(uuid=self.uuid).first()
+                db.delete(item)
                 db.commit()
             except:
                 db.rollback()

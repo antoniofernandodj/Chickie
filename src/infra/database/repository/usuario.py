@@ -3,15 +3,12 @@ from src.infra.database import entities as e
 from src.infra.database.repository import BaseRepositoryClass
 from uuid import uuid4
 from uuid import uuid4
-from werkzeug.security import (
-    check_password_hash as check_hash,
-    generate_password_hash as gen_hash
-)
+
 
 @dataclass
-class User(BaseRepositoryClass):
+class UsuarioRepository(BaseRepositoryClass):
 
-    model_class = e.User
+    model_class = e.Usuario
 
     @classmethod
     def create(cls, **kwargs):
@@ -21,7 +18,3 @@ class User(BaseRepositoryClass):
 
         item = cls.model_class(**kwargs)
         item.save()
-
-
-    def validate_credentials(user: e.User, password: str) -> bool:
-        return check_hash(user.password_hash, password)

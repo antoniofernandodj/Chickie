@@ -1,8 +1,8 @@
-from src.infra.database.entities.user import User
+from src.infra.database.entities.usuario import Usuario
 from src.infra import database
 from werkzeug.security import generate_password_hash as gen_hash
 
-def test_user_class():
+def test_usuario_class():
     
     from faker import Faker
     
@@ -12,30 +12,30 @@ def test_user_class():
     email2 = fake.email()
     word = fake.word()
     
-    user = User(
+    usuario = Usuario(
         name=name,
         email=email1,
         password_hash=gen_hash(word)
     )
     
-    user.save()
+    usuario.save()
 
     with database.session.get() as session:
-        query_user = session.query(User).filter_by(name=name).first()
-        assert query_user is not None
+        query_usuario = session.query(Usuario).filter_by(name=name).first()
+        assert query_usuario is not None
 
     with database.session.get() as session:
-        query_user = session.query(User).filter_by(name=name).first()
-        query_user.update(email=email2)
+        query_usuario = session.query(Usuario).filter_by(name=name).first()
+        query_usuario.update(email=email2)
         
-        user_updated = session.query(User).filter_by(name=name, email=email2).first()
-        assert user_updated is not None
+        usuario_updated = session.query(Usuario).filter_by(name=name, email=email2).first()
+        assert usuario_updated is not None
 
 
     with database.session.get() as session:
-        query_user = session.query(User).filter_by(name=name).first()
-        query_user.delete()
+        query_usuario = session.query(Usuario).filter_by(name=name).first()
+        query_usuario.delete()
 
     with database.session.get() as session:
-        query_user = session.query(User).filter_by(name=name).first()
-        assert query_user is None
+        query_usuario = session.query(Usuario).filter_by(name=name).first()
+        assert query_usuario is None
