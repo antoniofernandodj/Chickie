@@ -5,6 +5,6 @@ from src import data
 
 def handle(data: dict):
 
-    produto = r.ProdutoRepository.find_one(data['produto_uuid'])
+    produto = r.ProdutoRepository.find_one(uuid=data['produto_uuid'])
 
     return HTTPResponse(body=produto.dict())

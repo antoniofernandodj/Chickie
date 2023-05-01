@@ -5,6 +5,6 @@ from src.presenters.models.http import HTTPResponse
 
 def handle(data: dict):
 
-    r.CategoriaRepository.remove_one(categoria_uuid=data['loja_uuid'])
+    r.CategoriaRepository.remove_one(uuid=data['loja_uuid'])
     
     return HTTPResponse()

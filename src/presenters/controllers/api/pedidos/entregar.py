@@ -5,7 +5,8 @@ from src import data
 
 def handle(data: dict):
 
-    pedido = r.PedidoRepository.find_one(data['pedido_uuid'])
-    pedido.marcar_como_entregando()
+    pedido = r.PedidoRepository.find_one(uuid=data['pedido_uuid'])
+    if pedido:
+        pedido.marcar_como_entregando()
 
     return HTTPResponse()

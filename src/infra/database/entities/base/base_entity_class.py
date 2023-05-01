@@ -2,6 +2,8 @@ from uuid import uuid4
 from copy import deepcopy
 
 class BaseEntityClass:
+
+    uuid: str
     
     def __repr__(self):
         cls = type(self)

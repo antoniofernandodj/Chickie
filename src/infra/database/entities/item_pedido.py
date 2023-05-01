@@ -15,10 +15,10 @@ class ItemPedido(Base, BaseEntityClass):
     subtotal = Col(Float)
 
     produto_uuid = Col(Str(40), FK('produtos.uuid'))
-    produto = rel(Produto)
+    # produto = rel(Produto)
 
     pedido_uuid = Col(Str(40), FK('pedidos.uuid'))
-    pedido = rel(Pedido, back_populates='items')
+    # pedido = rel(Pedido, back_populates='items')
 
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    loja = rel(Loja, back_populates='produtos')
+    # loja = rel(Loja, back_populates='produtos')

@@ -5,6 +5,6 @@ from src import data
 
 def handle(data: dict):
 
-    preco = r.PrecoRepository.find_one(data['preco_uuid'])
+    preco = r.PrecoRepository.find_one(uuid=data['preco_uuid'])
 
     return HTTPResponse(body=preco.dict())

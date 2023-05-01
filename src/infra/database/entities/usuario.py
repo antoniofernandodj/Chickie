@@ -29,4 +29,4 @@ class Usuario(Base, BaseEntityClass, UserMixin):
     password_hash = Col(Text)
 
     endereco_uuid = Col(Str(40), FK('enderecos.uuid'))
-    endereco = rel(Endereco, uselist=False, back_populates='usuario')
+    # endereco = rel(Endereco, uselist=False, back_populates='usuario')

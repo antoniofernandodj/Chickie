@@ -19,7 +19,7 @@ class Pedido(Base, BaseEntityClass):
     frete = Col(Float)
 
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    loja = rel(Loja, back_populates='produtos')
+    # loja = rel(Loja, back_populates='produtos')
 
     endereco = Col(Str(40), FK('enderecos.uuid'))
 

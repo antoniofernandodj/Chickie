@@ -19,7 +19,7 @@ class Produto(Base, BaseEntityClass):
     descricao = Col(Text)
 
     categoria_uuid = Col(Str(40), FK('categorias.uuid'))
-    categoria = rel(Categoria, back_populates='produtos')
+    # categoria = rel(Categoria, back_populates='produtos')
 
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    loja = rel(Loja, back_populates='produtos')
+    # loja = rel(Loja, back_populates='produtos')

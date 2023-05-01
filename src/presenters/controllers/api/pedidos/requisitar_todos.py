@@ -4,6 +4,6 @@ from src import data
 
 def handle(data: dict):
 
-    pedidos = r.PedidoRepository.find_all(data['loja_uuid'])
+    pedidos = r.PedidoRepository.find_all(loja_uuid=data['loja_uuid'])
 
     return HTTPResponse(body=pedidos)

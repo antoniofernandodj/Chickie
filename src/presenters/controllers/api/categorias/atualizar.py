@@ -5,6 +5,7 @@ from src.presenters.models.http import HTTPResponse
 def handle(dados: dict):
 
     categoria = r.CategoriaRepository.find_one(dados['categoria_uuid'])
-    r.CategoriaRepository.update_one(categoria, dados['data'])
+    if categoria:
+        r.CategoriaRepository.update_one(categoria, dados['data'])
 
-    return HTTPResponse()
+    return HTTPResponse(status='success', message='Item atualizado com sucesso!')

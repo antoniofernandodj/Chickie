@@ -11,6 +11,7 @@ class HTTPResponse:
             self,
             status: str,
             message: str,
+            status_code: Optional[int] = None,
             body: Optional[Union[str, dict]] = None,
             redirect: Optional[str] = None
         ):
@@ -29,6 +30,7 @@ class HTTPResponse:
         self.body = body
         self.message = message
         self.redirect = redirect
+        self.status_code = status_code
         
     def __repr__(self) -> str:
         return f'{type(self).__name__}(status={self.status})'
@@ -41,15 +43,36 @@ class HTTPResponse:
 
         if self.redirect:
             response = make_response(redirect(self.redirect))
+
+            if self.status_code:
+                response.status_code = self.status_code
+
+            return response
+        
+        if self.body is None:
+            response = make_response(self.message)
+
+            if self.status_code:
+                response.status_code = self.status_code
+
             return response
 
         if isinstance(self.body, str):
             response = make_response(self.body)
-            response.status_code = self.status_code
+
+            if self.status_code:
+                response.status_code = self.status_code
+
             return response
         
-        if isinstance(self.body, dict):
+        if isinstance(self.body, dict) or isinstance(self.body, list):
             response = jsonify(self.body)
-            response.status_code = self.status_code
+
+            if self.status_code:
+                response.status_code = self.status_code
+
+            if not self.body:
+                response.status_code = 404
+
             return response
 

@@ -4,7 +4,8 @@ from src.presenters.models.http import HTTPResponse
 
 def handle(dados: dict):
 
-    produto = r.ProdutoRepository.find_one(dados['produto_uuid'])
-    r.ProdutoRepository.update_one(produto, dados['data'])
+    produto = r.ProdutoRepository.find_one(uuid=dados['produto_uuid'])
+    if produto:
+        r.ProdutoRepository.update_one(produto, dados['data'])
 
     return HTTPResponse()

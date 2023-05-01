@@ -17,25 +17,25 @@ def historico():
 
 
 @bp.get('/loja/categorias/')
-def historico():
+def categorias():
     return render_template('/loja/categorias.html')
 
 
 @bp.get('/loja/produtos/')
-def historico():
+def produtos():
     return render_template('/loja/produtos.html')
 
 
 @bp.get('/loja/pedidos/')
-def cadastrar_pedidos_get():
+def pedidos():
     return render_template('/loja/pedidos.html')
 
 
 @bp.get('/loja/clientes/')
-def cadastrar_pedidos_get():
+def clientes():
     return render_template('/loja/clientes.html')
 
 
 @bp.get('/loja/dados/')
-def cadastrar_pedidos_get():
+def dados():
     return render_template('/loja/dados.html')

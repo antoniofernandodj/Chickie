@@ -5,6 +5,6 @@ from src import data
 
 def handle(data: dict):
 
-    r.ProdutoRepository.remove_one(data['produto_uuid'])
+    r.ProdutoRepository.remove_one(uuid=data['produto_uuid'])
 
     return HTTPResponse()

@@ -4,7 +4,8 @@ from src.presenters.models.http import HTTPResponse
 
 def handle(dados: dict):
 
-    categoria = r.PrecoRepository.find_one(dados['categoria_uuid'])
-    r.PrecoRepository.update_one(categoria, dados['data'])
+    preco = r.PrecoRepository.find_one(uuid=dados['categoria_uuid'])
+    if preco:
+        r.PrecoRepository.update_one(preco, dados['data'])
 
     return HTTPResponse()

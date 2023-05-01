@@ -5,6 +5,6 @@ from src import data
 
 def handle(data: dict):
 
-    r.PrecoRepository.remove_one(data['preco_uuid'])
+    r.PrecoRepository.remove_one(uuid=data['preco_uuid'])
 
     return HTTPResponse()
