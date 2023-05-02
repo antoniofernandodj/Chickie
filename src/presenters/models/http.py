@@ -9,8 +9,8 @@ class HTTPResponse:
     
     def __init__(
             self,
-            status: str,
-            message: str,
+            status: Optional[str] = None,
+            message: Optional[str] = None,
             status_code: Optional[int] = None,
             body: Optional[Union[str, dict]] = None,
             redirect: Optional[str] = None

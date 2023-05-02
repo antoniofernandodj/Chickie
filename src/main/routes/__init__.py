@@ -1,5 +1,10 @@
 from flask import Flask
-from . import loja, usuario, api
+from . import (
+    loja,
+    usuario,
+    api
+)
+
 
 def init_app(app: Flask) -> None:
     app.register_blueprint(loja.bp)

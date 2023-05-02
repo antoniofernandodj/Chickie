@@ -9,7 +9,6 @@ class BaseRepositoryClass:
             item = db.query(cls.model_class) \
                 .filter_by(**kwargs) \
                 .first()
-        
 
             return item
 
@@ -20,7 +19,6 @@ class BaseRepositoryClass:
             items = db.query(cls.model_class) \
                 .filter_by(**kwargs) \
                 .all()
-        
 
             return items
 

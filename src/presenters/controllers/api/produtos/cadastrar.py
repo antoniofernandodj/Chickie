@@ -9,4 +9,4 @@ def handle(dados: dict):
     produto_dados = ProdutoDados.parse_obj(dados)
     result = data.produto.cadastrar(dados=produto_dados)
 
-    return HTTPResponse(**result)
+    return HTTPResponse()

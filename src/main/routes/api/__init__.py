@@ -1,7 +1,10 @@
-from src.presenters import controllers
-from . import pedidos, precos, produtos, categorias
-from flask import (Blueprint, render_template, redirect,
-                   flash, request)
+from flask import Blueprint
+from . import (
+    pedidos,
+    precos,
+    produtos,
+    categorias
+)
 
 
 bp = Blueprint('api', __name__, url_prefix='/api/')

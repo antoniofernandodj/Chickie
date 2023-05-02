@@ -9,4 +9,4 @@ def handle(dados: dict):
     preco_dados = PrecoDados.parse_obj(dados)
     result = data.preco.cadastrar(dados=preco_dados)
 
-    return HTTPResponse(**result)
+    return HTTPResponse()

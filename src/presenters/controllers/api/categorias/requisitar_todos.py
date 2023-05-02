@@ -1,11 +1,12 @@
-from src.infra.database import repository as r
-from src.infra.database import entities as e
 from src.presenters.models.http import HTTPResponse
+from src.infra.database import repository as r
 
 
 def handle(data: dict):
-    
-    categorias = r.CategoriaRepository.find_all(loja_uuid=data['loja_uuid'])
 
-    return HTTPResponse(body=categorias, status='success',
-                        message='Categorias encontradas com sucesso')
+    loja_uuid = data.get('loja_uuid')
+    if loja_uuid:
+        categorias = r.CategoriaRepository.find_all(loja_uuid=loja_uuid)
+        return HTTPResponse(body=categorias)
+
+    return HTTPResponse()

@@ -1,10 +1,13 @@
-from src.data.schema import PedidoDados, ItemDePedidoDados
 from src.presenters.models.http import HTTPResponse
 from src.infra.database import repository as r
 from src import data
 
+
 def handle(data: dict):
 
-    produtos = r.ProdutoRepository.find_all(empresa_uuid=data['empresa_uuid'])
-
-    return HTTPResponse(body=produtos)
+    loja_uuid = data.get('loja_uuid')
+    if loja_uuid:
+        produtos = r.ProdutoRepository.find_all(loja_uuid=loja_uuid)
+        return HTTPResponse(body=produtos)
+    
+    return HTTPResponse()

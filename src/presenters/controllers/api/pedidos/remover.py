@@ -5,6 +5,6 @@ from src import data
 
 def handle(data: dict):
 
-    r.PedidoRepository.remove_one(uuid=data['pedido_uuid'])
+    r.PedidoRepository.remove_one(uuid=data['uuid'])
 
     return HTTPResponse()
