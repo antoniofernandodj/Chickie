@@ -1,13 +1,15 @@
+from src.lib import auth
 from src.presenters import controllers
-from flask import (Blueprint, render_template, redirect,
-                   flash, request)
-
-from src.main.routes.usuario import (
-    auth, home
-)
+from flask import (Blueprint, render_template, make_response)
 
 
-bp = Blueprint('usuario', __name__)
+bp = Blueprint('home', __name__)
 
-bp.register_blueprint(blueprint=auth.bp)
-bp.register_blueprint(blueprint=home.bp)
+@bp.get('/home/')
+@auth.login_required
+def home():
+    
+    pagina = render_template('usuario/home.html')
+    response = make_response(pagina)
+
+    return response

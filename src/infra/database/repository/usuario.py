@@ -14,7 +14,6 @@ class UsuarioRepository(BaseRepositoryClass):
 
         from werkzeug.security import generate_password_hash
 
-        kwargs['uuid'] = uuid4()
         kwargs['password_hash'] = generate_password_hash(
             kwargs['password_hash']
         )

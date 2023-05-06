@@ -26,6 +26,18 @@
           {{ message }}
         </div>
 
+      {% elif category == 'session' %}
+
+        <div class="alert alert-warning" role="alert">
+
+          <button class="btn-close btn-smaller"
+            onclick="this.parentElement.style.display='none';">
+          </button>
+
+          Sua sessao está próxima de expirar. Gostaria de renová-la?
+          <a href="/renew/">Renovar</a>
+        </div>
+
       {% elif category == 'warning' %}
 
 

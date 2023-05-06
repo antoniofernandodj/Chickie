@@ -1,11 +1,11 @@
 from src.infra.database import entities as e
-from src.infra.database import repository as r
+from src.infra.database.repository import UsuarioRepository
 from src.data.schema import UsuarioDados
 
 
 def cadastrar(dados: UsuarioDados) -> dict:
 
-    usuario = r.UsuarioRepository.find_one(nome=dados.nome)
+    usuario = UsuarioRepository.find_one(nome=dados.nome)
 
     if usuario is not None:
         response = {
@@ -23,7 +23,7 @@ def cadastrar(dados: UsuarioDados) -> dict:
 
         return response
     
-    usuario = r.UsuarioRepository.create(
+    usuario = UsuarioRepository.create(
         nome = dados.nome,
         username = dados.username,
         email = dados.email,

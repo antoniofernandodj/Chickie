@@ -1,1 +1,7 @@
-from . import produto, preco, categoria, cliente, auth
+from . import (
+    # produto,
+    # preco,
+    # categoria,
+    # cliente,
+    auth
+)

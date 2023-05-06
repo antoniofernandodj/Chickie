@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet"
-        href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
-    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/libs/axios.min.js') }}"></script>
+    {% include 'base/libs.j2' %}
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport"
@@ -111,9 +109,11 @@
           <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
       
           <div class="form-floating">
-            <input type="email" class="form-control" name="email"
-            id="email" placeholder="name@example.com">
-            <label for="email">Email address</label>
+            <input type="text" class="form-control" name="login"
+            id="login" placeholder="">
+            <label for="email">Login 
+              <span class="text-muted">(Email, username, tel ou cel)<span>
+            </label>
           </div>
           <div class="form-floating">
             <input type="password" class="form-control" name="password"
@@ -127,7 +127,7 @@
               value="1"> Remember me
             </label>
           </div>
-          <button class="w-100 btn btn-lg btn-primary"
+          <button class="w-100 btn btn-lg btn-danger"
             type="submit" >Sign in</button>
         </form>
     </main>

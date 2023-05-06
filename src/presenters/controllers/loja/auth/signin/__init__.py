@@ -21,7 +21,7 @@ def handle(data: dict):
         return response
 
     loja = r.Loja.create(
-        name=data['name'],
+        nome=data['name'],
         email=data['email'],
         password_hash=data['password1'],
     )
