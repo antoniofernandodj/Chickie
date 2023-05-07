@@ -13,4 +13,3 @@ class App(Flask):
         database.config.init_database()
         ext.config.init_app(self)
         routes.init_app(self)
-        ext.auth.init_app(self)

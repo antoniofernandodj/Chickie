@@ -14,10 +14,13 @@ services:
     image: redis
     restart: always
     env_file:
-      - .env
+      - infra.secrets.toml
     command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
     ports:
       - "6379:6379"
 
 volumes:
-  flask-sqlalchemy-postgres:
+  redis-data:
+  postgres-data:

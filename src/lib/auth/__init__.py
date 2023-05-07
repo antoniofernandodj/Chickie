@@ -1,4 +1,3 @@
-from src.infra.database.repository import UsuarioRepository
 from src.infra.cache import get_cache
 from src.lib.auth import classes as c
 from src.lib.auth import erros as e
@@ -47,6 +46,7 @@ def login_data(request):
 
 
 def current_user(request):
+    from src.infra.database.repository import UsuarioRepository
 
     user_data = login_data(request)
     if user_data is None:

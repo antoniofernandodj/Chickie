@@ -1,5 +1,5 @@
 import enum
-from flask_login import UserMixin
+from src.lib.auth.classes import UserMixin
 from src.infra.database.entities import BaseEntityClass
 from src.infra.database.entities import Base
 from .endereco import Endereco
