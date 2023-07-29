@@ -10,7 +10,7 @@ import bcrypt
 
 class UserMixin:
     uuid: str
-    def authenticate(self, user: any, senha_usuario: str):
+    def authenticate(self, user: any, senha_usuario: str) -> bool:
         hash_bytes = base64.b64decode(user.password_hash.encode('utf-8'))
         return bcrypt.checkpw(senha_usuario.encode('utf-8'), hash_bytes)
 
