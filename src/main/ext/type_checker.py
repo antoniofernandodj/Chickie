@@ -15,9 +15,9 @@ def get_error_number(string):
     else:
         return 0
 
-def init_app() -> Union[None, NoReturn]:
+def init_app(args: list[str]) -> Union[None, NoReturn]:
 
-    FILES = ['app.py']
+    FILES = ['asgi.py']
 
     # args = sys.argv
     # args = [item.upper() for item in args]
@@ -29,14 +29,12 @@ def init_app() -> Union[None, NoReturn]:
     # if 'NO-CHECK' in mode:
     #     logging.info(' * Skipping type-checking with mypy')
     #     return None
-
-    if getenv('FLOW_MYENV') == 'development':
-
+    args = [item.upper() for item in args]
+    if '--CHECK-TYPES' in args or '-CT' in args:
         for FILE in FILES:
         
             params = ["mypy", FILE, "--check-untyped-defs"]
             logging.info(' * Checking application typing with untyped def with mypy')
-
             result = subprocess.run(params, capture_output=True)
             with open('mypy.log', 'wb') as logfile:
                 logfile.write(result.stdout)
@@ -49,7 +47,9 @@ def init_app() -> Union[None, NoReturn]:
                     logging.info(linha)
                     
                 sys.exit(-1)
-            logging.info(' * Checking application typing without untyped def with mypy')  
+            logging.info(
+                ' * Checking application typing without untyped def with mypy'
+            )  
             result = subprocess.run(params[:-1], capture_output=True)
             stdout = result.stdout.decode('utf-8')
             logging.info(stdout)
@@ -63,5 +63,3 @@ def init_app() -> Union[None, NoReturn]:
             
             if stdout:
                 logging.info(f' * mypy: {stdout}')
-    
-    return None

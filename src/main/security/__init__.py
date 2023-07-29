@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Optional
 from src.infra.database.repositories import LojaRepository, UsuarioRepository
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -20,12 +20,12 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-async def authenticate_user(username: str, password: str) -> Usuario:
+async def authenticate_user(username: str, password: str) -> Optional[Usuario]:
     async with DatabaseConnectionManager() as connection:
         user_repo = UsuarioRepository(connection=connection)
         user = await user_repo.find_one(username=username)
 
-        if user is None:
+        if user is None or not isinstance(user, Usuario):
             return None
         
         if not user.authenticate(user, password):
@@ -34,12 +34,12 @@ async def authenticate_user(username: str, password: str) -> Usuario:
         return user
     
 
-async def authenticate_company(username: str, password: str) -> Loja:
+async def authenticate_company(username: str, password: str) -> Optional[Loja]:
     async with DatabaseConnectionManager() as connection:
         loja_repo = LojaRepository(connection=connection)
         loja = await loja_repo.find_one(username=username)
 
-        if loja is None:
+        if loja is None or not isinstance(loja, Loja):
             return None
         
         if not loja_repo.authenticate(loja, password):
@@ -90,7 +90,7 @@ async def current_user(
         user_repo = UsuarioRepository(connection=connection)
         user = await user_repo.find_one(username=token_data.username)
     
-    if user is None:
+    if user is None or not isinstance(user, Usuario):
         raise credentials_exception
     
     return user
@@ -98,7 +98,7 @@ async def current_user(
 
 async def current_company(
         token: Annotated[str, Depends(oauth2_scheme)]
-    ) -> Usuario:
+    ) -> Loja:
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -121,7 +121,7 @@ async def current_company(
         loja_repo = LojaRepository(connection=connection)
         loja = await loja_repo.find_one(username=token_data.username)
     
-    if loja is None:
+    if loja is None or not isinstance(loja, Loja):
         raise credentials_exception
     
     return loja

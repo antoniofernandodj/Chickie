@@ -53,11 +53,11 @@ class DatabaseConnectionManager:
             async with pool.acquire() as connection:
                 async with connection.cursor() as cursor:
                     command = f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{name}'"
-                    cursor.execute(command)
+                    await cursor.execute(command)
                     
                     exists = await cursor.fetchone()
                     if exists:
                         name = f"DROP DATABASE {name}"
-                        cursor.execute(name)
+                        await cursor.execute(name)
                     
                     cursor.close()

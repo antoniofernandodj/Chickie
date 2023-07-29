@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 
-def create_app() -> FastAPI:
+def create_app(args: list) -> FastAPI:
 
     app = FastAPI()
     
@@ -9,4 +9,5 @@ def create_app() -> FastAPI:
     from src.main import ext
     routes.init_app(app)
     ext.config.init_app(app)
+    ext.type_checker.init_app(args)
     return app

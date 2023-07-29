@@ -1,4 +1,4 @@
-from src.presenters import controllers
+# from src.presenters import controllers
 from fastapi import APIRouter
 from src.schemas import Categoria
 
