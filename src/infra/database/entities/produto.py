@@ -17,9 +17,5 @@ class Produto(Base, BaseEntityClass):
     uuid = Col(Str(40), primary_key=True)
     nome = Col(Str(70))
     descricao = Col(Text)
-
     categoria_uuid = Col(Str(40), FK('categorias.uuid'))
-    # categoria = rel(Categoria, back_populates='produtos')
-
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    # loja = rel(Loja, back_populates='produtos')

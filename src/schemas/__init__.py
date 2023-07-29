@@ -1,46 +1,10 @@
-from pydantic import BaseModel
-from typing import Optional
-
-
-class Usuario(BaseModel):
-    
-    __tablename__ = 'usuarios'
-    
-    nome: str
-    username: str
-    email: str
-    telefone: str
-    celular: str
-    endereco_uuid: str
-    password: Optional[str] = None
-    password_hash: Optional[str] = None
-    endereco_uuid: Optional[str] = None
-    uuid: Optional[str] = None
-    
-
-class Login(BaseModel):
-    password: str
-    email: Optional[str] = None
-    username: Optional[str] = None
-    
-
-class SignIn(BaseModel):    
-    nome: str
-    username: str
-    email: str
-    telefone: str
-    celular: str
-    endereco_uuid: str
-    password: str
-    endereco_uuid: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
+from .categoria import Categoria
+from .item_pedido import ItemPedido
+from .login import Login
+from .loja import Loja
+from .pedido import Pedido
+from .preco import Preco
+from .produto import Produto
+from .signin import SignIn
+from .token import Token, TokenData
+from .usuario import Usuario

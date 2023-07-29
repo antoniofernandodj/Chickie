@@ -1,9 +1,12 @@
-from dataclasses import dataclass
-from src.infra.database import entities as e
+import asyncio
+from src.schemas import Preco
 from src.infra.database.repositories import BaseRepositoryClass
 
 
-@dataclass
 class PrecoRepository(BaseRepositoryClass):
 
-    model_class = e.Preco
+    def __init__(self, connection):
+        super().__init__(connection=connection)
+        self.__tablename__ = 'precos'
+        self.lock = asyncio.Lock()
+        self.model = Preco

@@ -1,4 +1,3 @@
-import enum
 from src.infra.database.entities import BaseEntityClass
 from src.infra.database.entities import Base, Loja
 from typing import Optional
@@ -17,10 +16,7 @@ class Pedido(Base, BaseEntityClass):
     data_hora = Col(DateTime, default=datetime.utcnow)
     status = Col(Str(50))
     frete = Col(Float)
-
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    # loja = rel(Loja, back_populates='produtos')
-
     endereco = Col(Str(40), FK('enderecos.uuid'))
 
     @property

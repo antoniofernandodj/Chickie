@@ -1,9 +1,12 @@
-from dataclasses import dataclass
-from src.infra.database import entities as e
+import asyncio
+from src.schemas import Pedido
 from src.infra.database.repositories import BaseRepositoryClass
 
 
-@dataclass
 class PedidoRepository(BaseRepositoryClass):
 
-    model_class = e.Pedido
+    def __init__(self, connection):
+        super().__init__(connection=connection)
+        self.__tablename__ = 'pedidos'
+        self.lock = asyncio.Lock()
+        self.model = Pedido

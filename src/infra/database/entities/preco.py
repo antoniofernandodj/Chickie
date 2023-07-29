@@ -27,5 +27,3 @@ class Preco(Base, BaseEntityClass):
     produto_uuid = Col(Str(40), FK('produtos.uuid'))
     valor = Col(Float)
     dia_da_semana = Col(Enum(DiasDaSemana))
-
-

@@ -16,8 +16,6 @@ from config import settings as s
 
 
 router = APIRouter(prefix='')
-
-
 current_user = Annotated[Usuario, Depends(security.current_user)]
 
 

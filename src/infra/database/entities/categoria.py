@@ -8,11 +8,7 @@ from sqlalchemy.types import (
 
 class Categoria(Base, BaseEntityClass):
     __tablename__ = 'categorias'
-
     uuid = Col(Str(40), primary_key=True)
     nome = Col(Str(40))
-
     descricao = Col(Text)
-
     loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    # loja = rel(Loja, back_populates='produtos')
