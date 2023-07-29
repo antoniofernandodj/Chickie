@@ -54,12 +54,14 @@ class CacheInterface(abc.ABC):
         pass
 
 
-cache: CacheInterface
-
-
 class RedisCache(CacheInterface):
     def __init__(self, host: str, port: int, db: int):
-        self.redis_db = redis.Redis(host=host, port=port, db=db, password=s.REDIS_PASSWORD)
+        self.redis_db = redis.Redis(
+            host=host,
+            port=port,
+            db=db,
+            password=s.REDIS_PASSWORD
+        )
         self.redis_db.config_set('maxmemory-policy', 'allkeys-lru')
         self.__port = port
         self.__host = host
@@ -139,36 +141,6 @@ def get_cache() -> RedisCache:
         db=s.REDIS_DB
     )
     cache['hello'] = 'world'
-    # print('Redis inicializado')
 
 
     return cache
-
-
-def cached_function(
-        function: Callable[..., T],
-        cache_time: Optional[int] = None,
-        **kwargs
-    ) -> T:
-
-    cached: T
-    cache = get_cache()
-    start_time = time.perf_counter()
-    
-    key = cache.get_function_key(function=function, **kwargs)
-    cached = cache[key]
-    
-    if cached is not None:
-        # print("cached!")
-        tf = f'{time.perf_counter() - start_time:.4f}'
-        # print(f'Requisição {function.__name__} levou {tf} segundos')
-        return cached
-
-    result: T = function(**kwargs)
-    # print("Not cached!")
-
-    cache[key, cache_time] = result
-
-    tf = f"{time.perf_counter() - start_time:.4f}"
-    print(f"Requisição {function.__name__} levou {tf} segundos")
-    return result

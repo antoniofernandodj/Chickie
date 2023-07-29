@@ -1,11 +1,12 @@
 import asyncio
-from src.schemas import Usuario, SignIn
-from src.infra.database.repositories import BaseRepositoryClass
+from src.schemas import Usuario, UsuarioSignIn
+from src.infra.database.repositories import BaseRepositoryClass, UserMixin
 import base64
 import bcrypt
 
 
-class UsuarioRepository(BaseRepositoryClass):
+
+class UsuarioRepository(BaseRepositoryClass, UserMixin):
 
     def __init__(self, connection):
         super().__init__(connection=connection)
@@ -13,7 +14,7 @@ class UsuarioRepository(BaseRepositoryClass):
         self.lock = asyncio.Lock()
         self.model = Usuario
         
-    async def register(self, user_data: SignIn):
+    async def register(self, user_data: UsuarioSignIn):
         salt = bcrypt.gensalt()
         password: str = user_data.password
         user_data_dict = user_data.model_dump()
@@ -25,7 +26,3 @@ class UsuarioRepository(BaseRepositoryClass):
         del user_data
         
         return await self.save(user)
-        
-    def authenticate(self, user: Usuario, senha_usuario: str):
-        hash_bytes = base64.b64decode(user.password_hash.encode('utf-8'))
-        return bcrypt.checkpw(senha_usuario.encode('utf-8'), hash_bytes)

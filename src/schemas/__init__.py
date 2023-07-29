@@ -5,6 +5,6 @@ from .loja import Loja
 from .pedido import Pedido
 from .preco import Preco
 from .produto import Produto
-from .signin import SignIn
+from .signin import UsuarioSignIn, LojaSignIn
 from .token import Token, TokenData
 from .usuario import Usuario

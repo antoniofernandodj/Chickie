@@ -4,6 +4,14 @@ from typing import Type, List, Optional
 from uuid import uuid4
 from asyncio import Lock
 from pydantic import BaseModel
+import base64
+import bcrypt
+
+
+class UserMixin:
+    def authenticate(self, user: any, senha_usuario: str):
+        hash_bytes = base64.b64decode(user.password_hash.encode('utf-8'))
+        return bcrypt.checkpw(senha_usuario.encode('utf-8'), hash_bytes)
 
 
 class BaseRepositoryClass:
@@ -143,7 +151,9 @@ class BaseRepositoryClass:
         """
         async with self.lock:
             cursor = await self.connection.cursor()
-            set_clause = ', '.join([f'{column} = %s' for column in data.keys()])
+            set_clause = ', '.join(
+                [f'{column} = %s' for column in data.keys()]
+            )
             values = list(data.values())
             query = f"UPDATE {self.__tablename__} SET {set_clause} WHERE uuid = '{item.uuid}';"
             logging.info(f'Command: {query} {values}')

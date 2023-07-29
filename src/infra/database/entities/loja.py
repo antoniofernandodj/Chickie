@@ -20,10 +20,6 @@ class LojaNaoEncontradaException(Exception):
 class UsuarioJaVinculadoException(Exception):
     pass
 
-class Grupo(enum.Enum):
-    ADMIN = enum.auto()
-    SUPERVISOR = enum.auto()
-
 class Loja(Base, BaseEntityClass, UserMixin):
     
     __tablename__ = 'lojas'
@@ -36,8 +32,6 @@ class Loja(Base, BaseEntityClass, UserMixin):
     celular = Col(Str(50))
     password_hash = Col(Text)
     
-    grupo = Col(Enum(Grupo))
-
     def vincular_comprador(self, comprador: Usuario):
         from src.infra.database import entities as e
 

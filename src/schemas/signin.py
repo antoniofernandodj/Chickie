@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 
-class SignIn(BaseModel):    
+class UsuarioSignIn(BaseModel):    
     nome: str
     username: str
     email: str
@@ -12,3 +12,13 @@ class SignIn(BaseModel):
     endereco_uuid: str
     password: str
     endereco_uuid: str
+
+
+
+class LojaSignIn(BaseModel):    
+    nome: str
+    username: str
+    email: str
+    telefone: str
+    celular: str
+    password: str

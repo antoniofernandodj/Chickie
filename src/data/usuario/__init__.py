@@ -29,8 +29,7 @@ def cadastrar(dados: UsuarioDados) -> dict:
         email = dados.email,
         telefone = dados.telefone,
         celular = dados.celular,
-        password_hash = dados.password2,
-        grupo = dados.grupo
+        password_hash = dados.password2
     )
 
     response = {

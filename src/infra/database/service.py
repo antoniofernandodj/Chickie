@@ -1,11 +1,9 @@
 from config import settings as s
 import aiopg
-import psycopg2
-import asyncio
 
 
 
-class DatabaseService:
+class DatabaseConnectionManager:
     
     CONNECTION_STRING_DB = 'dbname={0} user={1} password={2} host={3}'.format(
         s.POSTGRES_DATABASE_DEV,

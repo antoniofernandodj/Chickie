@@ -11,6 +11,5 @@ class Loja(BaseModel):
     celular: str
     password_hash: str
     password: str
-    grupo: str
         
     uuid: Optional[str] = None

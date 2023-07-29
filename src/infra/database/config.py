@@ -1,6 +1,6 @@
 from sqlalchemy.engine import create_engine
 from config import settings as s
-from src.infra.database.service import DatabaseService
+from src.infra.database.service import DatabaseConnectionManager
 from sqlalchemy.orm.session import sessionmaker
 from time import sleep
 
@@ -17,8 +17,12 @@ engine = create_engine(database_url)
 async def init_database():
     from src.infra.database.entities import Base
     
-    await DatabaseService.create_database(name=s.POSTGRES_DATABASE_PROD)
-    await DatabaseService.create_database(name=s.POSTGRES_DATABASE_DEV)
+    # await DatabaseConnectionManager.create_database(
+    #     name=s.POSTGRES_DATABASE_PROD
+    # )
+    await DatabaseConnectionManager.create_database(
+        name=s.POSTGRES_DATABASE_DEV
+    )
 
 def get_db():
     while True:
@@ -27,4 +31,3 @@ def get_db():
             return Session()
         except:
             sleep(5)
-        

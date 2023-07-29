@@ -11,4 +11,3 @@ class UsuarioDados(BaseModel):
     celular: str
     password1: str
     password2: str
-    grupo: str
