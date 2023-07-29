@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Union, Optional
-from flask.wrappers import Response as FlaskResponse
+
 from urllib.parse import parse_qs
 
 
@@ -35,10 +35,11 @@ class HTTPResponse:
     def __repr__(self) -> str:
         return f'{type(self).__name__}(status={self.status})'
     
-    def to_flask(self) -> FlaskResponse:
+    def to_flask(self):
         """
         Converte a resposta HTTP em um objeto FlaskResponse.
         """
+        from flask.wrappers import Response as FlaskResponse
         from flask import jsonify, make_response, redirect
 
         if self.redirect:

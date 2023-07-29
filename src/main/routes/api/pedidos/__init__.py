@@ -1,19 +1,19 @@
 from copy import copy
 from src.presenters import controllers
-from flask import Blueprint, request
+from fastapi import APIRouter
 
 
-bp = Blueprint('pedidos', __name__, url_prefix='/pedidos/')
+router = APIRouter(prefix='/pedidos')
 
 
-@bp.get('/')
+@router.get('/')
 def requisitar_pedidos():
     data = copy(request.json)
     response = controllers.api.pedidos.requisitar_todos.handle(data=data)
     return response
 
 
-@bp.get('/<string:uuid>')
+@router.get('/<string:uuid>')
 def requisitar_pedido(uuid):
     data = copy(request.json)
     data['uuid'] = uuid
@@ -21,14 +21,14 @@ def requisitar_pedido(uuid):
     return response
 
 
-@bp.post('/')
+@router.post('/')
 def cadastrar_pedidos():
     data = copy(request.json)
     response = controllers.api.pedidos.cadastrar.handle(data=data)
     return response
 
 
-@bp.patch('/<string:uuid>')
+@router.patch('/<string:uuid>')
 def atualizar_pedido(uuid):
 
     data = copy(request.json)
@@ -45,7 +45,7 @@ def atualizar_pedido(uuid):
     return {}, 400
 
 
-@bp.delete('/<string:uuid>')
+@router.delete('/<string:uuid>')
 def remover_pedido(uuid):
     data = copy(request.json)
     data['uuid'] = uuid

@@ -1,4 +1,5 @@
-from flask import Blueprint
+from fastapi import APIRouter
+
 from . import (
     pedidos,
     precos,
@@ -7,10 +8,10 @@ from . import (
 )
 
 
-bp = Blueprint('api', __name__, url_prefix='/api/')
+router = APIRouter(prefix='')
 
 
-bp.register_blueprint(blueprint=pedidos.bp)
-bp.register_blueprint(blueprint=precos.bp)
-bp.register_blueprint(blueprint=produtos.bp)
-bp.register_blueprint(blueprint=categorias.bp)
+router.include_router(pedidos.router)
+router.include_router(precos.router)
+router.include_router(produtos.router)
+router.include_router(categorias.router)

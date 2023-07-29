@@ -131,83 +131,17 @@ class RedisCache(CacheInterface):
             self.delete(key)
 
 
-class FlaskCache(CacheInterface):
-    def __init__(self):
-        from src.extensions.cache import cache
-        self.cache = cache
-        self.get_function_key = get_function_key
+def get_cache() -> RedisCache:
 
-    def __str__(self):
-        return f'{type(self).__name__}(data={list(self.dict().keys())})'
+    cache = RedisCache(
+        host=s.REDIS_HOST,
+        port=s.REDIS_PORT,
+        db=s.REDIS_DB
+    )
+    cache['hello'] = 'world'
+    # print('Redis inicializado')
 
-    def __getitem__(self, key: str) -> Any:
 
-        try:
-            print('Retornando cache do flask-cache')
-            item = self.cache.get(key)
-            return item
-        except:
-            return None
-    
-    def __setitem__(self, key: str, value: Any):
-
-        print('Atribuindo valor ao flask-cache')
-
-        try:
-            if isinstance(key, tuple):
-                key_ttl = key[1]
-                key_name = key[0]
-                self.cache.set(key_name, value, timeout=key_ttl)
-
-            else:
-                self.cache.set(key, value, timeout=s.CACHE_DEFAULT_TIMEOUT)
-
-        except:
-            pass
-
-    def store_dict(self, data: dict):
-        print('Armazenando dicionario ao flask-cache')
-
-        for key, value in data.items():
-            self.cache[key] = value
-
-    def dict(self) -> dict:
-        print('Retornando dicionario do flask-cache')
-        keys = self.cache.cache._cache.keys()
-        data = {}
-        for key in keys:
-            value = self.cache.get(key)
-            data[key] = value
-
-        return data
-
-    def delete(self, key: str) -> None:
-        self.cache[key] = None
-
-    def clear(self) -> None:
-        self.cache.clear()
-
-  
-def get_cache() -> Union[RedisCache, FlaskCache]:
-
-    try:
-        cache = RedisCache(
-            host=s.REDIS_HOST,
-            port=s.REDIS_PORT,
-            db=s.REDIS_DB
-        )
-        cache['hello'] = 'world'
-        # print('Redis inicializado')
-
-    except (redis.exceptions.ConnectionError, NameError) as e:
-        print(e)
-        try:
-            cache = FlaskCache()
-            cache['hello'] = 'world'
-            print('Flask cache inicializado')
-        except:
-            raise RuntimeError('Nenhum cache encontrado')
-        
     return cache
 
 

@@ -1,5 +1,5 @@
 from src.presenters.models.http import HTTPResponse
-from src.infra.database import repository as r
+from src.infra.database import repositories as r
 from src import data
 
 

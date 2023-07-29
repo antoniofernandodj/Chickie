@@ -1,5 +1,5 @@
 from src.infra.database.entities import Usuario
-from src.infra.database.repository import UsuarioRepository
+from src.infra.database.repositories import UsuarioRepository
 
 user_data_1 = {
     'uuid': 'test-uuid-1',

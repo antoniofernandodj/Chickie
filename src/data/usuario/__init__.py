@@ -1,5 +1,5 @@
 from src.infra.database import entities as e
-from src.infra.database.repository import UsuarioRepository
+from src.infra.database.repositories import UsuarioRepository
 from src.data.schema import UsuarioDados
 
 

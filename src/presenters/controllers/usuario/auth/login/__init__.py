@@ -1,11 +1,7 @@
 from src.lib import auth
-from src.infra.database.repository import UsuarioRepository
+from src.infra.database.repositories import UsuarioRepository
 from src.presenters.models.http import HTTPResponse
 from config import settings as s
-
-from werkzeug.security import (
-    check_password_hash as check_hash,
-)
 
 
 def handle(data: dict):
@@ -28,6 +24,11 @@ def handle(data: dict):
         )
 
         return None, response
+
+    from werkzeug.security import (
+        check_password_hash as check_hash,
+    )
+
     
     valid_credentials = check_hash(
         pwhash=user.password_hash,

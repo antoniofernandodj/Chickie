@@ -1,10 +1,7 @@
 from src.lib.auth import login_user
-from src.infra.database import repository as r
+from src.infra.database import repositories as r
 from src.presenters.models.http import HTTPResponse
 
-from werkzeug.security import (
-    check_password_hash as check_hash,
-)
 
 
 def handle(data: dict):
@@ -21,6 +18,11 @@ def handle(data: dict):
         )
 
         return response
+    
+
+    from werkzeug.security import (
+        check_password_hash as check_hash,
+    )
     
     valid_credentials = check_hash(
         loja.password_hash,

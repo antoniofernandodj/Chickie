@@ -1,12 +1,10 @@
-from flask import Flask
+from fastapi import FastAPI
 from . import (
-    loja,
-    usuario,
-    api
+    api,
+    auth
 )
 
 
-def init_app(app: Flask) -> None:
-    app.register_blueprint(loja.bp)
-    app.register_blueprint(usuario.bp)
-    app.register_blueprint(api.bp)
+def init_app(app: FastAPI) -> None:
+    # app.include_router(api.router)
+    app.include_router(auth.router)

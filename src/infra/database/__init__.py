@@ -1,1 +1,1 @@
-from . import config, session, entities, repository
+from . import config, session, entities, repositories

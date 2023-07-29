@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  postgres:
+  database:
     image: postgres
     volumes:
       - ~/volumes/flask-sqlalchemy-postgres:/var/lib/postgresql/data
@@ -15,12 +15,13 @@ services:
     restart: always
     env_file:
       - infra.secrets.toml
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
-      - redis-data:/data
+      - cache:/data
+      - ./config/redis.secrets.conf:/usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
 
 volumes:
-  redis-data:
+  cache:
   postgres-data:

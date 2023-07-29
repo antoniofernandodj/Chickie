@@ -1,3 +1,9 @@
+[default]
 CACHE_DEFAULT_TIMEOUT = 1800
-SESSION_TIME = 70
-LOGIN_URL = '/login/'
+MODE = 'local'
+
+[dev]
+MODE = 'dev'
+
+[prod]
+MODE = 'prod'

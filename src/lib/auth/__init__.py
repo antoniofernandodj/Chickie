@@ -4,7 +4,6 @@ from src.lib.auth import erros as e
 from src.lib import security
 from datetime import datetime, timedelta
 from config import settings as s
-from flask import request
 from contextlib import suppress
 import functools
 import json
@@ -46,7 +45,7 @@ def login_data(request):
 
 
 def current_user(request):
-    from src.infra.database.repository import UsuarioRepository
+    from src.infra.database.repositories import UsuarioRepository
 
     user_data = login_data(request)
     if user_data is None:
@@ -105,36 +104,36 @@ def logout_user(user):
     print('logout realizado com sucesso!')
 
 
-def login_required(f):
-    from flask import redirect, flash
+# def login_required(f):
+#     from flask import redirect, flash
 
-    functools.wraps(f)
-    def decorator(*a, **kw):
-        data = login_data(request)
-        if data is None:
-            response = redirect(s.LOGIN_URL)
-            return response
+#     functools.wraps(f)
+#     def decorator(*a, **kw):
+#         data = login_data(request)
+#         if data is None:
+#             response = redirect(s.LOGIN_URL)
+#             return response
 
-        login_time = datetime.fromisoformat(data['time'])
-        expire_time: datetime = data['expire_time']
-        expire_td = timedelta(seconds=expire_time)
+#         login_time = datetime.fromisoformat(data['time'])
+#         expire_time: datetime = data['expire_time']
+#         expire_td = timedelta(seconds=expire_time)
 
-        now = datetime.utcnow()
-        if now > login_time + expire_td:
-            response = redirect(s.LOGIN_URL)
-            return response
+#         now = datetime.utcnow()
+#         if now > login_time + expire_td:
+#             response = redirect(s.LOGIN_URL)
+#             return response
         
-        remaining_time = login_time + expire_td - now
-        if remaining_time <= timedelta(minutes=1):
-            flash('', category='session')
+#         remaining_time = login_time + expire_td - now
+#         if remaining_time <= timedelta(minutes=1):
+#             flash('', category='session')
         
-        usuario = current_user(request)
-        if usuario:
-            response = f(*a, **kw)
+#         usuario = current_user(request)
+#         if usuario:
+#             response = f(*a, **kw)
 
-        else:
-            response = redirect(s.LOGIN_URL)
+#         else:
+#             response = redirect(s.LOGIN_URL)
 
-        return response
+#         return response
     
-    return decorator
+#     return decorator
