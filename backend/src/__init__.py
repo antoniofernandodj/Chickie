@@ -10,4 +10,5 @@ def create_app(args: list) -> FastAPI:
     routes.init_app(app)
     ext.config.init_app(app)
     ext.type_checker.init_app(args)
+    ext.middlewares.init_app(app)
     return app

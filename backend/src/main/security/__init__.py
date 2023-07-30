@@ -20,7 +20,11 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-async def authenticate_user(username: str, password: str) -> Optional[Usuario]:
+async def authenticate_user(
+        username: str,
+        password: str
+    ) -> Optional[Usuario]:
+
     async with DatabaseConnectionManager() as connection:
         user_repo = UsuarioRepository(connection=connection)
         user = await user_repo.find_one(username=username)
@@ -28,13 +32,17 @@ async def authenticate_user(username: str, password: str) -> Optional[Usuario]:
         if user is None or not isinstance(user, Usuario):
             return None
         
-        if not user.authenticate(user, password):
+        if not user_repo.authenticate(user, password):
             return None
         
         return user
     
 
-async def authenticate_company(username: str, password: str) -> Optional[Loja]:
+async def authenticate_company(
+        username: str,
+        password: str
+    ) -> Optional[Loja]:
+    
     async with DatabaseConnectionManager() as connection:
         loja_repo = LojaRepository(connection=connection)
         loja = await loja_repo.find_one(username=username)

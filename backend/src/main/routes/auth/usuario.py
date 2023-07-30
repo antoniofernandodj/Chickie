@@ -1,19 +1,20 @@
 # from src.presenters import controllers
-from fastapi.routing import APIRouter
-from fastapi import Depends
 from datetime import timedelta
+from typing import Any, Annotated
+
+from fastapi import Depends, HTTPException, status
+from fastapi.routing import APIRouter
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.exceptions import HTTPException
+from fastapi.requests import Request
+
 from src.main import security
 from src.infra.database.repositories import UsuarioRepository
-from src.schemas import Usuario
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from src.infra.database.config import DatabaseConnectionManager
-from pydantic import BaseModel
-from fastapi.exceptions import HTTPException
-from fastapi import Depends, FastAPI, HTTPException, status
-from typing import Optional, Any
-from src.schemas import Login, Token, UsuarioSignIn
-from typing import Annotated
+from src.schemas import Usuario
+from src.schemas import Token, UsuarioSignIn
 from config import settings as s
+
 
 
 router = APIRouter(
@@ -25,12 +26,14 @@ current_user = Annotated[Usuario, Depends(security.current_user)]
 
 @router.post('/login', response_model=Token)
 async def login_post(
+        request: Request,
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
     ) -> Any:
     
     user = await security.authenticate_user(
         form_data.username, form_data.password
     )
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
