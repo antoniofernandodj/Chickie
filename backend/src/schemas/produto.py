@@ -6,7 +6,7 @@ from datetime import datetime
 class Produto(BaseModel):
     nome: str
     descricao: str
-    categoria_uuid: str
+    categoria_de_produto_uuid: str
     loja_uuid: str
     uuid: Optional[str] = None
 

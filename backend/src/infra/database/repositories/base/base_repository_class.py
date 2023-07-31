@@ -1,4 +1,5 @@
 from aiopg import Connection
+from src.schemas import Model, ModelInstance
 import logging
 from typing import Type, List, Optional
 from uuid import uuid4
@@ -35,11 +36,11 @@ class BaseRepositoryClass:
             connection (Connection): The aiopg Connection to the database.
         """
         self.connection = connection
-        self.model: Type
+        self.model: Model
         self.lock: Lock
         self.__tablename__: str
 
-    async def find_one(self, **kwargs) -> Optional[Type]:
+    async def find_one(self, **kwargs) -> Optional[ModelInstance]:
         """
         Find a single record in the database based on the provided filters.
 
@@ -74,7 +75,7 @@ class BaseRepositoryClass:
             
             cursor.close()
 
-    async def find_all(self, **kwargs) -> List:
+    async def find_all(self, **kwargs) -> List[ModelInstance]:
         """
         Find all records in the database based on the provided filters.
 
@@ -110,7 +111,7 @@ class BaseRepositoryClass:
                 
             return response
 
-    async def save(self, pydantic_model: BaseModel):
+    async def save(self, pydantic_model: ModelInstance):
         """
         Save a new record or update an existing record in the database.
 
@@ -137,7 +138,7 @@ class BaseRepositoryClass:
             cursor.close()
             return kwargs['uuid']
 
-    async def update(self, item: object, data: dict={}):
+    async def update(self, item: ModelInstance, data: dict={}):
         """
         Update the existing item in the database based on the provided data.
 
@@ -163,7 +164,7 @@ class BaseRepositoryClass:
             cursor.close()
             return num_rows_affected
 
-    async def delete(self, item: object):
+    async def delete(self, item: ModelInstance):
         """
         Delete a record from the database based on the provided item.
 
@@ -176,6 +177,27 @@ class BaseRepositoryClass:
         async with self.lock:
             cursor = await self.connection.cursor()
             uuid = item.uuid
+            query = f'DELETE FROM {self.__tablename__} WHERE uuid = %s;'
+            logging.debug(f'Query: {query} {uuid}\n')
+            await cursor.execute(query, (uuid,))
+
+            num_rows_affected = cursor.rowcount
+
+            cursor.close()
+            return num_rows_affected
+
+    async def delete_from_uuid(self, uuid):
+        """
+        Delete a record from the database based on the provided item.
+
+        Args:
+            item (object): The model instance with the UUID of the row to delete.
+
+        Returns:
+            int: The number of rows affected by the delete operation (1 if successful, 0 if no record found).
+        """
+        async with self.lock:
+            cursor = await self.connection.cursor()
             query = f'DELETE FROM {self.__tablename__} WHERE uuid = %s;'
             logging.debug(f'Query: {query} {uuid}\n')
             await cursor.execute(query, (uuid,))

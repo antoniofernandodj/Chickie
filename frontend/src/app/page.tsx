@@ -2,6 +2,7 @@
 import Image from 'next/image'
 import axios from 'axios'
 
+
 export async function getData() {
 
   let formData = new FormData();

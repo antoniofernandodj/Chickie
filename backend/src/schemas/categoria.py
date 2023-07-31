@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 
-class Categoria(BaseModel):
+class CategoriaProdutos(BaseModel):
     nome: str
     descricao: str
     loja_uuid: str

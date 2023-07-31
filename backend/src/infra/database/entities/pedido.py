@@ -7,17 +7,26 @@ from datetime import datetime
 from sqlalchemy.types import (
     Integer as Int, Float, String as Str, Text, Enum, DateTime
 )
+import enum
+
+class StatusPedido(enum.Enum):
+    Pendente = 'Pendente'
+    Pago = 'Pago'
+    EmEnvio = 'EmEnvio'
+    Entregue = 'Entregue'
+    Cancelado = 'Cancelado'
 
 
 class Pedido(Base, BaseEntityClass):
     __tablename__ = 'pedidos'
 
-    uuid = Col(Str(40), primary_key=True)
+    uuid = Col(Str(36), primary_key=True)
     data_hora = Col(DateTime, default=datetime.utcnow)
-    status = Col(Str(50))
+    status = Col(Enum(StatusPedido))
     frete = Col(Float)
-    loja_uuid = Col(Str(40), FK('lojas.uuid'))
-    endereco = Col(Str(40), FK('enderecos.uuid'))
+    loja_uuid = Col(Str(36), FK('lojas.uuid'))
+    endereco_uuid = Col(Str(36), FK('enderecos.uuid'))
+    timestamp = Col(Float)
 
     @property
     def total(self):

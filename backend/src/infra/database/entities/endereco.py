@@ -3,7 +3,7 @@ from src.infra.database.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 import enum
 from sqlalchemy.types import (
-    Integer as Int, String as Str, Text, Enum
+    Integer as Int, String as Str, Text, Enum, Float
 )
 
 
@@ -49,3 +49,4 @@ class Endereco(Base, BaseEntityClass):
     complemento = Col(Str(50))
     bairro = Col(Text)
     cep = Col(Str(50))
+    timestamp = Col(Float)

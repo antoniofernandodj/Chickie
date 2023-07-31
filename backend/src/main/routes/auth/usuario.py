@@ -44,7 +44,11 @@ async def login_post(
     access_token = security.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "uuid": user.uuid
+    }
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)

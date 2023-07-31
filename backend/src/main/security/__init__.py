@@ -96,7 +96,9 @@ async def current_user(
     
     async with DatabaseConnectionManager() as connection:
         user_repo = UsuarioRepository(connection=connection)
-        user = await user_repo.find_one(username=token_data.username)
+        user = await user_repo.find_one(
+            username=token_data.username
+        )
     
     if user is None or not isinstance(user, Usuario):
         raise credentials_exception
@@ -127,7 +129,9 @@ async def current_company(
     
     async with DatabaseConnectionManager() as connection:
         loja_repo = LojaRepository(connection=connection)
-        loja = await loja_repo.find_one(username=token_data.username)
+        loja = await loja_repo.find_one(
+            username=token_data.username
+        )
     
     if loja is None or not isinstance(loja, Loja):
         raise credentials_exception
