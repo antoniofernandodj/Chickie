@@ -1,6 +1,6 @@
 from sqlalchemy import (
-    Column as Col, Integer, String,
-    Date, ForeignKey, Float, Text
+    Column as Col, String,
+    ForeignKey, Float, Text
 )
 from src.infra.database.entities import Base
 

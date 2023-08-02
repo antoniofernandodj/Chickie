@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column as Col, Integer, String, Text, Float, ForeignKey
+    Column as Col, String, Text, Float, ForeignKey
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship

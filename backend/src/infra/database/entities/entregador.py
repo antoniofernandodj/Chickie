@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column as Col, Integer, String, Text, Float, ForeignKey
+    Column as Col, Integer, String, Float, ForeignKey
 )
 from sqlalchemy.orm import relationship
 from src.infra.database.entities import Base

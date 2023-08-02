@@ -1,10 +1,15 @@
 import axios from 'axios'
 import { SyntheticEvent, useRef } from 'react'
 import { useRouter } from 'next/router';
+import { NextPage } from 'next';
+import { RootState } from '../../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { storeToken } from '../../reducers/storeToken';
 
 
-
-export default function Page() {
+const Page: NextPage = () => {
+  const auth = useSelector((state: RootState) => state.tokenStore.value);
+  const dispatch = useDispatch();
 
   let router = useRouter()
   let inputEmail = useRef<HTMLInputElement>(null);
@@ -20,6 +25,10 @@ export default function Page() {
         }
         let response = await axios.post('/api/login', data)
         if (response.status == 200) {
+          console.log(response.data)
+          const token = response.data.access_token
+          dispatch(storeToken(token))
+          console.log(`stored: ${token}`)
           router.push(`/home/${response.data.uuid}`)
         }
       } catch (error) {
@@ -62,3 +71,5 @@ export default function Page() {
     </main>
   )
 }
+
+export default Page;

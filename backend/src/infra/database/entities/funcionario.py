@@ -1,9 +1,7 @@
 from sqlalchemy import (
-    Column as Col, Integer, String, Boolean, DateTime, Float
+    Column as Col, ForeignKey,
+    String, Float
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship
 from src.infra.database.entities import Base
 
 

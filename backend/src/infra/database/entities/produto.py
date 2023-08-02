@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy.orm import relationship as rel
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from sqlalchemy.types import (
-    Integer as Int, Float, String as Str, Text, Enum
+    Float, String as Str, Text
 )
 
 class Produto(Base, BaseEntityClass):

@@ -1,11 +1,9 @@
 import enum
-from src.infra.database.entities import BaseEntityClass
-from src.infra.database.entities import Base, Loja
-from sqlalchemy.orm import relationship as rel
+from src.infra.database.entities import BaseEntityClass, Base
 from typing import Optional
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from sqlalchemy.types import (
-    Integer as Int, Float, String as Str, Text, Enum
+    Float, String as Str, Enum
 )
 
 

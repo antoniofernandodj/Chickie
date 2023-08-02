@@ -1,11 +1,9 @@
-from src.infra.database.entities import BaseEntityClass
-from src.infra.database.entities import Base, Loja
-from typing import Optional
+from src.infra.database.entities import BaseEntityClass, Base
 from sqlalchemy.orm import relationship as rel
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from datetime import datetime
 from sqlalchemy.types import (
-    Integer as Int, Float, String as Str, Text, Enum, DateTime
+    Float, String as Str, Enum, DateTime
 )
 import enum
 

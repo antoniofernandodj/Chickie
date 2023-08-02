@@ -1,12 +1,16 @@
 // store.js
 
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './authSlice';
+import authReducer from './reducers/storeToken';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    tokenStore: authReducer,
   },
 });
 
-export default store;
+export type RootState = ReturnType<typeof store.getState>
+// type RootState = {
+//   tokenStore: TokenState;
+// }
+export type AppDispatch = typeof store.dispatch

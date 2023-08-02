@@ -1,14 +1,10 @@
-import enum
 from src.lib.auth.classes import UserMixin
 from src.infra.database.entities import BaseEntityClass
 from src.infra.database.entities import Base, Usuario
 from src.infra.database import session
-from sqlalchemy.orm import relationship as rel
-from .endereco import Endereco
-from typing import Optional
-from sqlalchemy.schema import Column as Col, ForeignKey as FK
+from sqlalchemy.schema import Column as Col
 from sqlalchemy.types import (
-    Integer as Int, String as Str, Text, Enum, Float
+    Integer as Int, String as Str, Text, Float
 )
 
 class UsuarioNaoEncontradoException(Exception):

@@ -1,6 +1,6 @@
 from src.infra.database.entities import BaseEntityClass
 from src.infra.database.entities import Base
-from sqlalchemy.schema import Column as Col, ForeignKey as FK
+from sqlalchemy.schema import Column as Col
 import enum
 from sqlalchemy.types import (
     Integer as Int, String as Str, Text, Enum, Float
