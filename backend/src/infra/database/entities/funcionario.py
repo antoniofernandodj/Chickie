@@ -4,7 +4,7 @@ from src.infra.database.entities import Base
 
 class Funcionario(Base):
     __tablename__ = "funcionarios"
-
+    uuid = Col(String(36), unique=True, primary_key=True)
     loja_uuid = Col(String(36), ForeignKey("lojas.uuid"))
     cargo = Col(String(100))
 

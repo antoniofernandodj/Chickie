@@ -22,6 +22,7 @@ class Pedido(Base):
     frete = Col(Float)
     loja_uuid = Col(Str(36), FK("lojas.uuid"))
     endereco_uuid = Col(Str(36), FK("enderecos.uuid"))
+    usuario_uuid = Col(Str(36), FK("usuarios.uuid"))
 
     @property
     def total(self):

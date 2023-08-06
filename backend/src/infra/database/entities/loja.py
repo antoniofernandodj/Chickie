@@ -18,7 +18,7 @@ class UsuarioJaVinculadoException(Exception):
 
 class Loja(Base):
     __tablename__ = "lojas"
-
+    uuid = Col(Str(36), unique=True, primary_key=True)
     nome = Col(Str(100))
     username = Col(Str(100))
     email = Col(Str(100))

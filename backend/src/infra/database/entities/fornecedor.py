@@ -5,7 +5,7 @@ from src.infra.database.entities import Base
 
 class Fornecedor(Base):
     __tablename__ = "fornecedores"
-
+    uuid = Col(String(36), unique=True, primary_key=True)
     nome = Col(String(100))
     username = Col(String(100))
     celular = Col(String(100))

@@ -4,7 +4,7 @@ from src.infra.database.entities import Base
 
 class Entregador(Base):
     __tablename__ = "entregadores"
-
+    uuid = Col(String(36), unique=True, primary_key=True)
     nome = Col(String(100), nullable=False)
     telefone = Col(String(20))
     celular = Col(String(20))

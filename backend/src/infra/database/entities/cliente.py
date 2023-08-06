@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .base.declarative_base import Base
+from .base import Base
 from sqlalchemy import Column
 from sqlalchemy import Table
 from sqlalchemy import ForeignKey

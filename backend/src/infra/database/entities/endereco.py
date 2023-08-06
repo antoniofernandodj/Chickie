@@ -36,7 +36,7 @@ class UF(enum.Enum):
 
 class Endereco(Base):
     __tablename__ = "enderecos"
-
+    uuid = Col(Str(36), unique=True, primary_key=True)
     uf = Col(Enum(UF))  # type: ignore
     cidade = Col(Str(50))
     logradouro = Col(Text)
