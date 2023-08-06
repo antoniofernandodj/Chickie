@@ -2,9 +2,9 @@ import axios from 'axios'
 import { SyntheticEvent, useRef } from 'react'
 import { useRouter } from 'next/router';
 import { NextPage } from 'next';
-import { RootState } from '../../store';
+import { RootState } from '../../../store';
+import { storeToken } from '../../../reducers/storeToken';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeToken } from '../../reducers/storeToken';
 
 
 const Page: NextPage = () => {

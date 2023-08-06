@@ -50,7 +50,7 @@ async def cadastrar_enderecos(endereco: Endereco):
         try:
             uuid = await repository.save(endereco)
         except Exception as error:
-            return {"error": str(error)}
+            raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
@@ -89,6 +89,6 @@ async def remover_endereco(
         try:
             itens_removed = await repository.delete_from_uuid(uuid=uuid)
         except Exception as error:
-            return {"error": str(error)}
+            raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

@@ -9,6 +9,7 @@ export default function Page() {
     let inputEmail =  useRef<HTMLInputElement>(null)
     let inputTelefone =  useRef<HTMLInputElement>(null)
     let inputCelular =  useRef<HTMLInputElement>(null)
+    
     let inputCEP =  useRef<HTMLInputElement>(null)
     let inputUF =  useRef<HTMLInputElement>(null)
     let inputCidade =  useRef<HTMLInputElement>(null)
@@ -35,7 +36,7 @@ export default function Page() {
             inputComplemento.current &&
             inputBairro.current
         ) {
-            let url = '/api/signup/'
+            let url = '/api/signup-loja/'
             let data = {
                 nome: inputNome.current.value,
                 username: inputUsername.current.value,
