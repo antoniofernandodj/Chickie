@@ -1,18 +1,17 @@
-from dynaconf import Dynaconf
+from dynaconf import Dynaconf  # type: ignore
 from os.path import join, dirname
 from pathlib import Path
-from collections import namedtuple
 
 PROJECT_PATH = str(Path(join(dirname(__file__))).parent.absolute())
 
-s1 = join(PROJECT_PATH, 'config', 'settings.toml')
-s2 = join(PROJECT_PATH, 'config', '.secrets.toml')
+s1 = join(PROJECT_PATH, "config", "settings.toml")
+s2 = join(PROJECT_PATH, "config", ".secrets.toml")
 settings_files = [s1, s2]
 
 settings = Dynaconf(
     envvar_prefix="CHICKIE",
     # env_switcher='CHICKIE_ENV',
-    environments = ["local", "development", "production"],
+    environments=["local", "development", "production"],
     settings_files=settings_files,
 )
 

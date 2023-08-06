@@ -1,12 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
 
 
 class Produto(BaseModel):
+    __tablename__ = "produtos"
     nome: str
     descricao: str
-    categoria_de_produto_uuid: str
+    categoria_uuid: str
     loja_uuid: str
     uuid: Optional[str] = None
-

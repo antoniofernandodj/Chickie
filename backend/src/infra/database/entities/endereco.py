@@ -1,10 +1,7 @@
-from src.infra.database.entities import BaseEntityClass
 from src.infra.database.entities import Base
 from sqlalchemy.schema import Column as Col
 import enum
-from sqlalchemy.types import (
-    Integer as Int, String as Str, Text, Enum, Float
-)
+from sqlalchemy.types import String as Str, Text, Enum
 
 
 class UF(enum.Enum):
@@ -37,16 +34,13 @@ class UF(enum.Enum):
     TO = "Tocantins"
 
 
-class Endereco(Base, BaseEntityClass):
-    
-    __tablename__ = 'enderecos'
-    
-    uuid = Col(Str(40), primary_key=True)
-    uf = Col(Enum(UF))
+class Endereco(Base):
+    __tablename__ = "enderecos"
+
+    uf = Col(Enum(UF))  # type: ignore
     cidade = Col(Str(50))
     logradouro = Col(Text)
     numero = Col(Str(50))
     complemento = Col(Str(50))
     bairro = Col(Text)
     cep = Col(Str(50))
-    timestamp = Col(Float)

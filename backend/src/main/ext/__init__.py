@@ -1,7 +1,1 @@
-from . import (
-    cache,
-    config,
-    middlewares,
-    type_checker,
-    logging
-)
+from . import cache, config, middlewares, logging  # noqa

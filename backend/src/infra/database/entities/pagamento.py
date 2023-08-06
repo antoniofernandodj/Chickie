@@ -1,22 +1,18 @@
-from sqlalchemy import (
-    Column as Col, String,
-    ForeignKey, Float, Text
-)
+from sqlalchemy import Column as Col, String, ForeignKey, Text
 from src.infra.database.entities import Base
 
 
 class Pagamento(Base):
-    __tablename__ = 'pagamentos'
+    __tablename__ = "pagamentos"
 
     uuid = Col(String(36), primary_key=True)
-    pedido_uuid = Col(String(36), ForeignKey('pedidos.uuid'))
+    pedido_uuid = Col(String(36), ForeignKey("pedidos.uuid"))
     metodo_pagamento = Col(String(100))
-    timestamp = Col(Float)
 
 
 class MetodosPagamento(Base):
-    __tablename__ = 'metodos_pagamento'
+    __tablename__ = "metodos_pagamento"
     uuid = Col(String(36), primary_key=True)
-    loja_uuid = Col(String(36), ForeignKey('lojas.uuid'))
+    loja_uuid = Col(String(36), ForeignKey("lojas.uuid"))
     nome = Col(String(100))
     Descricao = Col(Text)

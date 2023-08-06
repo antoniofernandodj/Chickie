@@ -1,34 +1,16 @@
 import abc
 import redis
-import json
-import time
 import pickle
 from contextlib import suppress
-from typing import Callable, TypeVar, Any, Union, Optional
+from typing import TypeVar, Any
+
 with suppress(ModuleNotFoundError):
     from config import settings as s
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
-def get_function_key(function, *args, **kwargs):
-    """
-    Método para gerar uma chave para a funcao em questao com
-    seus argumentos especificos
-    """
-    function_name: str
-    if callable(function):
-        function_name = str(function.__name__)
-    else:
-        function_name = str(function)
-
-    data = {'function':function_name, 'args': args, 'kwargs': kwargs}
-    dumps = str(data)
-    return dumps
-
-
-class CacheInterface(abc.ABC):
-
+class Cache(abc.ABC):
     @abc.abstractmethod
     def __getitem__(self, key):
         pass
@@ -49,27 +31,27 @@ class CacheInterface(abc.ABC):
     def delete(self, key: str):
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def clear(self):
         pass
 
 
-class RedisCache(CacheInterface):
+class RedisCache(Cache):
     def __init__(self, host: str, port: int, db: int):
         self.redis_db = redis.Redis(
-            host=host,
-            port=port,
-            db=db,
-            password=s.REDIS_PASSWORD
+            host=host, port=port, db=db, password=s.REDIS_PASSWORD
         )
-        self.redis_db.config_set('maxmemory-policy', 'allkeys-lru')
+        self.redis_db.config_set("maxmemory-policy", "allkeys-lru")
         self.__port = port
         self.__host = host
-        self.get_function_key = get_function_key
-        
 
     def __str__(self):
-        return f'{type(self).__name__}(host={self.__host}, port={self.__port}, data={list(self.dict().keys())})'
+        return "{}(host={}, port={}, data={})".format(
+            type(self).__name__,
+            self.__host,
+            self.__port,
+            list(self.dict().keys()),
+        )
 
     def __getitem__(self, key: str) -> Any:
         """Método para recuperar um valor do cache."""
@@ -78,7 +60,7 @@ class RedisCache(CacheInterface):
         if value:
             # print('Retornando cache do redis')
             return pickle.loads(value)
-        
+
         return None
 
     def __setitem__(self, key: str, value: Any) -> None:
@@ -101,7 +83,7 @@ class RedisCache(CacheInterface):
 
     def store_dict(self, data: dict) -> None:
         """Método para armazenar um dicionário completo no cache."""
-        print('Armazenando dicionario ao redis')
+        print("Armazenando dicionario ao redis")
 
         for key, value in data.items():
             self[key] = value
@@ -111,36 +93,30 @@ class RedisCache(CacheInterface):
         Método para recuperar todos os pares chave-valor
         do cache como um dicionário.
         """
-        print('Retornando dicionario do redis')
+        print("Retornando dicionario do redis")
 
-        keys = [key.decode() for key in self.redis_db.keys('*')]
+        keys = [key.decode() for key in self.redis_db.keys("*")]
 
         data = {}
         for key in keys:
             data[key] = self[key]
 
         return data
-    
+
     def delete(self, key: str) -> None:
-        print('Deletando chave do redis')
+        print("Deletando chave do redis")
         self.redis_db.delete(key)
 
     def clear(self) -> None:
-        print('Limpando cache do redis')
-        keys = [key.decode() for key in self.redis_db.keys('*')]
+        print("Limpando cache do redis")
+        keys = [key.decode() for key in self.redis_db.keys("*")]
 
         for key in keys:
             self.delete(key)
 
 
 def get_cache() -> RedisCache:
-
-    cache = RedisCache(
-        host=s.REDIS_HOST,
-        port=s.REDIS_PORT,
-        db=s.REDIS_DB
-    )
-    cache['hello'] = 'world'
-
+    cache = RedisCache(host=s.REDIS_HOST, port=s.REDIS_PORT, db=s.REDIS_DB)
+    cache["hello"] = "world"
 
     return cache

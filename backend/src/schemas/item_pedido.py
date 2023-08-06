@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
 
 
 class ItemPedido(BaseModel):
+    __tablename__ = "itens_pedido"
     quantidade: int
     subtotal: float
     produto_uuid: str

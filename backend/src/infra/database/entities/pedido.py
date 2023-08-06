@@ -1,42 +1,36 @@
-from src.infra.database.entities import BaseEntityClass, Base
-from sqlalchemy.orm import relationship as rel
+from src.infra.database.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from datetime import datetime
-from sqlalchemy.types import (
-    Float, String as Str, Enum, DateTime
-)
+from sqlalchemy.types import Float, String as Str, Enum, DateTime
 import enum
 
+
 class StatusPedido(enum.Enum):
-    Pendente = 'Pendente'
-    Pago = 'Pago'
-    EmEnvio = 'EmEnvio'
-    Entregue = 'Entregue'
-    Cancelado = 'Cancelado'
+    Pendente = "Pendente"
+    Pago = "Pago"
+    EmEnvio = "EmEnvio"
+    Entregue = "Entregue"
+    Cancelado = "Cancelado"
 
 
-class Pedido(Base, BaseEntityClass):
-    __tablename__ = 'pedidos'
+class Pedido(Base):
+    __tablename__ = "pedidos"
 
     uuid = Col(Str(36), primary_key=True)
     data_hora = Col(DateTime, default=datetime.utcnow)
-    status = Col(Enum(StatusPedido))
+    status = Col(Enum(StatusPedido))  # type: ignore
     frete = Col(Float)
-    loja_uuid = Col(Str(36), FK('lojas.uuid'))
-    endereco_uuid = Col(Str(36), FK('enderecos.uuid'))
-    timestamp = Col(Float)
+    loja_uuid = Col(Str(36), FK("lojas.uuid"))
+    endereco_uuid = Col(Str(36), FK("enderecos.uuid"))
 
     @property
     def total(self):
         from src.infra.database import session
         from src.infra.database import entities as e
-        from sqlalchemy.sql import func
 
         db = session.get()
-        items = db.query(e.ItemPedido) \
-            .filter_by(pedido_uuid=self.uuid) \
-            .all()
-        
+        items = db.query(e.ItemPedido).filter_by(pedido_uuid=self.uuid).all()
+
         total = sum([float(item.subtotal) for item in items])
         return total
 
@@ -50,6 +44,5 @@ class Pedido(Base, BaseEntityClass):
     #     total = db.query(func.sum(e.ItemPedido.subtotal)) \
     #         .filter_by(pedido_uuid=self.uuid) \
     #         .scalar() or 0.0
-        
-    #     return total
 
+    #     return total

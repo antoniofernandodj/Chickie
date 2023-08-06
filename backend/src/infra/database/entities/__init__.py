@@ -1,16 +1,15 @@
-from .base.declarative_base import Base
-from .base.base_entity_class import BaseEntityClass
-from .endereco import Endereco
-from .usuario import Usuario
-from .loja import Loja
-from .cliente import Cliente
-from .categoria_produto import CategoriaProduto
-from .produto import Produto
-from .preco import Preco
-from .pedido import Pedido
-from .item_pedido import ItemPedido
-from .entregador import Entregador
-from .feedback import Feedback
-from .funcionario import Funcionario
-from .pagamento import Pagamento, MetodosPagamento
-from .zona_de_entrega import ZonaEntrega
+from .base.declarative_base import Base  # noqa
+from .endereco import Endereco  # noqa
+from .usuario import Usuario  # noqa
+from .loja import Loja  # noqa
+from .cliente import Cliente  # noqa
+from .categoria_produto import CategoriaProduto  # noqa
+from .produto import Produto  # noqa
+from .preco import Preco  # noqa
+from .pedido import Pedido  # noqa
+from .item_pedido import ItemPedido  # noqa
+from .entregador import Entregador  # noqa
+from .feedback import Feedback  # noqa
+from .funcionario import Funcionario  # noqa
+from .pagamento import Pagamento, MetodosPagamento  # noqa
+from .zona_de_entrega import ZonaEntrega  # noqa

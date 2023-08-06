@@ -1,9 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
 
 
-class UsuarioSignIn(BaseModel):    
+class UsuarioSignIn(BaseModel):
     nome: str
     username: str
     email: str
@@ -11,11 +9,9 @@ class UsuarioSignIn(BaseModel):
     celular: str
     endereco_uuid: str
     password: str
-    endereco_uuid: str
 
 
-
-class LojaSignIn(BaseModel):    
+class LojaSignIn(BaseModel):
     nome: str
     username: str
     email: str

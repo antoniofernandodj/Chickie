@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class Pedido(BaseModel):
+    __tablename__ = "pedidos"
     data_hora: datetime
     status: str
     frete: float
