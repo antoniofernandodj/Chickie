@@ -7,12 +7,13 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.schemas import CategoriaProdutos
+from src.main import security
+from src.schemas import CategoriaProdutos, Loja
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-repo_name = "categoria"
+current_user = Annotated[Loja, Depends(security.current_user)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Categoria não encontrada"
 )
@@ -51,7 +52,10 @@ async def requisitar_categoria(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_categorias(categoria: CategoriaProdutos):
+async def cadastrar_categorias(
+    categoria: CategoriaProdutos,
+    current_user: current_user
+):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(CategoriaProdutos, connection=connection)
         try:
@@ -64,6 +68,7 @@ async def cadastrar_categorias(categoria: CategoriaProdutos):
 
 @router.patch("/{uuid}")
 async def atualizar_categoria_patch(
+    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")]
 ):
     return {}
@@ -72,6 +77,7 @@ async def atualizar_categoria_patch(
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
     itemData: CategoriaProdutos,
+    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
 ):
     async with DatabaseConnectionManager() as connection:
@@ -92,6 +98,7 @@ async def atualizar_categoria_put(
 
 @router.delete("/{uuid}")
 async def remover_categoria(
+    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")]
 ):
     async with DatabaseConnectionManager() as connection:

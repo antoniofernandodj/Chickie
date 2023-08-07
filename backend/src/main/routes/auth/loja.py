@@ -11,7 +11,7 @@ from config import settings as s
 from src import use_cases
 
 
-router = APIRouter(prefix="/loja", tags=["Loja Auth"])
+router = APIRouter(prefix="/loja", tags=["Loja", "Auth"])
 current_company = Annotated[Loja, Depends(security.current_company)]
 
 
@@ -39,6 +39,8 @@ async def login_post(
     }
 
 
+# Adicionar verificação para unico
+# Tbm no banco
 @router.post("/signin", status_code=status.HTTP_201_CREATED)
 async def signin(loja: LojaSignIn) -> Any:
     uuid = await use_cases.lojas.registrar(loja_data=loja)

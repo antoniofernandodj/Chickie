@@ -7,12 +7,13 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.schemas import Preco
+from src.main import security
+from src.schemas import Preco, Loja
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-repo_name = "preco"
+current_user = Annotated[Loja, Depends(security.current_user)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Preço não encontrado"
 )

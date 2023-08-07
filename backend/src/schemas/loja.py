@@ -12,8 +12,8 @@ class Loja(BaseModel):
     telefone: str
     celular: str
     password_hash: str
-    password: str
 
+    password: Optional[str] = None
     uuid: Optional[str] = None
 
     def authenticate(self, senha_loja: str) -> bool:

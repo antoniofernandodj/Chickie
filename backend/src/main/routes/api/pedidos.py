@@ -7,12 +7,13 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.schemas import Pedido
+from src.main import security
+from src.schemas import Loja, Pedido
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-repo_name = "pedido"
+current_user = Annotated[Loja, Depends(security.current_user)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Pedido não encontrado"
 )
@@ -57,7 +58,8 @@ async def cadastrar_pedidos(pedido: Pedido):
 
 @router.patch("/{uuid}")
 async def atualizar_pedido_patch(
-    uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
+    current_user: current_user,
 ):
     return {"uuid": uuid}
 
@@ -65,6 +67,7 @@ async def atualizar_pedido_patch(
 @router.put("/{uuid}")
 async def atualizar_pedido_put(
     itemData: Pedido,
+    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer put")],
 ):
     async with DatabaseConnectionManager() as connection:
@@ -82,6 +85,7 @@ async def atualizar_pedido_put(
 
 @router.delete("/{uuid}")
 async def remover_pedido(
+    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]
 ):
     async with DatabaseConnectionManager() as connection:

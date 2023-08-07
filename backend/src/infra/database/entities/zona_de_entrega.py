@@ -3,7 +3,7 @@ from src.infra.database.entities import Base
 
 
 class ZonaEntrega(Base):
-    __tablename__ = "zonas_de_entrga"
+    __tablename__ = "zonas_de_entrega"
 
     uuid = Col(String(36), primary_key=True)
     nome = Col(String(255))
