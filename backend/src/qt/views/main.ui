@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Antonio Fernando &lt;antoniofernandodj@outlook.com&gt;</author>
+ <class>Chickie</class>
+ <widget class="QMainWindow" name="Chickie">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chickie</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuNovo">
+    <property name="title">
+     <string>Novo</string>
+    </property>
+    <addaction name="actionCategoria_2"/>
+    <addaction name="actionEntregador"/>
+    <addaction name="actionFuncionario"/>
+    <addaction name="actionMetodoDePagamento"/>
+    <addaction name="actionZona_de_entrega"/>
+    <addaction name="actionCliente"/>
+    <addaction name="actionPreco"/>
+    <addaction name="actionPedido_2"/>
+   </widget>
+   <widget class="QMenu" name="menuAtualizar">
+    <property name="title">
+     <string>Atualizar</string>
+    </property>
+    <addaction name="actionCategoria_3"/>
+    <addaction name="actionEntregador_2"/>
+    <addaction name="actionFeedback_2"/>
+    <addaction name="actionFuncionario_2"/>
+    <addaction name="actionZona_de_Entrega"/>
+    <addaction name="actionPre_o"/>
+    <addaction name="actionPedido_3"/>
+   </widget>
+   <widget class="QMenu" name="menuRemover">
+    <property name="title">
+     <string>Remover</string>
+    </property>
+    <addaction name="actionCategoria_4"/>
+    <addaction name="actionEntregador_3"/>
+    <addaction name="actionFuncionario_3"/>
+    <addaction name="actionMetodoDePagamento_2"/>
+    <addaction name="actionZona_de_entrega_2"/>
+    <addaction name="actionPreco_3"/>
+    <addaction name="actionProduto_2"/>
+   </widget>
+   <widget class="QMenu" name="menuHistorico">
+    <property name="title">
+     <string>Histórico</string>
+    </property>
+    <addaction name="actionHistorico"/>
+   </widget>
+   <widget class="QMenu" name="menuSobre">
+    <property name="title">
+     <string>Sobre</string>
+    </property>
+    <addaction name="actionObter_ajuda"/>
+    <addaction name="actionCompartilhar_ideias_e_comentarios"/>
+    <addaction name="separator"/>
+    <addaction name="actionSobre_o_Chickie"/>
+   </widget>
+   <addaction name="menuNovo"/>
+   <addaction name="menuAtualizar"/>
+   <addaction name="menuRemover"/>
+   <addaction name="menuHistorico"/>
+   <addaction name="menuSobre"/>
+  </widget>
+  <action name="actionCategoria">
+   <property name="text">
+    <string>Categoria</string>
+   </property>
+  </action>
+  <action name="actionCategoria_2">
+   <property name="text">
+    <string>Categoria</string>
+   </property>
+  </action>
+  <action name="actionEntregador">
+   <property name="text">
+    <string>Entregador</string>
+   </property>
+  </action>
+  <action name="actionFeedback">
+   <property name="text">
+    <string>Feedback</string>
+   </property>
+  </action>
+  <action name="actionFuncionario">
+   <property name="text">
+    <string>Funcionário</string>
+   </property>
+  </action>
+  <action name="actionMetodoDePagamento">
+   <property name="text">
+    <string>Método de pagamento</string>
+   </property>
+  </action>
+  <action name="actionZona_de_entrega">
+   <property name="text">
+    <string>Zona de entrega</string>
+   </property>
+  </action>
+  <action name="actionCliente">
+   <property name="text">
+    <string>Cliente</string>
+   </property>
+  </action>
+  <action name="actionPedido">
+   <property name="text">
+    <string>Pedido</string>
+   </property>
+  </action>
+  <action name="actionPreco">
+   <property name="text">
+    <string>Preço</string>
+   </property>
+  </action>
+  <action name="actionPedido_2">
+   <property name="text">
+    <string>Pedido</string>
+   </property>
+  </action>
+  <action name="actionPreco_2">
+   <property name="text">
+    <string>Preço</string>
+   </property>
+  </action>
+  <action name="actionProduto">
+   <property name="text">
+    <string>Produto</string>
+   </property>
+  </action>
+  <action name="actionCategoria_3">
+   <property name="text">
+    <string>Categoria</string>
+   </property>
+  </action>
+  <action name="actionEntregador_2">
+   <property name="text">
+    <string>Entregador</string>
+   </property>
+  </action>
+  <action name="actionFeedback_2">
+   <property name="text">
+    <string>Feedback</string>
+   </property>
+  </action>
+  <action name="actionFuncionario_2">
+   <property name="text">
+    <string>Funcionário</string>
+   </property>
+  </action>
+  <action name="actionZona_de_Entrega">
+   <property name="text">
+    <string>Zona de Entrega</string>
+   </property>
+  </action>
+  <action name="actionCliente_2">
+   <property name="text">
+    <string>Cliente</string>
+   </property>
+  </action>
+  <action name="actionPre_o">
+   <property name="text">
+    <string>Preço</string>
+   </property>
+  </action>
+  <action name="actionPedido_3">
+   <property name="text">
+    <string>Pedido</string>
+   </property>
+  </action>
+  <action name="actionPreco_3">
+   <property name="text">
+    <string>Preço</string>
+   </property>
+  </action>
+  <action name="actionProduto_2">
+   <property name="text">
+    <string>Produto</string>
+   </property>
+  </action>
+  <action name="actionEntregador_3">
+   <property name="text">
+    <string>Entregador</string>
+   </property>
+  </action>
+  <action name="actionFuncionario_3">
+   <property name="text">
+    <string>Funcionário</string>
+   </property>
+  </action>
+  <action name="actionMetodoDePagamento_2">
+   <property name="text">
+    <string>Método de pagamento</string>
+   </property>
+  </action>
+  <action name="actionCategoria_4">
+   <property name="text">
+    <string>Categoria</string>
+   </property>
+  </action>
+  <action name="actionZona_de_entrega_2">
+   <property name="text">
+    <string>Zona de entrega</string>
+   </property>
+  </action>
+  <action name="actionHistorico">
+   <property name="text">
+    <string>Historico de vendas</string>
+   </property>
+  </action>
+  <action name="actionObter_ajuda">
+   <property name="text">
+    <string>Obter ajuda</string>
+   </property>
+  </action>
+  <action name="actionCompartilhar_ideias_e_comentarios">
+   <property name="text">
+    <string>Compartilhar ideias e comentarios</string>
+   </property>
+  </action>
+  <action name="actionSobre_o_Chickie">
+   <property name="text">
+    <string>Sobre o Chickie</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
