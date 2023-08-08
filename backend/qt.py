@@ -1,14 +1,6 @@
-from PySide6.QtWidgets import QApplication, QMainWindow
-from src.qt.views.main import Ui_Chickie
 import sys
-
-
-class MainWindow(QMainWindow):
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-        self.view = Ui_Chickie()
-        self.view.setupUi(self)
+from PySide6.QtWidgets import QApplication
+from src.qt import MainWindow
 
 
 if __name__ == "__main__":

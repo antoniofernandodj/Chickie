@@ -8,9 +8,9 @@ class Fornecedor(Base):
     uuid = Col(String(36), unique=True, primary_key=True)
     nome = Col(String(100))
     username = Col(String(100))
-    celular = Col(String(100))
-    password_hash = Col(String(100))
     email = Col(String(100))
+    password_hash = Col(String(100))
+    celular = Col(String(100))
     telefone = Col(String(20))
 
     cnpj = Col(String(18), unique=True)

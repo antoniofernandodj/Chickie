@@ -5,7 +5,9 @@ ct:
 	poetry run mypy --check-untyped-defs asgi.py
 
 uic:
-	poetry run pyside6-uic src/qt/views/main.ui -o src/qt/views/main.py
+	poetry run pyside6-uic src/qt/views/main.ui -o src/qt/views/main_ui.py
+	poetry run pyside6-uic src/qt/views/novaCategoria.ui -o src/qt/views/novaCategoria_ui.py
+	poetry run pyside6-uic src/qt/views/novoFuncionario.ui -o src/qt/views/novoFuncionario_ui.py
 
 qt:
 	poetry run python qt.py
