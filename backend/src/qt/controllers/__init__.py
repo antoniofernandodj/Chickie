@@ -19,6 +19,7 @@ class Controller(QObject):
         self.app = app
         self.window = window
 
+    def setup(self):
         self.view.pushButtonCadastrarCategoriaProduto.clicked.connect(
             self.cadastrarCategoriaProduto
         )
@@ -192,6 +193,7 @@ class Controller(QObject):
         elif response.status_code == 201:
             self.showMessage("Success", successMessage)
             self.window.refreshUI()
+            self.window.setupController()
 
         elif response.status_code == 400:
             self.showMessage("Error", "Erro na requisição: dados inválidos.")

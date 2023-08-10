@@ -17,12 +17,16 @@ class MainWindow(QMainWindow):
         self.view.setupUi(self)
         self.loja_uuid = "06da9970-efd8-4485-918a-0d4a3b3f0abd"
 
-        self.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2phIiwiZXhwIjoxNjkxNjQ0NzkyfQ.UhLHdzO_KFonSCzvHxx8RwxaokZYN9L0pzjxavBYs08"  # noqa
+        self.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2phIiwiZXhwIjoxNjkxNjc2NTA0fQ.Nxsoqbd0YTJXLy8aKmjMSUjBCnqMBh_TJ_Et-5TN1R0"  # noqa
 
         self.refreshUI()
         self.controller = Controller(
             view=self.view, app=self.app, window=self
         )
+        self.controller.setup()
+
+    def setupController(self):
+        self.controller.setup()
 
     def refreshUI(self):
         self.view.comboBoxUFZonaEntrega.clear()
