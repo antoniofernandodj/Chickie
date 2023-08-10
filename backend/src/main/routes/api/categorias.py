@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -13,7 +13,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Categoria não encontrada"
 )
@@ -29,10 +29,13 @@ router = APIRouter(
 
 
 @router.get("/")
-async def requisitar_categorias():
+async def requisitar_categorias(nome: Optional[str] = Query(None)):
+    kwargs = {}
+    if nome is not None:
+        kwargs["nome"] = nome
     async with DatabaseConnectionManager() as connection:
         repository = Repository(CategoriaProdutos, connection=connection)
-        results = await repository.find_all()
+        results = await repository.find_all(**kwargs)
 
     return results
 
@@ -53,8 +56,7 @@ async def requisitar_categoria(
 
 @router.post("/", status_code=201)
 async def cadastrar_categorias(
-    categoria: CategoriaProdutos,
-    current_user: current_user
+    categoria: CategoriaProdutos, current_user: current_user
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(CategoriaProdutos, connection=connection)
@@ -69,7 +71,7 @@ async def cadastrar_categorias(
 @router.patch("/{uuid}")
 async def atualizar_categoria_patch(
     current_user: current_user,
-    uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")],
 ):
     return {}
 
@@ -99,7 +101,7 @@ async def atualizar_categoria_put(
 @router.delete("/{uuid}")
 async def remover_categoria(
     current_user: current_user,
-    uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")]
+    uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(CategoriaProdutos, connection=connection)

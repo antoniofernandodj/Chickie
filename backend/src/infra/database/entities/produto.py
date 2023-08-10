@@ -1,14 +1,15 @@
 from src.infra.database.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
-from sqlalchemy.types import String as Str, Text, Integer
+from sqlalchemy.types import String as Str, Text, Integer, Float
 
 
 class Produto(Base):
     __tablename__ = "produtos"
 
     uuid = Col(Str(36), primary_key=True)
-    nome = Col(Str(100))
+    nome = Col(Text)
     descricao = Col(Text)
+    preco = Col(Float)
     categoria_uuid = Col(Str(36), FK("categorias_de_produtos.uuid"))
     loja_uuid = Col(Str(36), FK("lojas.uuid"))
 

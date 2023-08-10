@@ -1,16 +1,7 @@
 from src.infra.database.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from datetime import datetime
-from sqlalchemy.types import Float, String as Str, Enum, DateTime
-import enum
-
-
-class StatusPedido(enum.Enum):
-    Pendente = "Pendente"
-    Pago = "Pago"
-    EmEnvio = "EmEnvio"
-    Entregue = "Entregue"
-    Cancelado = "Cancelado"
+from sqlalchemy.types import Float, String as Str, DateTime
 
 
 class Pedido(Base):
@@ -18,7 +9,7 @@ class Pedido(Base):
 
     uuid = Col(Str(36), primary_key=True)
     data_hora = Col(DateTime, default=datetime.utcnow)
-    status = Col(Enum(StatusPedido))  # type: ignore
+    status_uuid = Col(Str(36), FK("status.uuid"))
     frete = Col(Float)
     loja_uuid = Col(Str(36), FK("lojas.uuid"))
     endereco_uuid = Col(Str(36), FK("enderecos.uuid"))

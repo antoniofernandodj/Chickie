@@ -13,7 +13,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado"
 )
@@ -77,7 +77,7 @@ async def atualizar_produto_put(
 @router.patch("/{uuid}")
 async def atualizar_produto_patch(
     produtoData: Produto,
-    uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
@@ -86,11 +86,10 @@ async def atualizar_produto_patch(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        produto,
-        produtoData.model_dump()  # type: ignore
+        produto, produtoData.model_dump()  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")

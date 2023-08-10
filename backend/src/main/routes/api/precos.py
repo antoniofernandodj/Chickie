@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -13,7 +13,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Preço não encontrado"
 )
@@ -22,10 +22,13 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 
 
 @router.get("/")
-async def requisitar_precos():
+async def requisitar_precos(nome: Optional[str] = Query(None)):
+    kwargs = {}
+    if nome is not None:
+        kwargs["nome"] = nome
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
-        results = await repository.find_all()
+        results = await repository.find_all(**kwargs)
 
     return results
 

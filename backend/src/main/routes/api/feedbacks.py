@@ -7,21 +7,16 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.main import security
-from src.schemas import Loja, Feedback
+from src.schemas import Feedback
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Feedback não encontrado"
 )
 
-router = APIRouter(
-    prefix="/feedbacks",
-    tags=["Feedbacks"]
-)
+router = APIRouter(prefix="/feedbacks", tags=["Feedbacks"])
 
 
 @router.get("/")
@@ -80,7 +75,7 @@ async def atualizar_feedback_put(
 @router.patch("/{uuid}")
 async def atualizar_feedback_patch(
     feedbackData: Feedback,
-    uuid: Annotated[str, Path(title="O uuid do feedback a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid do feedback a fazer patch")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Feedback, connection=connection)
@@ -89,11 +84,10 @@ async def atualizar_feedback_patch(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        feedback,
-        feedbackData.model_dump()  # type: ignore
+        feedback, feedbackData.model_dump()  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")

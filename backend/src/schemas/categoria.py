@@ -7,4 +7,5 @@ class CategoriaProdutos(BaseModel):
     nome: str
     descricao: str
     loja_uuid: str
+
     uuid: Optional[str] = None

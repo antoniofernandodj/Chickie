@@ -15,15 +15,12 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Entregador não encontrado"
 )
 
-router = APIRouter(
-    prefix="/entregadores",
-    tags=["Entregadores"]
-)
+router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
 
 
 @router.get("/")
@@ -82,7 +79,7 @@ async def atualizar_entregador_put(
 @router.patch("/{uuid}")
 async def atualizar_entregador_patch(
     entregadorData: Entregador,
-    uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)
@@ -91,11 +88,10 @@ async def atualizar_entregador_patch(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        entregador,
-        entregadorData.model_dump()  # type: ignore
+        entregador, entregadorData.model_dump()  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")

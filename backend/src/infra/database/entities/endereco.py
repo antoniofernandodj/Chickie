@@ -38,9 +38,9 @@ class Endereco(Base):
     __tablename__ = "enderecos"
     uuid = Col(Str(36), unique=True, primary_key=True)
     uf = Col(Enum(UF))  # type: ignore
-    cidade = Col(Str(50))
+    cidade = Col(Text)
     logradouro = Col(Text)
-    numero = Col(Str(50))
-    complemento = Col(Str(50))
+    numero = Col(Text)
+    complemento = Col(Text)
     bairro = Col(Text)
-    cep = Col(Str(50))
+    cep = Col(Text)

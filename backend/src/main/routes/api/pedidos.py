@@ -13,7 +13,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Pedido não encontrado"
 )
@@ -86,7 +86,7 @@ async def atualizar_pedido_put(
 @router.delete("/{uuid}")
 async def remover_pedido(
     current_user: current_user,
-    uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]
+    uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)

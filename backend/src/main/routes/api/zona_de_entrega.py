@@ -13,16 +13,13 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="Zona de entrega não encontrada"
+    detail="Zona de entrega não encontrada",
 )
 
-router = APIRouter(
-    prefix="/zonas_de_entrega",
-    tags=["Zonas de entrega"]
-)
+router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 
 
 @router.get("/")
@@ -36,9 +33,7 @@ async def requisitar_zonas_de_entrega():
 
 @router.get("/{uuid}")
 async def requisitar_zona_de_entrega(
-    uuid: Annotated[
-        str, Path(title="O uuid da zona de entrega a fazer get")
-    ]
+    uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
@@ -51,9 +46,7 @@ async def requisitar_zona_de_entrega(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_zonas_de_entrega(
-    zona_de_entrega: ZonaDeEntrega
-):
+async def cadastrar_zonas_de_entrega(zona_de_entrega: ZonaDeEntrega):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
         try:
@@ -78,8 +71,7 @@ async def atualizar_zona_de_entrega_put(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        zona_de_entrega,
-        zona_de_entrega_Data.model_dump()  # type: ignore
+        zona_de_entrega, zona_de_entrega_Data.model_dump()  # type: ignore
     )
 
     return {"num_rows_affected": num_rows_affected}
@@ -90,7 +82,7 @@ async def atualizar_zona_de_entrega_patch(
     zona_de_entregaData: ZonaDeEntrega,
     uuid: Annotated[
         str, Path(title="O uuid da zona de entrega a fazer patch")
-    ]
+    ],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
@@ -99,11 +91,10 @@ async def atualizar_zona_de_entrega_patch(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        zona_de_entrega,
-        zona_de_entregaData.model_dump()  # type: ignore
+        zona_de_entrega, zona_de_entregaData.model_dump()  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")

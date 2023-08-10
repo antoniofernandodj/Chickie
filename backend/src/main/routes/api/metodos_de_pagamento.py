@@ -13,15 +13,14 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="Metodo de pagamento não encontrado"
+    detail="Metodo de pagamento não encontrado",
 )
 
 router = APIRouter(
-    prefix="/metodos_de_pagamento",
-    tags=["Métodos de pagamentos"]
+    prefix="/metodos_de_pagamento", tags=["Métodos de pagamentos"]
 )
 
 
@@ -52,7 +51,7 @@ async def requisitar_metodo_de_pagamento(
 
 @router.post("/", status_code=201)
 async def cadastrar_metodos_de_pagamento(
-    metodo_de_pagamento: MetodoDePagamento
+    metodo_de_pagamento: MetodoDePagamento,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(MetodoDePagamento, connection=connection)
@@ -79,7 +78,7 @@ async def atualizar_metodo_de_pagamento_put(
 
     num_rows_affected = await repository.update(
         metodo_de_pagamento,
-        metodo_de_pagamento_Data.model_dump()  # type: ignore
+        metodo_de_pagamento_Data.model_dump(),  # type: ignore
     )
 
     return {"num_rows_affected": num_rows_affected}
@@ -90,7 +89,7 @@ async def atualizar_metodo_de_pagamento_patch(
     metodo_de_pagamentoData: MetodoDePagamento,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer patch")
-    ]
+    ],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(MetodoDePagamento, connection=connection)
@@ -100,10 +99,10 @@ async def atualizar_metodo_de_pagamento_patch(
 
     num_rows_affected = await repository.update(
         metodo_de_pagamento,
-        metodo_de_pagamentoData.model_dump()  # type: ignore
+        metodo_de_pagamentoData.model_dump(),  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")

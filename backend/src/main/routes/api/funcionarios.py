@@ -13,15 +13,12 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_user)]
+current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Funcionario não encontrado"
 )
 
-router = APIRouter(
-    prefix="/funcionarios",
-    tags=["Funcionários"]
-)
+router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
 
 
 @router.get("/")
@@ -80,7 +77,7 @@ async def atualizar_funcionario_put(
 @router.patch("/{uuid}")
 async def atualizar_funcionario_patch(
     funcionarioData: Funcionario,
-    uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Funcionario, connection=connection)
@@ -89,11 +86,10 @@ async def atualizar_funcionario_patch(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        funcionario,
-        funcionarioData.model_dump()  # type: ignore
+        funcionario, funcionarioData.model_dump()  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")
