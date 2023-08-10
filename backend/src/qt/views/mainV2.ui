@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Chickie</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="tabCategoria">
        <attribute name="title">
@@ -298,17 +298,17 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
-           <item row="5" column="0">
-            <widget class="QLineEdit" name="lineEditCEPZonaEntrega">
+           <item row="6" column="0">
+            <widget class="QLabel" name="labelCEPZonaEntrega">
+             <property name="text">
+              <string>CEP</string>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
-             <property name="placeholderText">
-              <string/>
-             </property>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="3" column="0">
             <widget class="QLineEdit" name="lineEditNomeZonaEntrega">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -318,8 +318,8 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_3">
+           <item row="4" column="0">
+            <widget class="QLabel" name="labelBairroZonaEntrega">
              <property name="text">
               <string>Bairro</string>
              </property>
@@ -328,20 +328,30 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxTaxaZonaEntrega"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="label_4">
+           <item row="6" column="1">
+            <widget class="QLabel" name="labelTaxaZonaEntrega">
              <property name="text">
-              <string>UF</string>
+              <string>Taxa</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="7" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxTaxaZonaEntrega"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="labelCidadeZonaEntrega">
+             <property name="text">
+              <string>Cidade</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
             <widget class="QLineEdit" name="lineEditCidadeZonaEntrega">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -351,7 +361,7 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="5" column="1">
             <widget class="QComboBox" name="comboBoxUFZonaEntrega">
              <property name="placeholderText">
               <string/>
@@ -363,7 +373,17 @@
              </item>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="4" column="1">
+            <widget class="QLabel" name="labelUFZonaEntrega">
+             <property name="text">
+              <string>UF</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
             <widget class="QLineEdit" name="lineEditBairroZonaEntrega">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -373,7 +393,17 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
+           <item row="7" column="0">
+            <widget class="QLineEdit" name="lineEditCEPZonaEntrega">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
               <string>Nome</string>
@@ -383,35 +413,18 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Cidade</string>
+           <item row="1" column="1">
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
              </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>CEP</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Taxa</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -853,6 +866,35 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
+                  <widget class="QFrame" name="frame_14">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout_4">
+                    <item row="1" column="0">
+                     <widget class="QDoubleSpinBox" name="doubleSpinBoxFretePedido"/>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QCheckBox" name="checkBoxFretePedido">
+                      <property name="text">
+                       <string>Usar frete padrão</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="labelFretePedido">
+                      <property name="text">
+                       <string>Frete</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QLabel" name="labelStatusPedido">
                    <property name="text">
                     <string>Status</string>
@@ -907,25 +949,8 @@ p, li { white-space: pre-wrap; }
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_17">
-                 <item>
-                  <widget class="QLabel" name="labelFretePedido">
-                   <property name="text">
-                    <string>Frete</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBoxFretePedido"/>
-                 </item>
                  <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="checkBoxFretePedido">
-                   <property name="text">
-                    <string>Usar frete padrão</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_7">
+                  <widget class="QLabel" name="labelItemPedido">
                    <property name="text">
                     <string>Item</string>
                    </property>

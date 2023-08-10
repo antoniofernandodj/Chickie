@@ -20,8 +20,8 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QFrame, QGridLayout, QHBoxLayout, QLabel,
     QLineEdit, QListView, QMainWindow, QMenu,
     QMenuBar, QPlainTextEdit, QPushButton, QSizePolicy,
-    QStatusBar, QTabWidget, QTextBrowser, QTextEdit,
-    QVBoxLayout, QWidget)
+    QSpacerItem, QStatusBar, QTabWidget, QTextBrowser,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -228,76 +228,80 @@ class Ui_MainWindow(object):
         self.frame_7.setFrameShadow(QFrame.Raised)
         self.gridLayout_5 = QGridLayout(self.frame_7)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.lineEditCEPZonaEntrega = QLineEdit(self.frame_7)
-        self.lineEditCEPZonaEntrega.setObjectName(u"lineEditCEPZonaEntrega")
-        self.lineEditCEPZonaEntrega.setAlignment(Qt.AlignCenter)
+        self.labelCEPZonaEntrega = QLabel(self.frame_7)
+        self.labelCEPZonaEntrega.setObjectName(u"labelCEPZonaEntrega")
+        self.labelCEPZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditCEPZonaEntrega, 5, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.labelCEPZonaEntrega, 6, 0, 1, 1)
 
         self.lineEditNomeZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditNomeZonaEntrega.setObjectName(u"lineEditNomeZonaEntrega")
         self.lineEditNomeZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditNomeZonaEntrega, 1, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditNomeZonaEntrega, 3, 0, 1, 1)
 
-        self.label_3 = QLabel(self.frame_7)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setAlignment(Qt.AlignCenter)
+        self.labelBairroZonaEntrega = QLabel(self.frame_7)
+        self.labelBairroZonaEntrega.setObjectName(u"labelBairroZonaEntrega")
+        self.labelBairroZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.label_3, 2, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.labelBairroZonaEntrega, 4, 0, 1, 1)
+
+        self.labelTaxaZonaEntrega = QLabel(self.frame_7)
+        self.labelTaxaZonaEntrega.setObjectName(u"labelTaxaZonaEntrega")
+        self.labelTaxaZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.labelTaxaZonaEntrega, 6, 1, 1, 1)
 
         self.doubleSpinBoxTaxaZonaEntrega = QDoubleSpinBox(self.frame_7)
         self.doubleSpinBoxTaxaZonaEntrega.setObjectName(u"doubleSpinBoxTaxaZonaEntrega")
 
-        self.gridLayout_5.addWidget(self.doubleSpinBoxTaxaZonaEntrega, 5, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.doubleSpinBoxTaxaZonaEntrega, 7, 1, 1, 1)
 
-        self.label_4 = QLabel(self.frame_7)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setAlignment(Qt.AlignCenter)
+        self.labelCidadeZonaEntrega = QLabel(self.frame_7)
+        self.labelCidadeZonaEntrega.setObjectName(u"labelCidadeZonaEntrega")
+        self.labelCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.label_4, 2, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.labelCidadeZonaEntrega, 2, 1, 1, 1)
 
         self.lineEditCidadeZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditCidadeZonaEntrega.setObjectName(u"lineEditCidadeZonaEntrega")
         self.lineEditCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditCidadeZonaEntrega, 1, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditCidadeZonaEntrega, 3, 1, 1, 1)
 
         self.comboBoxUFZonaEntrega = QComboBox(self.frame_7)
         self.comboBoxUFZonaEntrega.addItem("")
         self.comboBoxUFZonaEntrega.setObjectName(u"comboBoxUFZonaEntrega")
 
-        self.gridLayout_5.addWidget(self.comboBoxUFZonaEntrega, 3, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.comboBoxUFZonaEntrega, 5, 1, 1, 1)
+
+        self.labelUFZonaEntrega = QLabel(self.frame_7)
+        self.labelUFZonaEntrega.setObjectName(u"labelUFZonaEntrega")
+        self.labelUFZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.labelUFZonaEntrega, 4, 1, 1, 1)
 
         self.lineEditBairroZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditBairroZonaEntrega.setObjectName(u"lineEditBairroZonaEntrega")
         self.lineEditBairroZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditBairroZonaEntrega, 3, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditBairroZonaEntrega, 5, 0, 1, 1)
+
+        self.lineEditCEPZonaEntrega = QLineEdit(self.frame_7)
+        self.lineEditCEPZonaEntrega.setObjectName(u"lineEditCEPZonaEntrega")
+        self.lineEditCEPZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.lineEditCEPZonaEntrega, 7, 0, 1, 1)
 
         self.label = QLabel(self.frame_7)
         self.label.setObjectName(u"label")
         self.label.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.label, 2, 0, 1, 1)
 
-        self.label_2 = QLabel(self.frame_7)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setAlignment(Qt.AlignCenter)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout_5.addWidget(self.label_2, 0, 1, 1, 1)
-
-        self.label_5 = QLabel(self.frame_7)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.label_5, 4, 0, 1, 1)
-
-        self.label_6 = QLabel(self.frame_7)
-        self.label_6.setObjectName(u"label_6")
-        self.label_6.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.label_6, 4, 1, 1, 1)
+        self.gridLayout_5.addItem(self.verticalSpacer, 1, 1, 1, 1)
 
 
         self.verticalLayout_8.addWidget(self.frame_7)
@@ -575,6 +579,30 @@ class Ui_MainWindow(object):
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.verticalLayout_12 = QVBoxLayout(self.frame_5)
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.frame_14 = QFrame(self.frame_5)
+        self.frame_14.setObjectName(u"frame_14")
+        self.frame_14.setFrameShape(QFrame.StyledPanel)
+        self.frame_14.setFrameShadow(QFrame.Raised)
+        self.gridLayout_4 = QGridLayout(self.frame_14)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.doubleSpinBoxFretePedido = QDoubleSpinBox(self.frame_14)
+        self.doubleSpinBoxFretePedido.setObjectName(u"doubleSpinBoxFretePedido")
+
+        self.gridLayout_4.addWidget(self.doubleSpinBoxFretePedido, 1, 0, 1, 1)
+
+        self.checkBoxFretePedido = QCheckBox(self.frame_14)
+        self.checkBoxFretePedido.setObjectName(u"checkBoxFretePedido")
+
+        self.gridLayout_4.addWidget(self.checkBoxFretePedido, 1, 2, 1, 1)
+
+        self.labelFretePedido = QLabel(self.frame_14)
+        self.labelFretePedido.setObjectName(u"labelFretePedido")
+
+        self.gridLayout_4.addWidget(self.labelFretePedido, 0, 0, 1, 1)
+
+
+        self.verticalLayout_12.addWidget(self.frame_14)
+
         self.labelStatusPedido = QLabel(self.frame_5)
         self.labelStatusPedido.setObjectName(u"labelStatusPedido")
 
@@ -611,25 +639,10 @@ class Ui_MainWindow(object):
         self.frame_12.setFrameShadow(QFrame.Raised)
         self.verticalLayout_17 = QVBoxLayout(self.frame_12)
         self.verticalLayout_17.setObjectName(u"verticalLayout_17")
-        self.labelFretePedido = QLabel(self.frame_12)
-        self.labelFretePedido.setObjectName(u"labelFretePedido")
+        self.labelItemPedido = QLabel(self.frame_12)
+        self.labelItemPedido.setObjectName(u"labelItemPedido")
 
-        self.verticalLayout_17.addWidget(self.labelFretePedido)
-
-        self.doubleSpinBoxFretePedido = QDoubleSpinBox(self.frame_12)
-        self.doubleSpinBoxFretePedido.setObjectName(u"doubleSpinBoxFretePedido")
-
-        self.verticalLayout_17.addWidget(self.doubleSpinBoxFretePedido)
-
-        self.checkBoxFretePedido = QCheckBox(self.frame_12)
-        self.checkBoxFretePedido.setObjectName(u"checkBoxFretePedido")
-
-        self.verticalLayout_17.addWidget(self.checkBoxFretePedido, 0, Qt.AlignHCenter)
-
-        self.label_7 = QLabel(self.frame_12)
-        self.label_7.setObjectName(u"label_7")
-
-        self.verticalLayout_17.addWidget(self.label_7)
+        self.verticalLayout_17.addWidget(self.labelItemPedido, 0, Qt.AlignHCenter)
 
         self.comboBoxItemPedido = QComboBox(self.frame_12)
         self.comboBoxItemPedido.addItem("")
@@ -748,14 +761,14 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(7)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Chickie", None))
         self.actionAtualizar.setText(QCoreApplication.translate("MainWindow", u"Atualizar ...", None))
         self.actionCadastro.setText(QCoreApplication.translate("MainWindow", u"Cadastrar ...", None))
         self.actionRemover.setText(QCoreApplication.translate("MainWindow", u"Remover ...", None))
@@ -792,19 +805,19 @@ class Ui_MainWindow(object):
         self.pushButtonCadastrarPreco.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPreco), QCoreApplication.translate("MainWindow", u"Pre\u00e7o", None))
         self.labelCadastroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cadastro de Zona de Entrega", None))
-        self.lineEditCEPZonaEntrega.setPlaceholderText("")
+        self.labelCEPZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"CEP", None))
         self.lineEditNomeZonaEntrega.setPlaceholderText("")
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Bairro", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"UF", None))
+        self.labelBairroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Bairro", None))
+        self.labelTaxaZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Taxa", None))
+        self.labelCidadeZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cidade", None))
         self.lineEditCidadeZonaEntrega.setPlaceholderText("")
         self.comboBoxUFZonaEntrega.setItemText(0, QCoreApplication.translate("MainWindow", u"RJ", None))
 
         self.comboBoxUFZonaEntrega.setPlaceholderText("")
+        self.labelUFZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"UF", None))
         self.lineEditBairroZonaEntrega.setPlaceholderText("")
+        self.lineEditCEPZonaEntrega.setPlaceholderText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Cidade", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"CEP", None))
-        self.label_6.setText(QCoreApplication.translate("MainWindow", u"Taxa", None))
         self.pushButtonCadastrarZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabZonaEntrega), QCoreApplication.translate("MainWindow", u"Zona de Entrega", None))
         self.lineEditBairroCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Bairro", None))
@@ -846,6 +859,8 @@ class Ui_MainWindow(object):
         self.pushButtonCadastrarFuncionario.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabFuncionario), QCoreApplication.translate("MainWindow", u"Funcionario", None))
         self.labelCadastrarPedido.setText(QCoreApplication.translate("MainWindow", u"Cadastrar Pedido", None))
+        self.checkBoxFretePedido.setText(QCoreApplication.translate("MainWindow", u"Usar frete padr\u00e3o", None))
+        self.labelFretePedido.setText(QCoreApplication.translate("MainWindow", u"Frete", None))
         self.labelStatusPedido.setText(QCoreApplication.translate("MainWindow", u"Status", None))
         self.comboBoxStatusPedido.setItemText(0, QCoreApplication.translate("MainWindow", u"Pendente", None))
 
@@ -857,9 +872,7 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Noto Sans'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Rua bla bla bla</p></body></html>", None))
-        self.labelFretePedido.setText(QCoreApplication.translate("MainWindow", u"Frete", None))
-        self.checkBoxFretePedido.setText(QCoreApplication.translate("MainWindow", u"Usar frete padr\u00e3o", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"Item", None))
+        self.labelItemPedido.setText(QCoreApplication.translate("MainWindow", u"Item", None))
         self.comboBoxItemPedido.setItemText(0, QCoreApplication.translate("MainWindow", u"Pizza tal", None))
 
         self.pushButtonAdicionarItemPedido.setText(QCoreApplication.translate("MainWindow", u"Adicionar Item", None))
