@@ -11,7 +11,8 @@ from . import (
     funcionarios,
     metodos_de_pagamento,
     pagamentos,
-    zona_de_entrega
+    zona_de_entrega,
+    status,
 )
 
 router = APIRouter(prefix="")
@@ -28,3 +29,4 @@ router.include_router(funcionarios.router)
 router.include_router(metodos_de_pagamento.router)
 router.include_router(pagamentos.router)
 router.include_router(zona_de_entrega.router)
+router.include_router(status.router)

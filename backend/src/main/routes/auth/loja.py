@@ -2,10 +2,12 @@
 from fastapi.routing import APIRouter
 from datetime import timedelta
 from src.main import security
+from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database.repository import Repository
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status
 from typing import Any
-from src.schemas import LojaSignIn, Token, Loja
+from src.schemas import LojaSignIn, Token, Loja, UsuarioSignIn, Cliente
 from typing import Annotated
 from config import settings as s
 from src import use_cases
@@ -50,3 +52,21 @@ async def signin(loja: LojaSignIn) -> Any:
 @router.get("/protected")
 async def home(current_company: current_company):
     return {"msg": "ok"}
+
+
+@router.post("/cliente", status_code=status.HTTP_201_CREATED)
+async def cadastrar_cliente(
+    current_company: current_company, usuario: UsuarioSignIn
+) -> Any:
+    if usuario.loja_uuid is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="uuid da loja em falta",
+        )
+    usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
+    cliente = Cliente(usuario_uuid=usuario_uuid, loja_uuid=usuario.loja_uuid)
+    async with DatabaseConnectionManager() as connection:
+        repository = Repository(Cliente, connection=connection)
+        await repository.save(cliente)
+
+    return {"uuid": usuario_uuid}

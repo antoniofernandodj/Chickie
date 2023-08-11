@@ -369,12 +369,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.lineEditSenhaCliente, 6, 0, 1, 2)
 
-        self.lineEditUFCliente = QLineEdit(self.frame_2)
-        self.lineEditUFCliente.setObjectName(u"lineEditUFCliente")
-        self.lineEditUFCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditUFCliente, 9, 0, 1, 1)
-
         self.lineEditCidadeCliente = QLineEdit(self.frame_2)
         self.lineEditCidadeCliente.setObjectName(u"lineEditCidadeCliente")
         self.lineEditCidadeCliente.setAlignment(Qt.AlignCenter)
@@ -409,6 +403,11 @@ class Ui_MainWindow(object):
         self.labelDadosCliente.setObjectName(u"labelDadosCliente")
 
         self.gridLayout_2.addWidget(self.labelDadosCliente, 2, 0, 1, 2, Qt.AlignHCenter)
+
+        self.comboBoxUFCliente = QComboBox(self.frame_2)
+        self.comboBoxUFCliente.setObjectName(u"comboBoxUFCliente")
+
+        self.gridLayout_2.addWidget(self.comboBoxUFCliente, 9, 0, 1, 1)
 
 
         self.gridLayout.addWidget(self.frame_2, 1, 0, 1, 1)
@@ -761,7 +760,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(7)
+        self.tabWidget.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -774,6 +773,7 @@ class Ui_MainWindow(object):
         self.actionRemover.setText(QCoreApplication.translate("MainWindow", u"Remover ...", None))
         self.labelNovaCategoriaProduto.setText(QCoreApplication.translate("MainWindow", u"Nova categoria de produto", None))
         self.labelNomeCategoriaProduto.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
+        self.lineEditNomeCategoriaProduto.setText("")
         self.labelDescricaoCategoriaProduto.setText(QCoreApplication.translate("MainWindow", u"Descri\u00e7\u00e3o", None))
         self.pushButtonCadastrarCategoriaProduto.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabCategoria), QCoreApplication.translate("MainWindow", u"Categoria", None))
@@ -829,7 +829,6 @@ class Ui_MainWindow(object):
         self.lineEditCelularCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Celular", None))
         self.labelEnderecoCliente.setText(QCoreApplication.translate("MainWindow", u"Endere\u00e7o", None))
         self.lineEditSenhaCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Senha (padr\u00e3o: 123456)", None))
-        self.lineEditUFCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"UF", None))
         self.lineEditCidadeCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Cidade", None))
         self.lineEditUsernameCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Username", None))
         self.lineEditCEPCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"CEP", None))

@@ -109,7 +109,10 @@ class Controller(QObject):
     def cadastrarPreco(self):
         produtoNome = self.view.comboBoxProdutoPreco.currentText()
         valor = self.view.doubleSpinValorPreco.value()
-        diaDaSemana = self.view.comboBoxProdutoPreco.currentText()[:3].lower()
+        diaDaSemana = self.view.comboBoxDiaDaSemanaPreco.currentText()[
+            :3
+        ].lower()
+
         response = self.getRequest("produtos/?nome={0}".format(produtoNome))
         produto_uuid = self.handleResponse(response=response)
         if produto_uuid is None:
@@ -170,7 +173,70 @@ class Controller(QObject):
         self.view.lineEditCEPZonaEntrega.clear()
 
     def cadastrarCliente(self):
-        pass
+        nome = self.view.lineEditNomeCliente.text()
+        email = self.view.lineEditEmailCliente.text()
+        username = self.view.lineEditUsernameCliente.text()
+        telefone = self.view.lineEditTelefoneCliente.text()
+        celular = self.view.lineEditCelularCliente.text()
+        senha = self.view.lineEditSenhaCliente.text()
+
+        logradouro = self.view.lineEditLogradouroCliente.text()
+        uf = self.view.comboBoxUFCliente.currentText()
+        cidade = self.view.lineEditCidadeCliente.text()
+        numero = self.view.lineEditNumeroCliente.text()
+        bairro = self.view.lineEditBairroCliente.text()
+        cep = self.view.lineEditCEPCliente.text()
+        complemento = self.view.lineEditComplementoCliente.text()
+        response = self.postRequest(
+            "enderecos/",
+            json={
+                "uf": uf,
+                "cidade": cidade,
+                "logradouro": logradouro,
+                "numero": numero,
+                "nome": nome,
+                "complemento": complemento,
+                "bairro": bairro,
+                "cep": cep,
+            },
+        )
+
+        endereco_uuid = self.handleResponse(response=response)
+        if endereco_uuid is None:
+            return
+
+        response = self.postRequest(
+            "loja/cliente",
+            json={
+                "nome": nome,
+                "username": username,
+                "email": email,
+                "telefone": telefone,
+                "celular": celular,
+                "endereco_uuid": endereco_uuid,
+                "password": senha,
+                "loja_uuid": self.window.loja_uuid,
+            },
+        )
+
+        try:
+            self.handleResponse(response, "Cliente cadastrado com sucesso!")
+        except ValueError:
+            return None
+
+        self.view.lineEditNomeCliente.clear()
+        self.view.lineEditEmailCliente.clear()
+        self.view.lineEditUsernameCliente.clear()
+        self.view.lineEditTelefoneCliente.clear()
+        self.view.lineEditCelularCliente.clear()
+        self.view.lineEditSenhaCliente.clear()
+
+        self.view.lineEditLogradouroCliente.clear()
+        self.view.lineEditCidadeCliente.clear()
+        self.view.lineEditNumeroCliente.clear()
+        self.view.lineEditBairroCliente.clear()
+        self.view.lineEditCEPCliente.clear()
+        self.view.lineEditComplementoCliente.clear()
 
     def cadastrarFornecedor(self):
         pass
@@ -182,18 +248,43 @@ class Controller(QObject):
         pass
 
     def cadastrarStatusPedido(self):
-        pass
+        nome = self.view.lineEditNomeStatusPedido.text()
+        descricao = self.view.textEditDescricaoStatusPedido.toPlainText()
+
+        response = self.postRequest(
+            "status/",
+            json={
+                "nome": nome,
+                "descricao": descricao,
+                "loja_uuid": self.window.loja_uuid,
+            },
+        )
+
+        try:
+            self.handleResponse(
+                response, "Status de pedido cadastrado com sucesso!"
+            )
+        except ValueError:
+            return None
+
+        self.view.lineEditNomeStatusPedido.clear()
+        self.view.textEditDescricaoStatusPedido.clear()
 
     def handleResponse(
         self, response: httpx.Response, successMessage: str = ""
     ) -> Optional[str]:
         if response.status_code == 200:
-            return str(json.loads(response.text)[0]["uuid"])
+            r = str(json.loads(response.text)[0]["uuid"])
+            return r
 
         elif response.status_code == 201:
-            self.showMessage("Success", successMessage)
+            if successMessage:
+                self.showMessage("Success", successMessage)
             self.window.refreshUI()
             self.window.setupController()
+            with suppress(Exception):
+                r = str(json.loads(response.text)["uuid"])
+                return r
 
         elif response.status_code == 400:
             self.showMessage("Error", "Erro na requisição: dados inválidos.")

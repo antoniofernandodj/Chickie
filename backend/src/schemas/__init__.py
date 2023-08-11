@@ -9,10 +9,12 @@ from .signin import UsuarioSignIn, LojaSignIn  # noqa
 from .token import Token, TokenData  # noqa
 from .usuario import Usuario  # noqa
 from .endereco import Endereco  # noqa
-from .avaliacao_de_produto import AvaliacaoDeProduto # noqa
+from .avaliacao_de_produto import AvaliacaoDeProduto  # noqa
 from .entregador import Entregador  # noqa
 from .feedback import Feedback  # noqa
 from .funcionario import Funcionario  # noqa
 from .metodo_de_pagamento import MetodoDePagamento  # noqa
 from .pagamento import Pagamento  # noqa
 from .zona_de_entrega import ZonaDeEntrega  # noqa
+from .cliente import Cliente  # noqa
+from .status import Status  # noqa

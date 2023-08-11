@@ -15,9 +15,9 @@ class MainWindow(QMainWindow):
         self.app = app
         self.view = Ui_MainWindow()
         self.view.setupUi(self)
-        self.loja_uuid = "06da9970-efd8-4485-918a-0d4a3b3f0abd"
+        self.loja_uuid = "472d657d-7ed4-4431-bee9-dc0ccea98c73"
 
-        self.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2phIiwiZXhwIjoxNjkxNjc2NTA0fQ.Nxsoqbd0YTJXLy8aKmjMSUjBCnqMBh_TJ_Et-5TN1R0"  # noqa
+        self.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2phIiwiZXhwIjoxNjkxNzE0MjUxfQ.Svc-Q6w6slwBuFYbD10NzzIaUVcvp9Y51bmi40tlEr4"  # noqa
 
         self.refreshUI()
         self.controller = Controller(
@@ -30,7 +30,10 @@ class MainWindow(QMainWindow):
 
     def refreshUI(self):
         self.view.comboBoxUFZonaEntrega.clear()
-        self.view.comboBoxUFZonaEntrega.addItems([uf.value for uf in UF])
+        self.view.comboBoxUFZonaEntrega.addItems([uf.name for uf in UF])
+
+        self.view.comboBoxUFZonaEntrega.clear()
+        self.view.comboBoxUFCliente.addItems([uf.name for uf in UF])
 
         response = httpx.get(
             "http://localhost:8000/categorias/",
