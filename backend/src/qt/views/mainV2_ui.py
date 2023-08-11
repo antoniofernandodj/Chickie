@@ -27,7 +27,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(800, 599)
+        MainWindow.resize(773, 662)
         self.actionAtualizar = QAction(MainWindow)
         self.actionAtualizar.setObjectName(u"actionAtualizar")
         self.actionCadastro = QAction(MainWindow)
@@ -40,12 +40,14 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
+        self.tabWidget.setMinimumSize(QSize(0, 40))
         self.tabCategoria = QWidget()
         self.tabCategoria.setObjectName(u"tabCategoria")
         self.verticalLayout_2 = QVBoxLayout(self.tabCategoria)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.labelNovaCategoriaProduto = QLabel(self.tabCategoria)
         self.labelNovaCategoriaProduto.setObjectName(u"labelNovaCategoriaProduto")
+        self.labelNovaCategoriaProduto.setMinimumSize(QSize(0, 100))
 
         self.verticalLayout_2.addWidget(self.labelNovaCategoriaProduto, 0, Qt.AlignHCenter)
 
@@ -80,6 +82,7 @@ class Ui_MainWindow(object):
 
         self.pushButtonCadastrarCategoriaProduto = QPushButton(self.tabCategoria)
         self.pushButtonCadastrarCategoriaProduto.setObjectName(u"pushButtonCadastrarCategoriaProduto")
+        self.pushButtonCadastrarCategoriaProduto.setMinimumSize(QSize(0, 40))
 
         self.verticalLayout_2.addWidget(self.pushButtonCadastrarCategoriaProduto)
 
@@ -88,17 +91,18 @@ class Ui_MainWindow(object):
         self.tabProduto.setObjectName(u"tabProduto")
         self.verticalLayout_7 = QVBoxLayout(self.tabProduto)
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.labelNovoProduto = QLabel(self.tabProduto)
+        self.labelNovoProduto.setObjectName(u"labelNovoProduto")
+        self.labelNovoProduto.setMinimumSize(QSize(0, 100))
+
+        self.verticalLayout_7.addWidget(self.labelNovoProduto, 0, Qt.AlignHCenter)
+
         self.frame_6 = QFrame(self.tabProduto)
         self.frame_6.setObjectName(u"frame_6")
         self.frame_6.setFrameShape(QFrame.StyledPanel)
         self.frame_6.setFrameShadow(QFrame.Raised)
         self.verticalLayout_10 = QVBoxLayout(self.frame_6)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.labelNovoProduto = QLabel(self.frame_6)
-        self.labelNovoProduto.setObjectName(u"labelNovoProduto")
-
-        self.verticalLayout_10.addWidget(self.labelNovoProduto, 0, Qt.AlignHCenter)
-
         self.labelCategoriaProduto = QLabel(self.frame_6)
         self.labelCategoriaProduto.setObjectName(u"labelCategoriaProduto")
 
@@ -140,24 +144,26 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_10.addWidget(self.textEditDescricaoProduto)
 
-        self.pushButtonCadastrarProduto = QPushButton(self.frame_6)
-        self.pushButtonCadastrarProduto.setObjectName(u"pushButtonCadastrarProduto")
-
-        self.verticalLayout_10.addWidget(self.pushButtonCadastrarProduto)
-
 
         self.verticalLayout_7.addWidget(self.frame_6)
+
+        self.pushButtonCadastrarProduto = QPushButton(self.tabProduto)
+        self.pushButtonCadastrarProduto.setObjectName(u"pushButtonCadastrarProduto")
+        self.pushButtonCadastrarProduto.setMinimumSize(QSize(0, 40))
+
+        self.verticalLayout_7.addWidget(self.pushButtonCadastrarProduto)
 
         self.tabWidget.addTab(self.tabProduto, "")
         self.tabPreco = QWidget()
         self.tabPreco.setObjectName(u"tabPreco")
         self.verticalLayout_3 = QVBoxLayout(self.tabPreco)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.labelCadastrarPreco = QLabel(self.tabPreco)
-        self.labelCadastrarPreco.setObjectName(u"labelCadastrarPreco")
-        self.labelCadastrarPreco.setMaximumSize(QSize(16777215, 150))
+        self.labelNovoPreco = QLabel(self.tabPreco)
+        self.labelNovoPreco.setObjectName(u"labelNovoPreco")
+        self.labelNovoPreco.setMinimumSize(QSize(0, 0))
+        self.labelNovoPreco.setMaximumSize(QSize(16777215, 100))
 
-        self.verticalLayout_3.addWidget(self.labelCadastrarPreco, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.labelNovoPreco, 0, Qt.AlignHCenter)
 
         self.frame_8 = QFrame(self.tabPreco)
         self.frame_8.setObjectName(u"frame_8")
@@ -208,6 +214,7 @@ class Ui_MainWindow(object):
 
         self.pushButtonCadastrarPreco = QPushButton(self.tabPreco)
         self.pushButtonCadastrarPreco.setObjectName(u"pushButtonCadastrarPreco")
+        self.pushButtonCadastrarPreco.setMinimumSize(QSize(0, 40))
 
         self.verticalLayout_3.addWidget(self.pushButtonCadastrarPreco)
 
@@ -218,7 +225,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.labelCadastroZonaEntrega = QLabel(self.tabZonaEntrega)
         self.labelCadastroZonaEntrega.setObjectName(u"labelCadastroZonaEntrega")
-        self.labelCadastroZonaEntrega.setMaximumSize(QSize(16777215, 150))
+        self.labelCadastroZonaEntrega.setMaximumSize(QSize(16777215, 100))
 
         self.verticalLayout_8.addWidget(self.labelCadastroZonaEntrega, 0, Qt.AlignHCenter)
 
@@ -228,11 +235,46 @@ class Ui_MainWindow(object):
         self.frame_7.setFrameShadow(QFrame.Raised)
         self.gridLayout_5 = QGridLayout(self.frame_7)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.labelCidadeZonaEntrega = QLabel(self.frame_7)
+        self.labelCidadeZonaEntrega.setObjectName(u"labelCidadeZonaEntrega")
+        self.labelCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.labelCidadeZonaEntrega, 2, 1, 1, 1)
+
+        self.labelTaxaZonaEntrega = QLabel(self.frame_7)
+        self.labelTaxaZonaEntrega.setObjectName(u"labelTaxaZonaEntrega")
+        self.labelTaxaZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.labelTaxaZonaEntrega, 6, 1, 1, 1)
+
         self.labelCEPZonaEntrega = QLabel(self.frame_7)
         self.labelCEPZonaEntrega.setObjectName(u"labelCEPZonaEntrega")
         self.labelCEPZonaEntrega.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_5.addWidget(self.labelCEPZonaEntrega, 6, 0, 1, 1)
+
+        self.lineEditCEPZonaEntrega = QLineEdit(self.frame_7)
+        self.lineEditCEPZonaEntrega.setObjectName(u"lineEditCEPZonaEntrega")
+        self.lineEditCEPZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.lineEditCEPZonaEntrega, 7, 0, 1, 1)
+
+        self.doubleSpinBoxTaxaZonaEntrega = QDoubleSpinBox(self.frame_7)
+        self.doubleSpinBoxTaxaZonaEntrega.setObjectName(u"doubleSpinBoxTaxaZonaEntrega")
+
+        self.gridLayout_5.addWidget(self.doubleSpinBoxTaxaZonaEntrega, 7, 1, 1, 1)
+
+        self.comboBoxUFZonaEntrega = QComboBox(self.frame_7)
+        self.comboBoxUFZonaEntrega.addItem("")
+        self.comboBoxUFZonaEntrega.setObjectName(u"comboBoxUFZonaEntrega")
+
+        self.gridLayout_5.addWidget(self.comboBoxUFZonaEntrega, 5, 1, 1, 1)
+
+        self.lineEditBairroZonaEntrega = QLineEdit(self.frame_7)
+        self.lineEditBairroZonaEntrega.setObjectName(u"lineEditBairroZonaEntrega")
+        self.lineEditBairroZonaEntrega.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.lineEditBairroZonaEntrega, 5, 0, 1, 1)
 
         self.lineEditNomeZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditNomeZonaEntrega.setObjectName(u"lineEditNomeZonaEntrega")
@@ -246,52 +288,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout_5.addWidget(self.labelBairroZonaEntrega, 4, 0, 1, 1)
 
-        self.labelTaxaZonaEntrega = QLabel(self.frame_7)
-        self.labelTaxaZonaEntrega.setObjectName(u"labelTaxaZonaEntrega")
-        self.labelTaxaZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.labelTaxaZonaEntrega, 6, 1, 1, 1)
-
-        self.doubleSpinBoxTaxaZonaEntrega = QDoubleSpinBox(self.frame_7)
-        self.doubleSpinBoxTaxaZonaEntrega.setObjectName(u"doubleSpinBoxTaxaZonaEntrega")
-
-        self.gridLayout_5.addWidget(self.doubleSpinBoxTaxaZonaEntrega, 7, 1, 1, 1)
-
-        self.labelCidadeZonaEntrega = QLabel(self.frame_7)
-        self.labelCidadeZonaEntrega.setObjectName(u"labelCidadeZonaEntrega")
-        self.labelCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.labelCidadeZonaEntrega, 2, 1, 1, 1)
-
         self.lineEditCidadeZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditCidadeZonaEntrega.setObjectName(u"lineEditCidadeZonaEntrega")
         self.lineEditCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_5.addWidget(self.lineEditCidadeZonaEntrega, 3, 1, 1, 1)
-
-        self.comboBoxUFZonaEntrega = QComboBox(self.frame_7)
-        self.comboBoxUFZonaEntrega.addItem("")
-        self.comboBoxUFZonaEntrega.setObjectName(u"comboBoxUFZonaEntrega")
-
-        self.gridLayout_5.addWidget(self.comboBoxUFZonaEntrega, 5, 1, 1, 1)
-
-        self.labelUFZonaEntrega = QLabel(self.frame_7)
-        self.labelUFZonaEntrega.setObjectName(u"labelUFZonaEntrega")
-        self.labelUFZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.labelUFZonaEntrega, 4, 1, 1, 1)
-
-        self.lineEditBairroZonaEntrega = QLineEdit(self.frame_7)
-        self.lineEditBairroZonaEntrega.setObjectName(u"lineEditBairroZonaEntrega")
-        self.lineEditBairroZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.lineEditBairroZonaEntrega, 5, 0, 1, 1)
-
-        self.lineEditCEPZonaEntrega = QLineEdit(self.frame_7)
-        self.lineEditCEPZonaEntrega.setObjectName(u"lineEditCEPZonaEntrega")
-        self.lineEditCEPZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.lineEditCEPZonaEntrega, 7, 0, 1, 1)
 
         self.label = QLabel(self.frame_7)
         self.label.setObjectName(u"label")
@@ -299,15 +300,22 @@ class Ui_MainWindow(object):
 
         self.gridLayout_5.addWidget(self.label, 2, 0, 1, 1)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.labelUFZonaEntrega = QLabel(self.frame_7)
+        self.labelUFZonaEntrega.setObjectName(u"labelUFZonaEntrega")
+        self.labelUFZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addItem(self.verticalSpacer, 1, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.labelUFZonaEntrega, 4, 1, 1, 1)
+
+        self.verticalSpacer = QSpacerItem(20, 70, QSizePolicy.Minimum, QSizePolicy.Fixed)
+
+        self.gridLayout_5.addItem(self.verticalSpacer, 1, 0, 1, 2)
 
 
         self.verticalLayout_8.addWidget(self.frame_7)
 
         self.pushButtonCadastrarZonaEntrega = QPushButton(self.tabZonaEntrega)
         self.pushButtonCadastrarZonaEntrega.setObjectName(u"pushButtonCadastrarZonaEntrega")
+        self.pushButtonCadastrarZonaEntrega.setMinimumSize(QSize(0, 40))
 
         self.verticalLayout_8.addWidget(self.pushButtonCadastrarZonaEntrega)
 
@@ -316,111 +324,136 @@ class Ui_MainWindow(object):
         self.tabCliente.setObjectName(u"tabCliente")
         self.gridLayout = QGridLayout(self.tabCliente)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.pushButtonCadastrarCliente = QPushButton(self.tabCliente)
+        self.pushButtonCadastrarCliente.setObjectName(u"pushButtonCadastrarCliente")
+        self.pushButtonCadastrarCliente.setMinimumSize(QSize(0, 40))
+
+        self.gridLayout.addWidget(self.pushButtonCadastrarCliente, 4, 0, 1, 1)
+
         self.frame_2 = QFrame(self.tabCliente)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
-        self.gridLayout_2 = QGridLayout(self.frame_2)
-        self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.lineEditBairroCliente = QLineEdit(self.frame_2)
-        self.lineEditBairroCliente.setObjectName(u"lineEditBairroCliente")
-        self.lineEditBairroCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditBairroCliente, 10, 1, 1, 1)
-
-        self.lineEditTelefoneCliente = QLineEdit(self.frame_2)
-        self.lineEditTelefoneCliente.setObjectName(u"lineEditTelefoneCliente")
-        self.lineEditTelefoneCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditTelefoneCliente, 5, 0, 1, 1)
-
-        self.lineEditComplementoCliente = QLineEdit(self.frame_2)
-        self.lineEditComplementoCliente.setObjectName(u"lineEditComplementoCliente")
-        self.lineEditComplementoCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditComplementoCliente, 11, 1, 1, 1)
-
+        self.gridLayout_6 = QGridLayout(self.frame_2)
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.lineEditEmailCliente = QLineEdit(self.frame_2)
         self.lineEditEmailCliente.setObjectName(u"lineEditEmailCliente")
+        self.lineEditEmailCliente.setMinimumSize(QSize(0, 0))
         self.lineEditEmailCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lineEditEmailCliente, 4, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.lineEditEmailCliente, 2, 0, 1, 1)
 
-        self.lineEditNomeCliente = QLineEdit(self.frame_2)
-        self.lineEditNomeCliente.setObjectName(u"lineEditNomeCliente")
-        self.lineEditNomeCliente.setAlignment(Qt.AlignCenter)
+        self.lineEditUsernameCliente = QLineEdit(self.frame_2)
+        self.lineEditUsernameCliente.setObjectName(u"lineEditUsernameCliente")
+        self.lineEditUsernameCliente.setMinimumSize(QSize(0, 0))
+        self.lineEditUsernameCliente.setMaximumSize(QSize(16777215, 16777215))
+        self.lineEditUsernameCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lineEditNomeCliente, 3, 0, 1, 2)
-
-        self.lineEditCelularCliente = QLineEdit(self.frame_2)
-        self.lineEditCelularCliente.setObjectName(u"lineEditCelularCliente")
-        self.lineEditCelularCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditCelularCliente, 5, 1, 1, 1)
-
-        self.labelEnderecoCliente = QLabel(self.frame_2)
-        self.labelEnderecoCliente.setObjectName(u"labelEnderecoCliente")
-
-        self.gridLayout_2.addWidget(self.labelEnderecoCliente, 7, 0, 1, 2, Qt.AlignHCenter)
+        self.gridLayout_6.addWidget(self.lineEditUsernameCliente, 2, 1, 1, 1)
 
         self.lineEditSenhaCliente = QLineEdit(self.frame_2)
         self.lineEditSenhaCliente.setObjectName(u"lineEditSenhaCliente")
         self.lineEditSenhaCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lineEditSenhaCliente, 6, 0, 1, 2)
+        self.gridLayout_6.addWidget(self.lineEditSenhaCliente, 4, 0, 1, 2)
 
-        self.lineEditCidadeCliente = QLineEdit(self.frame_2)
-        self.lineEditCidadeCliente.setObjectName(u"lineEditCidadeCliente")
-        self.lineEditCidadeCliente.setAlignment(Qt.AlignCenter)
+        self.lineEditNomeCliente = QLineEdit(self.frame_2)
+        self.lineEditNomeCliente.setObjectName(u"lineEditNomeCliente")
+        self.lineEditNomeCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lineEditCidadeCliente, 9, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.lineEditNomeCliente, 1, 0, 1, 2)
 
-        self.lineEditUsernameCliente = QLineEdit(self.frame_2)
-        self.lineEditUsernameCliente.setObjectName(u"lineEditUsernameCliente")
-        self.lineEditUsernameCliente.setAlignment(Qt.AlignCenter)
+        self.lineEditCelularCliente = QLineEdit(self.frame_2)
+        self.lineEditCelularCliente.setObjectName(u"lineEditCelularCliente")
+        self.lineEditCelularCliente.setMinimumSize(QSize(200, 0))
+        self.lineEditCelularCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lineEditUsernameCliente, 4, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.lineEditCelularCliente, 3, 0, 1, 1)
 
-        self.lineEditCEPCliente = QLineEdit(self.frame_2)
-        self.lineEditCEPCliente.setObjectName(u"lineEditCEPCliente")
-        self.lineEditCEPCliente.setAlignment(Qt.AlignCenter)
+        self.lineEditTelefoneCliente = QLineEdit(self.frame_2)
+        self.lineEditTelefoneCliente.setObjectName(u"lineEditTelefoneCliente")
+        self.lineEditTelefoneCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lineEditCEPCliente, 11, 0, 1, 1)
-
-        self.lineEditNumeroCliente = QLineEdit(self.frame_2)
-        self.lineEditNumeroCliente.setObjectName(u"lineEditNumeroCliente")
-        self.lineEditNumeroCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditNumeroCliente, 10, 0, 1, 1)
-
-        self.lineEditLogradouroCliente = QLineEdit(self.frame_2)
-        self.lineEditLogradouroCliente.setObjectName(u"lineEditLogradouroCliente")
-        self.lineEditLogradouroCliente.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lineEditLogradouroCliente, 8, 0, 1, 2)
+        self.gridLayout_6.addWidget(self.lineEditTelefoneCliente, 3, 1, 1, 1)
 
         self.labelDadosCliente = QLabel(self.frame_2)
         self.labelDadosCliente.setObjectName(u"labelDadosCliente")
+        self.labelDadosCliente.setMinimumSize(QSize(0, 40))
+        self.labelDadosCliente.setMaximumSize(QSize(16777215, 50))
+        self.labelDadosCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.labelDadosCliente, 2, 0, 1, 2, Qt.AlignHCenter)
+        self.gridLayout_6.addWidget(self.labelDadosCliente, 0, 0, 1, 2)
 
-        self.comboBoxUFCliente = QComboBox(self.frame_2)
+
+        self.gridLayout.addWidget(self.frame_2, 1, 0, 2, 1)
+
+        self.frame_15 = QFrame(self.tabCliente)
+        self.frame_15.setObjectName(u"frame_15")
+        self.frame_15.setFrameShape(QFrame.StyledPanel)
+        self.frame_15.setFrameShadow(QFrame.Raised)
+        self.gridLayout_2 = QGridLayout(self.frame_15)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.lineEditComplementoCliente = QLineEdit(self.frame_15)
+        self.lineEditComplementoCliente.setObjectName(u"lineEditComplementoCliente")
+        self.lineEditComplementoCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lineEditComplementoCliente, 2, 1, 1, 1)
+
+        self.lineEditLogradouroCliente = QLineEdit(self.frame_15)
+        self.lineEditLogradouroCliente.setObjectName(u"lineEditLogradouroCliente")
+        self.lineEditLogradouroCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lineEditLogradouroCliente, 1, 0, 1, 4)
+
+        self.lineEditCEPCliente = QLineEdit(self.frame_15)
+        self.lineEditCEPCliente.setObjectName(u"lineEditCEPCliente")
+        self.lineEditCEPCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lineEditCEPCliente, 3, 1, 1, 2)
+
+        self.lineEditNumeroCliente = QLineEdit(self.frame_15)
+        self.lineEditNumeroCliente.setObjectName(u"lineEditNumeroCliente")
+        self.lineEditNumeroCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lineEditNumeroCliente, 2, 0, 1, 1)
+
+        self.lineEditCidadeCliente = QLineEdit(self.frame_15)
+        self.lineEditCidadeCliente.setObjectName(u"lineEditCidadeCliente")
+        self.lineEditCidadeCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lineEditCidadeCliente, 3, 0, 1, 1)
+
+        self.comboBoxUFCliente = QComboBox(self.frame_15)
         self.comboBoxUFCliente.setObjectName(u"comboBoxUFCliente")
+        self.comboBoxUFCliente.setMaximumSize(QSize(70, 16777215))
 
-        self.gridLayout_2.addWidget(self.comboBoxUFCliente, 9, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.comboBoxUFCliente, 3, 3, 1, 1)
+
+        self.lineEditBairroCliente = QLineEdit(self.frame_15)
+        self.lineEditBairroCliente.setObjectName(u"lineEditBairroCliente")
+        self.lineEditBairroCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lineEditBairroCliente, 2, 2, 1, 2)
+
+        self.labelEnderecoCliente = QLabel(self.frame_15)
+        self.labelEnderecoCliente.setObjectName(u"labelEnderecoCliente")
+        self.labelEnderecoCliente.setMinimumSize(QSize(0, 40))
+        self.labelEnderecoCliente.setMaximumSize(QSize(16777215, 16777215))
+        self.labelEnderecoCliente.setBaseSize(QSize(0, 0))
+        self.labelEnderecoCliente.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.labelEnderecoCliente, 0, 0, 1, 4)
 
 
-        self.gridLayout.addWidget(self.frame_2, 1, 0, 1, 1)
-
-        self.pushButtonCadastrarCliente = QPushButton(self.tabCliente)
-        self.pushButtonCadastrarCliente.setObjectName(u"pushButtonCadastrarCliente")
-
-        self.gridLayout.addWidget(self.pushButtonCadastrarCliente, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.frame_15, 3, 0, 1, 1)
 
         self.labelCadastroCliente = QLabel(self.tabCliente)
         self.labelCadastroCliente.setObjectName(u"labelCadastroCliente")
+        self.labelCadastroCliente.setMinimumSize(QSize(0, 100))
+        self.labelCadastroCliente.setMaximumSize(QSize(16777215, 100))
+        self.labelCadastroCliente.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.labelCadastroCliente, 0, 0, 1, 1, Qt.AlignHCenter)
+        self.gridLayout.addWidget(self.labelCadastroCliente, 0, 0, 1, 1)
 
         self.tabWidget.addTab(self.tabCliente, "")
         self.tabFornecedor = QWidget()
@@ -429,7 +462,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.labelNovoFornecedor = QLabel(self.tabFornecedor)
         self.labelNovoFornecedor.setObjectName(u"labelNovoFornecedor")
-        self.labelNovoFornecedor.setMaximumSize(QSize(16777215, 150))
+        self.labelNovoFornecedor.setMaximumSize(QSize(16777215, 100))
 
         self.verticalLayout_4.addWidget(self.labelNovoFornecedor, 0, Qt.AlignHCenter)
 
@@ -496,6 +529,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.labelNovoFuncionario = QLabel(self.tabFuncionario)
         self.labelNovoFuncionario.setObjectName(u"labelNovoFuncionario")
+        self.labelNovoFuncionario.setMaximumSize(QSize(16777215, 100))
 
         self.verticalLayout_5.addWidget(self.labelNovoFuncionario, 0, Qt.AlignHCenter)
 
@@ -568,6 +602,10 @@ class Ui_MainWindow(object):
 
         self.frame_11 = QFrame(self.frame_10)
         self.frame_11.setObjectName(u"frame_11")
+        self.frame_11.setStyleSheet(u"#frame_11, #frame_12, #frame_5 {\n"
+"  border: 0px;\n"
+"}\n"
+"")
         self.frame_11.setFrameShape(QFrame.StyledPanel)
         self.frame_11.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_11)
@@ -580,6 +618,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.frame_14 = QFrame(self.frame_5)
         self.frame_14.setObjectName(u"frame_14")
+        self.frame_14.setStyleSheet(u"#frame_14 {\n"
+"  border: 0px;\n"
+"}")
         self.frame_14.setFrameShape(QFrame.StyledPanel)
         self.frame_14.setFrameShadow(QFrame.Raised)
         self.gridLayout_4 = QGridLayout(self.frame_14)
@@ -680,6 +721,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
         self.labelCadastroStatusPedido = QLabel(self.tabStatus)
         self.labelCadastroStatusPedido.setObjectName(u"labelCadastroStatusPedido")
+        self.labelCadastroStatusPedido.setMinimumSize(QSize(0, 100))
+        self.labelCadastroStatusPedido.setMaximumSize(QSize(16777215, 16777215))
 
         self.verticalLayout_13.addWidget(self.labelCadastroStatusPedido, 0, Qt.AlignHCenter)
 
@@ -739,7 +782,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 800, 27))
+        self.menubar.setGeometry(QRect(0, 0, 773, 27))
         self.menuA_es = QMenu(self.menubar)
         self.menuA_es.setObjectName(u"menuA_es")
         self.menuHistorico = QMenu(self.menubar)
@@ -760,7 +803,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -788,7 +831,7 @@ class Ui_MainWindow(object):
         self.textEditDescricaoProduto.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Descri\u00e7\u00e3o", None))
         self.pushButtonCadastrarProduto.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabProduto), QCoreApplication.translate("MainWindow", u"Produto", None))
-        self.labelCadastrarPreco.setText(QCoreApplication.translate("MainWindow", u"Cadastrar Pre\u00e7o Excepcional", None))
+        self.labelNovoPreco.setText(QCoreApplication.translate("MainWindow", u"Novo Pre\u00e7o Excepcional", None))
         self.labelProdutoPreco.setText(QCoreApplication.translate("MainWindow", u"Produto", None))
         self.comboBoxProdutoPreco.setItemText(0, QCoreApplication.translate("MainWindow", u"Pizza tal", None))
 
@@ -805,37 +848,38 @@ class Ui_MainWindow(object):
         self.pushButtonCadastrarPreco.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPreco), QCoreApplication.translate("MainWindow", u"Pre\u00e7o", None))
         self.labelCadastroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cadastro de Zona de Entrega", None))
-        self.labelCEPZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"CEP", None))
-        self.lineEditNomeZonaEntrega.setPlaceholderText("")
-        self.labelBairroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Bairro", None))
-        self.labelTaxaZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Taxa", None))
         self.labelCidadeZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cidade", None))
-        self.lineEditCidadeZonaEntrega.setPlaceholderText("")
+        self.labelTaxaZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Taxa", None))
+        self.labelCEPZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"CEP", None))
+        self.lineEditCEPZonaEntrega.setPlaceholderText("")
         self.comboBoxUFZonaEntrega.setItemText(0, QCoreApplication.translate("MainWindow", u"RJ", None))
 
         self.comboBoxUFZonaEntrega.setPlaceholderText("")
-        self.labelUFZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"UF", None))
         self.lineEditBairroZonaEntrega.setPlaceholderText("")
-        self.lineEditCEPZonaEntrega.setPlaceholderText("")
+        self.lineEditNomeZonaEntrega.setPlaceholderText("")
+        self.labelBairroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Bairro", None))
+        self.lineEditCidadeZonaEntrega.setPlaceholderText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
+        self.labelUFZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"UF", None))
         self.pushButtonCadastrarZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabZonaEntrega), QCoreApplication.translate("MainWindow", u"Zona de Entrega", None))
-        self.lineEditBairroCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Bairro", None))
-        self.lineEditTelefoneCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Telefone", None))
-        self.lineEditComplementoCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Complemento", None))
+        self.pushButtonCadastrarCliente.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.lineEditEmailCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"E-mail", None))
+        self.lineEditUsernameCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Username", None))
+        self.lineEditSenhaCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Senha (padr\u00e3o: 123456)", None))
         self.lineEditNomeCliente.setText("")
         self.lineEditNomeCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Nome Completo", None))
         self.lineEditCelularCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Celular", None))
-        self.labelEnderecoCliente.setText(QCoreApplication.translate("MainWindow", u"Endere\u00e7o", None))
-        self.lineEditSenhaCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Senha (padr\u00e3o: 123456)", None))
-        self.lineEditCidadeCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Cidade", None))
-        self.lineEditUsernameCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Username", None))
+        self.lineEditTelefoneCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Telefone", None))
+        self.labelDadosCliente.setText(QCoreApplication.translate("MainWindow", u"Dados Pessoais", None))
+        self.lineEditComplementoCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Complemento", None))
+        self.lineEditLogradouroCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Logradouro", None))
         self.lineEditCEPCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"CEP", None))
         self.lineEditNumeroCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"N\u00famero", None))
-        self.lineEditLogradouroCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Logradouro", None))
-        self.labelDadosCliente.setText(QCoreApplication.translate("MainWindow", u"Dados Pessoais", None))
-        self.pushButtonCadastrarCliente.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
+        self.lineEditCidadeCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Cidade", None))
+        self.lineEditBairroCliente.setText("")
+        self.lineEditBairroCliente.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Bairro", None))
+        self.labelEnderecoCliente.setText(QCoreApplication.translate("MainWindow", u"Endere\u00e7o", None))
         self.labelCadastroCliente.setText(QCoreApplication.translate("MainWindow", u"Cadastro de cliente", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabCliente), QCoreApplication.translate("MainWindow", u"Cliente", None))
         self.labelNovoFornecedor.setText(QCoreApplication.translate("MainWindow", u"Novo Fornecedor", None))

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>599</height>
+    <width>773</width>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,14 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>40</height>
+       </size>
+      </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabCategoria">
        <attribute name="title">
@@ -27,6 +33,12 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item alignment="Qt::AlignHCenter">
          <widget class="QLabel" name="labelNovaCategoriaProduto">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
           <property name="text">
            <string>Nova categoria de produto</string>
           </property>
@@ -70,6 +82,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButtonCadastrarCategoriaProduto">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
           <property name="text">
            <string>Cadastrar</string>
           </property>
@@ -82,6 +100,19 @@
         <string>Produto</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QLabel" name="labelNovoProduto">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Novo Produto</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QFrame" name="frame_6">
           <property name="frameShape">
@@ -91,13 +122,6 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
-           <item alignment="Qt::AlignHCenter">
-            <widget class="QLabel" name="labelNovoProduto">
-             <property name="text">
-              <string>Novo Produto</string>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QLabel" name="labelCategoriaProduto">
              <property name="text">
@@ -152,14 +176,20 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="pushButtonCadastrarProduto">
-             <property name="text">
-              <string>Cadastrar</string>
-             </property>
-            </widget>
-           </item>
           </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonCadastrarProduto">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Cadastrar</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -170,15 +200,21 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item alignment="Qt::AlignHCenter">
-         <widget class="QLabel" name="labelCadastrarPreco">
+         <widget class="QLabel" name="labelNovoPreco">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>150</height>
+            <height>100</height>
            </size>
           </property>
           <property name="text">
-           <string>Cadastrar Preço Excepcional</string>
+           <string>Novo Preço Excepcional</string>
           </property>
          </widget>
         </item>
@@ -268,6 +304,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButtonCadastrarPreco">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
           <property name="text">
            <string>Cadastrar</string>
           </property>
@@ -285,7 +327,7 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>150</height>
+            <height>100</height>
            </size>
           </property>
           <property name="text">
@@ -302,6 +344,26 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
+           <item row="2" column="1">
+            <widget class="QLabel" name="labelCidadeZonaEntrega">
+             <property name="text">
+              <string>Cidade</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLabel" name="labelTaxaZonaEntrega">
+             <property name="text">
+              <string>Taxa</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
            <item row="6" column="0">
             <widget class="QLabel" name="labelCEPZonaEntrega">
              <property name="text">
@@ -309,6 +371,41 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLineEdit" name="lineEditCEPZonaEntrega">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxTaxaZonaEntrega"/>
+           </item>
+           <item row="5" column="1">
+            <widget class="QComboBox" name="comboBoxUFZonaEntrega">
+             <property name="placeholderText">
+              <string/>
+             </property>
+             <item>
+              <property name="text">
+               <string>RJ</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLineEdit" name="lineEditBairroZonaEntrega">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string/>
              </property>
             </widget>
            </item>
@@ -332,73 +429,8 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="QLabel" name="labelTaxaZonaEntrega">
-             <property name="text">
-              <string>Taxa</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxTaxaZonaEntrega"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelCidadeZonaEntrega">
-             <property name="text">
-              <string>Cidade</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1">
             <widget class="QLineEdit" name="lineEditCidadeZonaEntrega">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QComboBox" name="comboBoxUFZonaEntrega">
-             <property name="placeholderText">
-              <string/>
-             </property>
-             <item>
-              <property name="text">
-               <string>RJ</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="labelUFZonaEntrega">
-             <property name="text">
-              <string>UF</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLineEdit" name="lineEditBairroZonaEntrega">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLineEdit" name="lineEditCEPZonaEntrega">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -417,15 +449,28 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="4" column="1">
+            <widget class="QLabel" name="labelUFZonaEntrega">
+             <property name="text">
+              <string>UF</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>40</height>
+               <height>70</height>
               </size>
              </property>
             </spacer>
@@ -435,6 +480,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButtonCadastrarZonaEntrega">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
           <property name="text">
            <string>Cadastrar</string>
           </property>
@@ -447,7 +498,20 @@
         <string>Cliente</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="0">
+        <item row="4" column="0">
+         <widget class="QPushButton" name="pushButtonCadastrarCliente">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Cadastrar</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" rowspan="2">
          <widget class="QFrame" name="frame_2">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -455,39 +519,15 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="10" column="1">
-            <widget class="QLineEdit" name="lineEditBairroCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>Bairro</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLineEdit" name="lineEditTelefoneCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>Telefone</string>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="1">
-            <widget class="QLineEdit" name="lineEditComplementoCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>Complemento</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="2" column="0">
             <widget class="QLineEdit" name="lineEditEmailCliente">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -496,7 +536,39 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0" colspan="2">
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="lineEditUsernameCliente">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>Username</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <widget class="QLineEdit" name="lineEditSenhaCliente">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>Senha (padrão: 123456)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
             <widget class="QLineEdit" name="lineEditNomeCliente">
              <property name="text">
               <string/>
@@ -509,8 +581,14 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="3" column="0">
             <widget class="QLineEdit" name="lineEditCelularCliente">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
@@ -519,64 +597,61 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0" colspan="2" alignment="Qt::AlignHCenter">
-            <widget class="QLabel" name="labelEnderecoCliente">
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="lineEditTelefoneCliente">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>Telefone</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QLabel" name="labelDadosCliente">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>50</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Endereço</string>
+              <string>Dados Pessoais</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
-           <item row="6" column="0" colspan="2">
-            <widget class="QLineEdit" name="lineEditSenhaCliente">
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QFrame" name="frame_15">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="lineEditComplementoCliente">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
              <property name="placeholderText">
-              <string>Senha (padrão: 123456)</string>
+              <string>Complemento</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
-            <widget class="QLineEdit" name="lineEditCidadeCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>Cidade</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="lineEditUsernameCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>Username</string>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="0">
-            <widget class="QLineEdit" name="lineEditCEPCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>CEP</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLineEdit" name="lineEditNumeroCliente">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="placeholderText">
-              <string>Número</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0" colspan="2">
+           <item row="1" column="0" colspan="4">
             <widget class="QLineEdit" name="lineEditLogradouroCliente">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -586,30 +661,109 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0" colspan="2" alignment="Qt::AlignHCenter">
-            <widget class="QLabel" name="labelDadosCliente">
-             <property name="text">
-              <string>Dados Pessoais</string>
+           <item row="3" column="1" colspan="2">
+            <widget class="QLineEdit" name="lineEditCEPCliente">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>CEP</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="0">
-            <widget class="QComboBox" name="comboBoxUFCliente"/>
+           <item row="2" column="0">
+            <widget class="QLineEdit" name="lineEditNumeroCliente">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>Número</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLineEdit" name="lineEditCidadeCliente">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>Cidade</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QComboBox" name="comboBoxUFCliente">
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>16777215</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2" colspan="2">
+            <widget class="QLineEdit" name="lineEditBairroCliente">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="placeholderText">
+              <string>Bairro</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="4">
+            <widget class="QLabel" name="labelEnderecoCliente">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="baseSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Endereço</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pushButtonCadastrarCliente">
-          <property name="text">
-           <string>Cadastrar</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" alignment="Qt::AlignHCenter">
+        <item row="0" column="0">
          <widget class="QLabel" name="labelCadastroCliente">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
           <property name="text">
            <string>Cadastro de cliente</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -625,7 +779,7 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>150</height>
+            <height>100</height>
            </size>
           </property>
           <property name="text">
@@ -731,6 +885,12 @@
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item alignment="Qt::AlignHCenter">
          <widget class="QLabel" name="labelNovoFuncionario">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
           <property name="text">
            <string>Novo Funcionario</string>
           </property>
@@ -846,6 +1006,12 @@
            </item>
            <item>
             <widget class="QFrame" name="frame_11">
+             <property name="styleSheet">
+              <string notr="true">#frame_11, #frame_12, #frame_5 {
+  border: 0px;
+}
+</string>
+             </property>
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
@@ -864,6 +1030,11 @@
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
                   <widget class="QFrame" name="frame_14">
+                   <property name="styleSheet">
+                    <string notr="true">#frame_14 {
+  border: 0px;
+}</string>
+                   </property>
                    <property name="frameShape">
                     <enum>QFrame::StyledPanel</enum>
                    </property>
@@ -997,6 +1168,18 @@ p, li { white-space: pre-wrap; }
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item alignment="Qt::AlignHCenter">
          <widget class="QLabel" name="labelCadastroStatusPedido">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="text">
            <string>Cadastro de Status de Pedido</string>
           </property>
@@ -1077,7 +1260,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>773</width>
      <height>27</height>
     </rect>
    </property>
