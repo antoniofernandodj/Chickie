@@ -1,9 +1,9 @@
 from . import views  # noqa
 from src.infra.database.entities.endereco import UF
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+from PySide6.QtWidgets import QMainWindow
 from src.qt.controllers import Controller
-import json
-import httpx
+from src.qt.models import CategoriasModel, ProdutosModel, StatusModel
+from PySide6.QtCore import Slot
 
 
 class MainWindow(QMainWindow):
@@ -11,80 +11,63 @@ class MainWindow(QMainWindow):
         from src.qt.views.mainV2_ui import Ui_MainWindow
 
         super().__init__()
-
         self.app = app
+
+        # Models
+        self.loja_uuid = "472d657d-7ed4-4431-bee9-dc0ccea98c73"
+        self.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2phIiwiZXhwIjoxNjkxODE0MjI0fQ.pYim-SHvaoRTSUbyUz6Mmp5zaJZjsTsQnC-Ew6eyUPc"  # noqa
+
+        self.categorias = CategoriasModel(self)
+        self.produtos = ProdutosModel(self)
+        self.status = StatusModel(self)
+
+        # View
         self.view = Ui_MainWindow()
         self.view.setupUi(self)
-        self.loja_uuid = "472d657d-7ed4-4431-bee9-dc0ccea98c73"
+        self.setupUI()
 
-        self.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2phIiwiZXhwIjoxNjkxNzE0MjUxfQ.Svc-Q6w6slwBuFYbD10NzzIaUVcvp9Y51bmi40tlEr4"  # noqa
-
-        self.refreshUI()
+        # Controller
         self.controller = Controller(
             view=self.view, app=self.app, window=self
         )
+        self.controller.categoriaCatastrada.connect(self.atualizarCategoria)
+        self.controller.produtoCatastrado.connect(self.atualizarProduto)
+
         self.controller.setup()
 
     def setupController(self):
         self.controller.setup()
 
-    def refreshUI(self):
+    @Slot(str)
+    def atualizarCategoria(self, categoriaNome: str):
+        self.categorias.refresh()
+        categoria = self.categorias.getFromNome(categoriaNome)
+        if categoria is None:
+            return
+        self.view.comboBoxCategoriaProduto.addItem(categoria.nome)
+
+    @Slot(str)
+    def atualizarProduto(self, produtoNome: str):
+        self.produtos.refresh()
+        produto = self.produtos.getFromNome(produtoNome)
+        if produto is None:
+            return
+
+        self.view.comboBoxProdutoPreco.addItem(produto.nome)
+        self.view.comboBoxItemPedido.addItem(produto.nome)
+
+    def setupUI(self):
         self.view.comboBoxUFZonaEntrega.clear()
         self.view.comboBoxUFZonaEntrega.addItems([uf.name for uf in UF])
 
-        self.view.comboBoxUFZonaEntrega.clear()
+        self.view.comboBoxUFCliente.clear()
         self.view.comboBoxUFCliente.addItems([uf.name for uf in UF])
 
-        response = httpx.get(
-            "http://localhost:8000/categorias/",
-            headers={"Authorization": f"Bearer {self.token}"},
-        )
+        self.view.comboBoxCategoriaProduto.clear()
+        self.view.comboBoxCategoriaProduto.addItems(self.categorias.nomes)
 
-        if response.status_code == 200:
-            categoriaList = json.loads(response.text)
-            categoriaNomeList = [item["nome"] for item in categoriaList]
+        self.view.comboBoxProdutoPreco.clear()
+        self.view.comboBoxProdutoPreco.addItems(self.produtos.nomes)
 
-            self.view.comboBoxCategoriaProduto.clear()
-            self.view.comboBoxCategoriaProduto.addItems(categoriaNomeList)
-
-        elif response.status_code == 400:
-            QMessageBox.critical(
-                self.window, "Error", "Erro na requisição: dados inválidos."
-            )
-        elif response.status_code == 401:
-            QMessageBox.critical(
-                self.window, "Error", "Erro de sessão: Sua sessão expirou!"
-            )
-        elif response.status_code == 500:
-            QMessageBox.critical(self.window, "Error", "Erro no servidor.")
-        else:
-            QMessageBox.critical(self.window, "Error", "Erro desconhecido.")
-
-        self.controller = Controller(
-            view=self.view, app=self.app, window=self
-        )
-
-        response = httpx.get(
-            "http://localhost:8000/produtos/",
-            headers={"Authorization": f"Bearer {self.token}"},
-        )
-
-        if response.status_code == 200:
-            produtoList = json.loads(response.text)
-            produtoNomeList = [item["nome"] for item in produtoList]
-
-            self.view.comboBoxProdutoPreco.clear()
-            self.view.comboBoxProdutoPreco.addItems(produtoNomeList)
-
-        elif response.status_code == 400:
-            QMessageBox.critical(
-                self.window, "Error", "Erro na requisição: dados inválidos."
-            )
-        elif response.status_code == 401:
-            QMessageBox.critical(
-                self.window, "Error", "Erro de sessão: Sua sessão expirou!"
-            )
-        elif response.status_code == 500:
-            QMessageBox.critical(self.window, "Error", "Erro no servidor.")
-        else:
-            QMessageBox.critical(self.window, "Error", "Erro desconhecido.")
+        self.view.comboBoxItemPedido.clear()
+        self.view.comboBoxItemPedido.addItems(self.produtos.nomes)

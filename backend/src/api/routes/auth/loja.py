@@ -1,7 +1,7 @@
 # from src.presenters import controllers
 from fastapi.routing import APIRouter
 from datetime import timedelta
-from src.main import security
+from src.api import security
 from src.infra.database.manager import DatabaseConnectionManager
 from src.infra.database.repository import Repository
 from fastapi.security import OAuth2PasswordRequestForm

@@ -7,7 +7,7 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.requests import Request
 
-from src.main import security
+from src.api import security
 from src.schemas import Usuario
 from src.schemas import Token, UsuarioSignIn
 from config import settings as s

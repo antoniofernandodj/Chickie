@@ -8,7 +8,7 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.main import security
+from src.api import security
 from src.schemas import Loja, AvaliacaoDeProduto
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager

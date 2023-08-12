@@ -7,7 +7,8 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.main import security
+from typing import Optional
+from src.api import security
 from src.schemas import Loja, Pedido
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
@@ -22,10 +23,13 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 
 @router.get("/")
-async def requisitar_pedidos():
+async def requisitar_pedidos(loja_uuid: Optional[str] = Query(None)):
+    kwargs = {}
+    if loja_uuid is not None:
+        kwargs["loja_uuid"] = loja_uuid
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)
-        results = await repository.find_all()
+        results = await repository.find_all(**kwargs)
 
     return results
 

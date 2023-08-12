@@ -20,8 +20,8 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QFrame, QGridLayout, QHBoxLayout, QLabel,
     QLineEdit, QListView, QMainWindow, QMenu,
     QMenuBar, QPlainTextEdit, QPushButton, QSizePolicy,
-    QSpacerItem, QStatusBar, QTabWidget, QTextBrowser,
-    QTextEdit, QVBoxLayout, QWidget)
+    QStatusBar, QTabWidget, QTextBrowser, QTextEdit,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -235,80 +235,41 @@ class Ui_MainWindow(object):
         self.frame_7.setFrameShadow(QFrame.Raised)
         self.gridLayout_5 = QGridLayout(self.frame_7)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.labelCidadeZonaEntrega = QLabel(self.frame_7)
-        self.labelCidadeZonaEntrega.setObjectName(u"labelCidadeZonaEntrega")
-        self.labelCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
+        self.lineEditCidadeZonaEntrega = QLineEdit(self.frame_7)
+        self.lineEditCidadeZonaEntrega.setObjectName(u"lineEditCidadeZonaEntrega")
+        self.lineEditCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.labelCidadeZonaEntrega, 2, 1, 1, 1)
-
-        self.labelTaxaZonaEntrega = QLabel(self.frame_7)
-        self.labelTaxaZonaEntrega.setObjectName(u"labelTaxaZonaEntrega")
-        self.labelTaxaZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.labelTaxaZonaEntrega, 6, 1, 1, 1)
-
-        self.labelCEPZonaEntrega = QLabel(self.frame_7)
-        self.labelCEPZonaEntrega.setObjectName(u"labelCEPZonaEntrega")
-        self.labelCEPZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.labelCEPZonaEntrega, 6, 0, 1, 1)
-
-        self.lineEditCEPZonaEntrega = QLineEdit(self.frame_7)
-        self.lineEditCEPZonaEntrega.setObjectName(u"lineEditCEPZonaEntrega")
-        self.lineEditCEPZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.lineEditCEPZonaEntrega, 7, 0, 1, 1)
-
-        self.doubleSpinBoxTaxaZonaEntrega = QDoubleSpinBox(self.frame_7)
-        self.doubleSpinBoxTaxaZonaEntrega.setObjectName(u"doubleSpinBoxTaxaZonaEntrega")
-
-        self.gridLayout_5.addWidget(self.doubleSpinBoxTaxaZonaEntrega, 7, 1, 1, 1)
-
-        self.comboBoxUFZonaEntrega = QComboBox(self.frame_7)
-        self.comboBoxUFZonaEntrega.addItem("")
-        self.comboBoxUFZonaEntrega.setObjectName(u"comboBoxUFZonaEntrega")
-
-        self.gridLayout_5.addWidget(self.comboBoxUFZonaEntrega, 5, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditCidadeZonaEntrega, 1, 1, 1, 1)
 
         self.lineEditBairroZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditBairroZonaEntrega.setObjectName(u"lineEditBairroZonaEntrega")
         self.lineEditBairroZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditBairroZonaEntrega, 5, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditBairroZonaEntrega, 2, 0, 1, 1)
 
         self.lineEditNomeZonaEntrega = QLineEdit(self.frame_7)
         self.lineEditNomeZonaEntrega.setObjectName(u"lineEditNomeZonaEntrega")
         self.lineEditNomeZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditNomeZonaEntrega, 3, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditNomeZonaEntrega, 1, 0, 1, 1)
 
-        self.labelBairroZonaEntrega = QLabel(self.frame_7)
-        self.labelBairroZonaEntrega.setObjectName(u"labelBairroZonaEntrega")
-        self.labelBairroZonaEntrega.setAlignment(Qt.AlignCenter)
+        self.doubleSpinBoxTaxaZonaEntrega = QDoubleSpinBox(self.frame_7)
+        self.doubleSpinBoxTaxaZonaEntrega.setObjectName(u"doubleSpinBoxTaxaZonaEntrega")
 
-        self.gridLayout_5.addWidget(self.labelBairroZonaEntrega, 4, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.doubleSpinBoxTaxaZonaEntrega, 3, 1, 1, 1)
 
-        self.lineEditCidadeZonaEntrega = QLineEdit(self.frame_7)
-        self.lineEditCidadeZonaEntrega.setObjectName(u"lineEditCidadeZonaEntrega")
-        self.lineEditCidadeZonaEntrega.setAlignment(Qt.AlignCenter)
+        self.lineEditCEPZonaEntrega = QLineEdit(self.frame_7)
+        self.lineEditCEPZonaEntrega.setObjectName(u"lineEditCEPZonaEntrega")
+        self.lineEditCEPZonaEntrega.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.lineEditCidadeZonaEntrega, 3, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEditCEPZonaEntrega, 3, 0, 1, 1)
 
-        self.label = QLabel(self.frame_7)
-        self.label.setObjectName(u"label")
-        self.label.setAlignment(Qt.AlignCenter)
+        self.comboBoxUFZonaEntrega = QComboBox(self.frame_7)
+        self.comboBoxUFZonaEntrega.addItem("")
+        self.comboBoxUFZonaEntrega.setObjectName(u"comboBoxUFZonaEntrega")
+        self.comboBoxUFZonaEntrega.setStyleSheet(u"")
 
-        self.gridLayout_5.addWidget(self.label, 2, 0, 1, 1)
-
-        self.labelUFZonaEntrega = QLabel(self.frame_7)
-        self.labelUFZonaEntrega.setObjectName(u"labelUFZonaEntrega")
-        self.labelUFZonaEntrega.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.labelUFZonaEntrega, 4, 1, 1, 1)
-
-        self.verticalSpacer = QSpacerItem(20, 70, QSizePolicy.Minimum, QSizePolicy.Fixed)
-
-        self.gridLayout_5.addItem(self.verticalSpacer, 1, 0, 1, 2)
+        self.gridLayout_5.addWidget(self.comboBoxUFZonaEntrega, 2, 1, 1, 1)
 
 
         self.verticalLayout_8.addWidget(self.frame_7)
@@ -803,7 +764,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -848,19 +809,13 @@ class Ui_MainWindow(object):
         self.pushButtonCadastrarPreco.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPreco), QCoreApplication.translate("MainWindow", u"Pre\u00e7o", None))
         self.labelCadastroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cadastro de Zona de Entrega", None))
-        self.labelCidadeZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cidade", None))
-        self.labelTaxaZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Taxa", None))
-        self.labelCEPZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"CEP", None))
-        self.lineEditCEPZonaEntrega.setPlaceholderText("")
+        self.lineEditCidadeZonaEntrega.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Cidade", None))
+        self.lineEditBairroZonaEntrega.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Bairro", None))
+        self.lineEditNomeZonaEntrega.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Nome", None))
+        self.lineEditCEPZonaEntrega.setPlaceholderText(QCoreApplication.translate("MainWindow", u"CEP", None))
         self.comboBoxUFZonaEntrega.setItemText(0, QCoreApplication.translate("MainWindow", u"RJ", None))
 
         self.comboBoxUFZonaEntrega.setPlaceholderText("")
-        self.lineEditBairroZonaEntrega.setPlaceholderText("")
-        self.lineEditNomeZonaEntrega.setPlaceholderText("")
-        self.labelBairroZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Bairro", None))
-        self.lineEditCidadeZonaEntrega.setPlaceholderText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
-        self.labelUFZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"UF", None))
         self.pushButtonCadastrarZonaEntrega.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabZonaEntrega), QCoreApplication.translate("MainWindow", u"Zona de Entrega", None))
         self.pushButtonCadastrarCliente.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))

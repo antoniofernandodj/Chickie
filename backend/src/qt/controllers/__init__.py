@@ -4,6 +4,7 @@ from contextlib import suppress
 import json
 import httpx
 from typing import Optional
+from PySide6.QtCore import Signal
 
 with suppress(ImportError):
     from src.qt.views.mainV2_ui import Ui_MainWindow
@@ -13,6 +14,9 @@ with suppress(ImportError):
 
 
 class Controller(QObject):
+    categoriaCatastrada = Signal(str)
+    produtoCatastrado = Signal(str)
+
     def __init__(self, view: "Ui_MainWindow", app, window: "MainWindow"):
         super().__init__()
         self.view = view
@@ -72,6 +76,7 @@ class Controller(QObject):
 
         self.view.lineEditNomeCategoriaProduto.clear()
         self.view.plainTextEditDescricaoCategoriaProduto.clear()
+        self.categoriaCatastrada.emit(nome)
 
     def cadastrarProduto(self):
         nome = self.view.lineEditNomeProduto.text()
@@ -79,11 +84,11 @@ class Controller(QObject):
         categoriaNome = self.view.comboBoxCategoriaProduto.currentText()
         preco = self.view.doubleSpinBoxPrecoProduto.value()
 
-        response = self.getRequest(
-            "categorias/?nome={0}".format(categoriaNome)
-        )
+        categoria = self.window.categorias.getFromNome(categoriaNome)
+        if categoria is None:
+            return
 
-        categoria_uuid = self.handleResponse(response=response)
+        categoria_uuid = categoria.uuid
         if categoria_uuid is None:
             return
 
@@ -113,8 +118,11 @@ class Controller(QObject):
             :3
         ].lower()
 
-        response = self.getRequest("produtos/?nome={0}".format(produtoNome))
-        produto_uuid = self.handleResponse(response=response)
+        produto = self.window.produtos.getFromNome(produtoNome)
+        if produto is None:
+            return
+
+        produto_uuid = produto.uuid
         if produto_uuid is None:
             return
 
@@ -239,13 +247,89 @@ class Controller(QObject):
         self.view.lineEditComplementoCliente.clear()
 
     def cadastrarFornecedor(self):
-        pass
+        nome = self.view.lineEditNomeFornecedor
+        username = self.view.lineEditUsernameFornecedor
+        email = self.view.lineEditEmailFornecedor
+        celular = self.view.lineEditCelularFornecedor
+        telefone = self.view.lineEditTelefoneFornecedor
+        CNPJ = self.view.lineEditCNPJFornecedor
+
+        response = self.postRequest(
+            "fornecedores/",
+            json={
+                "email": email,
+                "username": username,
+                "celular": celular,
+                "telefone": telefone,
+                "nome": nome,
+                "CNPJ": CNPJ,
+            },
+        )
+
+        try:
+            self.handleResponse(
+                response, "Fornecedor cadastrado com sucesso!"
+            )
+        except ValueError:
+            return None
 
     def cadastrarFuncionario(self):
-        pass
+        nome = self.view.lineEditNomeFuncionario
+        cargo = self.view.lineEditCargoFuncionario
+        email = self.view.lineEditEmailFuncionario
+        senha = self.view.lineEditSenhaFuncionario
+        telefone = self.view.lineEditTelefoneFuncionario
+        celular = self.view.lineEditCelularFuncionario
+
+        response = self.postRequest(
+            "fornecedores/",
+            json={
+                "email": email,
+                "cargo": cargo,
+                "senha": senha,
+                "telefone": telefone,
+                "nome": nome,
+                "celular": celular,
+            },
+        )
+
+        try:
+            self.handleResponse(
+                response, "Funcionario cadastrado com sucesso!"
+            )
+        except ValueError:
+            return None
 
     def cadastrarPedido(self):
-        pass
+        status_uuid = self.view.comboBoxStatusPedido.currentText()
+        frete = self.view.doubleSpinBoxFretePedido.value()
+        loja_uuid = self.window.loja_uuid
+        usuarioNome = self.view.comboBoxClientePedido.currentText()
+
+        response = self.getRequest("usuarios/?nome={0}".format(usuarioNome))
+
+        endereco_uuid = self.getEnderecoUUIDFromResponse(response=response)
+        usuario_uuid = self.handleResponse(response=response)
+        if endereco_uuid is None or usuario_uuid is None:
+            return None
+
+        response = self.postRequest(
+            "fornecedores/",
+            json={
+                "status_uuid": status_uuid,
+                "frete": frete,
+                "loja_uuid": loja_uuid,
+                "usuario_uuid": usuario_uuid,
+                "endereco_uuid": endereco_uuid,
+            },
+        )
+
+        try:
+            pedido_uuid = self.handleResponse(response=response)
+        except ValueError:
+            return None
+
+        print(pedido_uuid)
 
     def cadastrarStatusPedido(self):
         nome = self.view.lineEditNomeStatusPedido.text()
@@ -280,11 +364,10 @@ class Controller(QObject):
         elif response.status_code == 201:
             if successMessage:
                 self.showMessage("Success", successMessage)
-            self.window.refreshUI()
-            self.window.setupController()
-            with suppress(Exception):
-                r = str(json.loads(response.text)["uuid"])
-                return r
+            # self.window.setupController()
+            # with suppress(Exception):
+            #     r = str(json.loads(response.text)["uuid"])
+            #     return r
 
         elif response.status_code == 400:
             self.showMessage("Error", "Erro na requisição: dados inválidos.")
@@ -300,6 +383,15 @@ class Controller(QObject):
 
         else:
             self.showMessage("Error", "Erro desconhecido.")
+        return None
+
+    def getEnderecoUUIDFromResponse(
+        self, response: httpx.Response, successMessage: str = ""
+    ) -> Optional[str]:
+        if response.status_code == 200:
+            r = str(json.loads(response.text)[0]["endereco_uuid"])
+            return r
+
         return None
 
     def getRequest(self, endpoint: str):
@@ -322,3 +414,26 @@ class Controller(QObject):
             QMessageBox.information(self.window, status, message)
         elif status == "Error":
             QMessageBox.critical(self.window, status, message)
+
+    def atualizarDados(self):
+        # Atualize os modelos aqui
+        self.window.atualizarCategoria("Nova Categoria")
+        self.window.atualizarProduto("Novo Produto")
+
+    def atualizarCategorias(self):
+        self.window.categorias.refresh()
+        self.window.view.comboBoxCategoriaProduto.clear()
+        self.window.view.comboBoxCategoriaProduto.addItems(
+            self.window.categorias.nomes
+        )
+
+    def atualizarProdutos(self):
+        self.window.produtos.refresh()
+        self.window.view.comboBoxProdutoPreco.clear()
+        self.window.view.comboBoxProdutoPreco.addItems(
+            self.window.produtos.nomes
+        )
+
+    def atualizarInterface(self):
+        self.atualizarCategorias()
+        self.atualizarProdutos()

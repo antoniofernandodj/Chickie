@@ -7,8 +7,8 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.main import security
-from src.schemas import Loja, MetodoDePagamento
+from src.api import security
+from src.schemas import Loja, ZonaDeEntrega
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
@@ -16,31 +16,27 @@ from src.infra.database.manager import DatabaseConnectionManager
 current_user = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="Metodo de pagamento não encontrado",
+    detail="Zona de entrega não encontrada",
 )
 
-router = APIRouter(
-    prefix="/metodos_de_pagamento", tags=["Métodos de pagamentos"]
-)
+router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 
 
 @router.get("/")
-async def requisitar_metodos_de_pagamento():
+async def requisitar_zonas_de_entrega():
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(MetodoDePagamento, connection=connection)
+        repository = Repository(ZonaDeEntrega, connection=connection)
         results = await repository.find_all()
 
     return results
 
 
 @router.get("/{uuid}")
-async def requisitar_metodo_de_pagamento(
-    uuid: Annotated[
-        str, Path(title="O uuid do método de pagamento a fazer get")
-    ]
+async def requisitar_zona_de_entrega(
+    uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(MetodoDePagamento, connection=connection)
+        repository = Repository(ZonaDeEntrega, connection=connection)
         result = await repository.find_one(uuid=uuid)
 
         if result is None:
@@ -50,13 +46,11 @@ async def requisitar_metodo_de_pagamento(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_metodos_de_pagamento(
-    metodo_de_pagamento: MetodoDePagamento,
-):
+async def cadastrar_zonas_de_entrega(zona_de_entrega: ZonaDeEntrega):
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(MetodoDePagamento, connection=connection)
+        repository = Repository(ZonaDeEntrega, connection=connection)
         try:
-            uuid = await repository.save(metodo_de_pagamento)
+            uuid = await repository.save(zona_de_entrega)
         except Exception as error:
             raise HTTPException(status_code=500, detail=str(error))
 
@@ -64,55 +58,53 @@ async def cadastrar_metodos_de_pagamento(
 
 
 @router.put("/{uuid}")
-async def atualizar_metodo_de_pagamento_put(
-    metodo_de_pagamento_Data: MetodoDePagamento,
+async def atualizar_zona_de_entrega_put(
+    zona_de_entrega_Data: ZonaDeEntrega,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer put")
     ],
 ):
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(MetodoDePagamento, connection=connection)
-        metodo_de_pagamento = await repository.find_one(uuid=uuid)
-        if metodo_de_pagamento is None:
+        repository = Repository(ZonaDeEntrega, connection=connection)
+        zona_de_entrega = await repository.find_one(uuid=uuid)
+        if zona_de_entrega is None:
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        metodo_de_pagamento,
-        metodo_de_pagamento_Data.model_dump(),  # type: ignore
+        zona_de_entrega, zona_de_entrega_Data.model_dump()  # type: ignore
     )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.patch("/{uuid}")
-async def atualizar_metodo_de_pagamento_patch(
-    metodo_de_pagamentoData: MetodoDePagamento,
+async def atualizar_zona_de_entrega_patch(
+    zona_de_entregaData: ZonaDeEntrega,
     uuid: Annotated[
-        str, Path(title="O uuid do método de pagemento a fazer patch")
+        str, Path(title="O uuid da zona de entrega a fazer patch")
     ],
 ):
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(MetodoDePagamento, connection=connection)
-        metodo_de_pagamento = await repository.find_one(uuid=uuid)
-        if metodo_de_pagamento is None:
+        repository = Repository(ZonaDeEntrega, connection=connection)
+        zona_de_entrega = await repository.find_one(uuid=uuid)
+        if zona_de_entrega is None:
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        metodo_de_pagamento,
-        metodo_de_pagamentoData.model_dump(),  # type: ignore
+        zona_de_entrega, zona_de_entregaData.model_dump()  # type: ignore
     )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")
-async def remover_metodo_de_pagamento(
+async def remover_zona_de_entrega(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
     ]
 ):
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(MetodoDePagamento, connection=connection)
+        repository = Repository(ZonaDeEntrega, connection=connection)
         try:
             itens_removed = await repository.delete_from_uuid(uuid=uuid)
         except Exception as error:

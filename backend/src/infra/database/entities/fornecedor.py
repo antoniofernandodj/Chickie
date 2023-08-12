@@ -14,6 +14,5 @@ class Fornecedor(Base):
     telefone = Col(Text)
 
     cnpj = Col(Text, unique=True)
-    site = Col(Text)
     nota_avaliacao = Col(Float)
     loja_uuid = Col(String(36), ForeignKey("lojas.uuid"))

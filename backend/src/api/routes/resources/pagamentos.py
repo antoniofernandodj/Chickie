@@ -7,7 +7,8 @@ from fastapi import (  # noqa
     Depends,
     Query,
 )
-from src.main import security
+from typing import Optional
+from src.api import security
 from src.schemas import Loja, Pagamento
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
@@ -15,30 +16,27 @@ from src.infra.database.manager import DatabaseConnectionManager
 
 current_user = Annotated[Loja, Depends(security.current_user)]
 NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="Pagamento não encontrado"
+    status_code=status.HTTP_404_NOT_FOUND, detail="Pagamento não encontrado"
 )
 
-router = APIRouter(
-    prefix="/pagamentos",
-    tags=["Pagamentos"]
-)
+router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
 
 @router.get("/")
-async def requisitar_pagamentos():
+async def requisitar_pagamentos(loja_uuid: Optional[str] = Query(None)):
+    kwargs = {}
+    if loja_uuid is not None:
+        kwargs["loja_uuid"] = loja_uuid
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
-        results = await repository.find_all()
+        results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_pagamento(
-    uuid: Annotated[
-        str, Path(title="O uuid do pagamento a fazer get")
-    ]
+    uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
@@ -51,9 +49,7 @@ async def requisitar_pagamento(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_pagamentos(
-    pagamento: Pagamento
-):
+async def cadastrar_pagamentos(pagamento: Pagamento):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
         try:
@@ -67,9 +63,7 @@ async def cadastrar_pagamentos(
 @router.put("/{uuid}")
 async def atualizar_pagamento_put(
     pagamento_Data: Pagamento,
-    uuid: Annotated[
-        str, Path(title="O uuid do pagemento a fazer put")
-    ],
+    uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
@@ -78,8 +72,7 @@ async def atualizar_pagamento_put(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        pagamento,
-        pagamento_Data.model_dump()  # type: ignore
+        pagamento, pagamento_Data.model_dump()  # type: ignore
     )
 
     return {"num_rows_affected": num_rows_affected}
@@ -88,9 +81,7 @@ async def atualizar_pagamento_put(
 @router.patch("/{uuid}")
 async def atualizar_pagamento_patch(
     pagamentoData: Pagamento,
-    uuid: Annotated[
-        str, Path(title="O uuid do pagamento a fazer patch")
-    ]
+    uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
@@ -99,18 +90,15 @@ async def atualizar_pagamento_patch(
             raise NotFoundException
 
     num_rows_affected = await repository.update(
-        pagamento,
-        pagamentoData.model_dump()  # type: ignore
+        pagamento, pagamentoData.model_dump()  # type: ignore
     )
 
-    return {'num_rows_affected': num_rows_affected}
+    return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")
 async def remover_pagamento(
-    uuid: Annotated[
-        str, Path(title="O uuid do pagemento a fazer delete")
-    ]
+    uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
