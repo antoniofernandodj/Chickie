@@ -5,7 +5,7 @@ from contextlib import suppress
 
 
 with suppress(ModuleNotFoundError, ImportError):
-    from src.qt import MainWindow
+    from src.qt.windows import MainWindow  # noqa
 
 
 class CategoriasModel:

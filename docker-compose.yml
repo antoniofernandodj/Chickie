@@ -6,6 +6,27 @@
 version: '3'
 
 services:
+  api:
+    container_name: api
+    build:
+      context: ./backend
+      dockerfile: ./dockerfiles/api.dockerfile
+    command: uvicorn --loop uvloop --port 8000 --log-level info --timeout-keep-alive 300 asgi:app
+
+    volumes:
+      - ./backend/src:/usr/app/src
+    restart: "on-failure"
+    env_file:
+      - ./infra.secrets.toml
+    network_mode: "host"
+    environment:
+      CHICKIE_MYENV: prod
+    depends_on:
+      - cache
+      - rabbitmq
+      - mongodb
+      - database
+
   database:
     image: postgres
     volumes:

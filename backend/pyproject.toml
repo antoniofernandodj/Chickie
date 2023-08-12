@@ -1,15 +1,14 @@
 [tool.black]
 line-length = 78
 
-
 [flake8]
 max-line-length = 78
 
 
 [tool.poetry]
-name = "chickie"
+name = "Chickie"
 version = "0.1.0"
-description = ""
+description = "Aplicação para pedidos e entregas de refeições"
 authors = ["Antonio Fernando <antoniofernandodj@outlook.com>"]
 readme = "README.md"
 
