@@ -959,17 +959,17 @@
                     <enum>QFrame::Raised</enum>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_4">
-                    <item row="1" column="0">
+                    <item row="3" column="0">
                      <widget class="QDoubleSpinBox" name="doubleSpinBoxFretePedido"/>
                     </item>
-                    <item row="1" column="2">
+                    <item row="1" column="0">
                      <widget class="QCheckBox" name="checkBoxFretePedido">
                       <property name="text">
-                       <string>Usar frete padrão</string>
+                       <string>Usar valor de frete padrão</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="0">
+                    <item row="2" column="0">
                      <widget class="QLabel" name="labelFretePedido">
                       <property name="text">
                        <string>Frete</string>
@@ -1051,14 +1051,79 @@ p, li { white-space: pre-wrap; }
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButtonAdicionarItemPedido">
-                   <property name="text">
-                    <string>Adicionar Item</string>
+                  <widget class="QFrame" name="frame_13">
+                   <property name="styleSheet">
+                    <string notr="true">#frame_13 {
+  border: 0px;
+}</string>
                    </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_2">
+                    <item>
+                     <widget class="QPushButton" name="pushButtonAdicionarItemPedido">
+                      <property name="text">
+                       <string>Adicionar Item</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButtonRemoverItem">
+                      <property name="text">
+                       <string>Remover item</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QListView" name="listView"/>
+                  <widget class="QListWidget" name="listWidgetItemPedido"/>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_16">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>60</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                    <item>
+                     <widget class="QLabel" name="label">
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTextBrowser" name="textBrowserTotalPedido">
+                      <property name="maximumSize">
+                       <size>
+                        <width>100</width>
+                        <height>35</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
                  </item>
                 </layout>
                </widget>

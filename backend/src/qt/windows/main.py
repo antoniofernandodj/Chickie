@@ -11,27 +11,22 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.app = app
 
-        # Models
         self.loja_uuid = loja_uuid
         self.token = token
 
         self.categorias = CategoriasModel(self)
         self.produtos = ProdutosModel(self)
         self.status = StatusModel(self)
+        self.items = []
 
-        # View
         self.view = Ui_MainWindow()
         self.view.setupUi(self)
         self.setupUI()
 
-        # Controller
         self.controller = MainController(
             view=self.view, app=self.app, window=self
         )
 
-        self.controller.setup()
-
-    def setupController(self):
         self.controller.setup()
 
     def setupUI(self):

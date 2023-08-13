@@ -1,7 +1,7 @@
 import json
 from contextlib import suppress
 from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QTableWidgetItem
 
 from src.qt.controllers.base import BaseController
 
@@ -23,6 +23,8 @@ class MainController(BaseController):
         self.categoriaCatastrada.connect(self.atualizarCategorias)
         self.produtoCatastrado.connect(self.atualizarProdutos)
 
+        self.totalPedido = 0.0
+
     def setup(self):
         self.view.pushButtonCadastrarCategoriaProduto.clicked.connect(
             self.cadastrarCategoriaProduto
@@ -31,7 +33,9 @@ class MainController(BaseController):
         self.view.pushButtonCadastrarProduto.clicked.connect(
             self.cadastrarProduto
         )  # ####
-        self.view.pushButtonCadastrarPreco.clicked.connect(self.cadastrarPreco)
+        self.view.pushButtonCadastrarPreco.clicked.connect(
+            self.cadastrarPreco
+        )
         self.view.pushButtonCadastrarZonaEntrega.clicked.connect(
             self.cadastrarZonaEntrega
         )
@@ -50,6 +54,55 @@ class MainController(BaseController):
         self.view.pushButtonCadastrarStatusPedido.clicked.connect(
             self.cadastrarStatusPedido
         )
+
+        self.view.pushButtonAdicionarItemPedido.clicked.connect(
+            self.adicionarItemNaLista
+        )
+
+        self.view.pushButtonRemoverItem.clicked.connect(
+            self.removerItemDaLista
+        )
+
+        self.view.checkBoxFretePedido.clicked.connect(self.setFreteSpinBox)
+
+    def setFreteSpinBox(self):
+        if self.view.checkBoxFretePedido.isChecked():
+            self.view.doubleSpinBoxFretePedido.hide()
+        else:
+            self.view.doubleSpinBoxFretePedido.show()
+
+    def refreshtextBrowserTotalPedido(self):
+        self.view.textBrowserTotalPedido.setText(f"R${self.totalPedido:.2f}")
+
+    def adicionarItemNaLista(self):
+        itemNome = self.view.comboBoxItemPedido.currentText()
+        produto = self.window.produtos.getFromNome(itemNome)
+
+        self.view.listWidgetItemPedido.addItem(
+            f"{itemNome}\t(R${produto.preco})"
+        )
+        self.totalPedido += produto.preco
+        self.refreshtextBrowserTotalPedido()
+
+        rowPosition = self.view.tableWidgetItemPedido.rowCount()
+        self.view.tableWidgetItemPedido.insertRow(rowPosition)
+
+        itemColunaNome = QTableWidgetItem(produto.nome)
+        itemColunaPreco = QTableWidgetItem(produto.preco)
+
+        self.tableWidget.setItem(rowPosition, 0, itemColunaNome)
+        self.tableWidget.setItem(rowPosition, 1, itemColunaPreco)
+
+    def removerItemDaLista(self):
+        selected_items = self.view.listWidgetItemPedido.selectedItems()
+        for item in selected_items:
+            itemNome = item.text()
+            itemNome = itemNome.split("\t")[0]
+            produto = self.window.produtos.getFromNome(itemNome)
+            self.totalPedido -= produto.preco
+            index = self.view.listWidgetItemPedido.row(item)
+            self.view.listWidgetItemPedido.takeItem(index)
+        self.refreshtextBrowserTotalPedido()
 
     def cadastrarCategoriaProduto(self):
         nome = self.view.lineEditNomeCategoriaProduto.text()
@@ -266,7 +319,9 @@ class MainController(BaseController):
         )
 
         try:
-            self.handleResponse(response, "Fornecedor cadastrado com sucesso!")
+            self.handleResponse(
+                response, "Fornecedor cadastrado com sucesso!"
+            )
         except ValueError:
             return None
 
@@ -309,7 +364,9 @@ class MainController(BaseController):
             endereco_uuid = str(json.loads(response.text)[0]["endereco_uuid"])
         else:
             QMessageBox.critical(
-                self.window, "Cadastro de Pedido", "Erro no cadastro do pedido"
+                self.window,
+                "Cadastro de Pedido",
+                "Erro no cadastro do pedido",
             )
 
         usuario_uuid = self.handleResponse(response=response)

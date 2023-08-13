@@ -18,10 +18,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
     QFrame, QGridLayout, QHBoxLayout, QLabel,
-    QLineEdit, QListView, QMainWindow, QMenu,
-    QMenuBar, QPlainTextEdit, QPushButton, QSizePolicy,
-    QStatusBar, QTabWidget, QTextBrowser, QTextEdit,
-    QVBoxLayout, QWidget)
+    QLineEdit, QListWidget, QListWidgetItem, QMainWindow,
+    QMenu, QMenuBar, QPlainTextEdit, QPushButton,
+    QSizePolicy, QStatusBar, QTabWidget, QTextBrowser,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -583,17 +583,17 @@ class Ui_MainWindow(object):
         self.doubleSpinBoxFretePedido = QDoubleSpinBox(self.frame_14)
         self.doubleSpinBoxFretePedido.setObjectName(u"doubleSpinBoxFretePedido")
 
-        self.gridLayout_4.addWidget(self.doubleSpinBoxFretePedido, 1, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.doubleSpinBoxFretePedido, 3, 0, 1, 1)
 
         self.checkBoxFretePedido = QCheckBox(self.frame_14)
         self.checkBoxFretePedido.setObjectName(u"checkBoxFretePedido")
 
-        self.gridLayout_4.addWidget(self.checkBoxFretePedido, 1, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBoxFretePedido, 1, 0, 1, 1)
 
         self.labelFretePedido = QLabel(self.frame_14)
         self.labelFretePedido.setObjectName(u"labelFretePedido")
 
-        self.gridLayout_4.addWidget(self.labelFretePedido, 0, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.labelFretePedido, 2, 0, 1, 1)
 
 
         self.verticalLayout_12.addWidget(self.frame_14)
@@ -645,15 +645,54 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_17.addWidget(self.comboBoxItemPedido)
 
-        self.pushButtonAdicionarItemPedido = QPushButton(self.frame_12)
+        self.frame_13 = QFrame(self.frame_12)
+        self.frame_13.setObjectName(u"frame_13")
+        self.frame_13.setStyleSheet(u"#frame_13 {\n"
+"  border: 0px;\n"
+"}")
+        self.frame_13.setFrameShape(QFrame.StyledPanel)
+        self.frame_13.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_2 = QHBoxLayout(self.frame_13)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.pushButtonAdicionarItemPedido = QPushButton(self.frame_13)
         self.pushButtonAdicionarItemPedido.setObjectName(u"pushButtonAdicionarItemPedido")
 
-        self.verticalLayout_17.addWidget(self.pushButtonAdicionarItemPedido)
+        self.horizontalLayout_2.addWidget(self.pushButtonAdicionarItemPedido)
 
-        self.listView = QListView(self.frame_12)
-        self.listView.setObjectName(u"listView")
+        self.pushButtonRemoverItem = QPushButton(self.frame_13)
+        self.pushButtonRemoverItem.setObjectName(u"pushButtonRemoverItem")
 
-        self.verticalLayout_17.addWidget(self.listView)
+        self.horizontalLayout_2.addWidget(self.pushButtonRemoverItem)
+
+
+        self.verticalLayout_17.addWidget(self.frame_13)
+
+        self.listWidgetItemPedido = QListWidget(self.frame_12)
+        self.listWidgetItemPedido.setObjectName(u"listWidgetItemPedido")
+
+        self.verticalLayout_17.addWidget(self.listWidgetItemPedido)
+
+        self.frame_16 = QFrame(self.frame_12)
+        self.frame_16.setObjectName(u"frame_16")
+        self.frame_16.setMaximumSize(QSize(16777215, 60))
+        self.frame_16.setFrameShape(QFrame.StyledPanel)
+        self.frame_16.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_3 = QHBoxLayout(self.frame_16)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.label = QLabel(self.frame_16)
+        self.label.setObjectName(u"label")
+        self.label.setMaximumSize(QSize(50, 16777215))
+
+        self.horizontalLayout_3.addWidget(self.label)
+
+        self.textBrowserTotalPedido = QTextBrowser(self.frame_16)
+        self.textBrowserTotalPedido.setObjectName(u"textBrowserTotalPedido")
+        self.textBrowserTotalPedido.setMaximumSize(QSize(100, 35))
+
+        self.horizontalLayout_3.addWidget(self.textBrowserTotalPedido)
+
+
+        self.verticalLayout_17.addWidget(self.frame_16)
 
 
         self.horizontalLayout.addWidget(self.frame_12)
@@ -850,7 +889,7 @@ class Ui_MainWindow(object):
         self.pushButtonCadastrarFuncionario.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabFuncionario), QCoreApplication.translate("MainWindow", u"Funcionario", None))
         self.labelCadastrarPedido.setText(QCoreApplication.translate("MainWindow", u"Cadastrar Pedido", None))
-        self.checkBoxFretePedido.setText(QCoreApplication.translate("MainWindow", u"Usar frete padr\u00e3o", None))
+        self.checkBoxFretePedido.setText(QCoreApplication.translate("MainWindow", u"Usar valor de frete padr\u00e3o", None))
         self.labelFretePedido.setText(QCoreApplication.translate("MainWindow", u"Frete", None))
         self.labelStatusPedido.setText(QCoreApplication.translate("MainWindow", u"Status", None))
         self.comboBoxStatusPedido.setItemText(0, QCoreApplication.translate("MainWindow", u"Pendente", None))
@@ -867,6 +906,8 @@ class Ui_MainWindow(object):
         self.comboBoxItemPedido.setItemText(0, QCoreApplication.translate("MainWindow", u"Pizza tal", None))
 
         self.pushButtonAdicionarItemPedido.setText(QCoreApplication.translate("MainWindow", u"Adicionar Item", None))
+        self.pushButtonRemoverItem.setText(QCoreApplication.translate("MainWindow", u"Remover item", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:600;\">Total:</span></p></body></html>", None))
         self.pushButtonCadastrarPedido.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPedido), QCoreApplication.translate("MainWindow", u"Pedido", None))
         self.labelCadastroStatusPedido.setText(QCoreApplication.translate("MainWindow", u"Cadastro de Status de Pedido", None))
