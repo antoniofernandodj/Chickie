@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QMessageBox
 from typing import Optional
+from contextlib import suppress
 import json
 import httpx
 
@@ -43,10 +44,10 @@ class BaseController(QObject):
         elif response.status_code == 201:
             if successMessage:
                 self.showMessage("Success", successMessage)
-            # self.window.setupController()
-            # with suppress(Exception):
-            #     r = str(json.loads(response.text)["uuid"])
-            #     return r
+
+            with suppress(Exception):
+                r = str(json.loads(response.text)["uuid"])
+                return r
 
         elif response.status_code == 400:
             self.showMessage("Error", "Erro na requisição: dados inválidos.")
