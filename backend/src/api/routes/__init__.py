@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from . import resources, auth
 import tomli
 
-# Read the version from pyproject.toml
 with open("pyproject.toml", "rb") as toml_file:
     toml_data = tomli.load(toml_file)
     version = toml_data["tool"]["poetry"]["version"]
@@ -22,20 +21,27 @@ def init_app(app: FastAPI) -> None:
             "name": name,
             "description": description,
             "links": [
-                {"rel": "self", "href": "https://api.example.com/"},
+                {"rel": "self", "href": "http://localhost:8000/"},
             ]
             + [
-                {"rel": route.path.split("/")[1], "href": route.path}
+                {
+                    "rel": route.path.split("/")[1],  # type: ignore
+                    "href": route.path,  # type: ignore
+                }
                 for route in app.router.routes
-                if route.path != "/"
+                if route.path != "/"  # type: ignore
             ],
             "actions": [
                 {
-                    "name": route.name.replace("_", " ").capitalize(),
-                    "methods": list(route.methods),
-                    "path": route.path,
+                    "name": (
+                        route.name.replace(  # type: ignore
+                            "_", " "
+                        ).capitalize()
+                    ),
+                    "methods": list(route.methods),  # type: ignore
+                    "path": route.path,  # type: ignore
                 }
-                for route in app.router.routes
+                for route in app.router.routes  # type: ignore
             ],
         }
 
