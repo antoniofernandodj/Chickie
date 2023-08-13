@@ -189,6 +189,11 @@
            <height>0</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton:hover {
+  background-color: rgba(180,200,220, 0.8);
+}</string>
+         </property>
          <property name="text">
           <string>Entrar</string>
          </property>
@@ -254,8 +259,20 @@
      <height>27</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuArquivo">
+    <property name="title">
+     <string>Arquivo</string>
+    </property>
+    <addaction name="actionSair"/>
+   </widget>
+   <addaction name="menuArquivo"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSair">
+   <property name="text">
+    <string>Sair</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

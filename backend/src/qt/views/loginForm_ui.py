@@ -11,14 +11,15 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QLineEdit, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout,
-    QWidget)
+    QLineEdit, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QSpacerItem, QStatusBar,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -28,6 +29,8 @@ class Ui_MainWindow(object):
         MainWindow.setStyleSheet(u".QLineEdit {\n"
 "  background-color: #ffffff;\n"
 "}")
+        self.actionSair = QAction(MainWindow)
+        self.actionSair.setObjectName(u"actionSair")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"#centralwidget {\n"
@@ -104,6 +107,9 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.pushButtonEntrar.sizePolicy().hasHeightForWidth())
         self.pushButtonEntrar.setSizePolicy(sizePolicy)
         self.pushButtonEntrar.setBaseSize(QSize(0, 0))
+        self.pushButtonEntrar.setStyleSheet(u"QPushButton:hover {\n"
+"  background-color: rgba(180,200,220, 0.8);\n"
+"}")
 
         self.verticalLayout_2.addWidget(self.pushButtonEntrar)
 
@@ -132,10 +138,15 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 27))
+        self.menuArquivo = QMenu(self.menubar)
+        self.menuArquivo.setObjectName(u"menuArquivo")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuArquivo.menuAction())
+        self.menuArquivo.addAction(self.actionSair)
 
         self.retranslateUi(MainWindow)
 
@@ -144,6 +155,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Login - Chickie", None))
+        self.actionSair.setText(QCoreApplication.translate("MainWindow", u"Sair", None))
         self.labelChikie.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:20pt; font-weight:600;\">Chickie</span></p></body></html>", None))
         self.labelLogin.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:600;\">Login</span></p></body></html>", None))
         self.lineEditLogin.setText("")
@@ -154,5 +166,6 @@ class Ui_MainWindow(object):
         self.pushButtonEntrar.setText(QCoreApplication.translate("MainWindow", u"Entrar", None))
         self.pushButtonCadastrar.setText(QCoreApplication.translate("MainWindow", u"Cadastre-se", None))
         self.pushButtonEsqueciASenha.setText(QCoreApplication.translate("MainWindow", u"Esqueci a senha", None))
+        self.menuArquivo.setTitle(QCoreApplication.translate("MainWindow", u"Arquivo", None))
     # retranslateUi
 
