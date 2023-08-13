@@ -87,7 +87,7 @@ class LoginWindow(QMainWindow):
         )  # ###
 
         self.controller.setup()
-        self.view.actionSair.triggered.connect(self.exit)
+        self.view.actionSair.triggered.connect(self.app.exit)
         self.mousePos = None
 
     def mousePressEvent(self, event):
@@ -100,9 +100,6 @@ class LoginWindow(QMainWindow):
 
     def mouseReleaseEvent(self, event):
         self.mousePos = None
-
-    def exit(self):
-        self.app.exit()
 
     """
     Eventos de Mouse:

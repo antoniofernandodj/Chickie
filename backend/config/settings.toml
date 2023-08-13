@@ -2,8 +2,17 @@
 CACHE_DEFAULT_TIMEOUT = 1800
 MODE = 'local'
 
+LOJA_NOME = "Loja Chickie"
+LOJA_USERNAME = "chickie"
+LOJA_TELEFONE = "2133333333"
+LOJA_CELULAR = "21999999999"
+LOJA_SENHA = "123123"
+LOJA_EMAIL = "loja@chickie.com"
+LOG_LEVEL = "DEBUG"
+
 [dev]
 MODE = 'dev'
 
 [prod]
 MODE = 'prod'
+LOG_LEVEL = "INFO"

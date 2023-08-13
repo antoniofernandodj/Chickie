@@ -1,5 +1,7 @@
 from config import settings as s
 import aiopg
+import psycopg2
+from psycopg2 import sql
 
 
 class DatabaseConnectionManager:
@@ -59,3 +61,78 @@ class DatabaseConnectionManager:
                         await cursor.execute(name)
 
                     cursor.close()
+
+
+class SyncDatabaseConnectionManager:
+    def __init__(self):
+        self.connection_pool = psycopg2.pool.SimpleConnectionPool(
+            minconn=1,
+            maxconn=10,
+            dbname=s.POSTGRES_DATABASE_DEV,
+            user=s.POSTGRES_USERNAME,
+            password=s.POSTGRES_PASSWORD,
+            host=s.POSTGRES_HOST,
+        )
+
+    def __enter__(self):
+        self.connection = self.connection_pool.getconn()
+        self.connection.autocommit = True
+        return self.connection
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        if self.connection:
+            self.connection_pool.putconn(self.connection)
+
+    @classmethod
+    def create_database(cls, name):
+        conn = None
+        try:
+            conn = psycopg2.connect(
+                dbname="postgres",
+                user=s.POSTGRES_USERNAME,
+                password=s.POSTGRES_PASSWORD,
+                host=s.POSTGRES_HOST,
+            )
+            conn.autocommit = True
+            cursor = conn.cursor()
+            cursor.execute(
+                sql.SQL(
+                    "SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s"
+                ),
+                (name,),
+            )
+            exists = cursor.fetchone()
+            if not exists:
+                cursor.execute(
+                    sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name))
+                )
+        finally:
+            if conn:
+                conn.close()
+
+    @classmethod
+    def remove_database(cls, name):
+        conn = None
+        try:
+            conn = psycopg2.connect(
+                dbname="postgres",
+                user=s.POSTGRES_USERNAME,
+                password=s.POSTGRES_PASSWORD,
+                host=s.POSTGRES_HOST,
+            )
+            conn.autocommit = True
+            cursor = conn.cursor()
+            cursor.execute(
+                sql.SQL(
+                    "SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s"
+                ),
+                (name,),
+            )
+            exists = cursor.fetchone()
+            if exists:
+                cursor.execute(
+                    sql.SQL("DROP DATABASE {}").format(sql.Identifier(name))
+                )
+        finally:
+            if conn:
+                conn.close()

@@ -71,9 +71,9 @@ async def atualizar_pagamento_put(
         if pagamento is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        pagamento, pagamento_Data.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            pagamento, pagamento_Data.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

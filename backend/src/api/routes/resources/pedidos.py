@@ -80,9 +80,9 @@ async def atualizar_pedido_put(
         if pedido is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        pedido, itemData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            pedido, itemData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

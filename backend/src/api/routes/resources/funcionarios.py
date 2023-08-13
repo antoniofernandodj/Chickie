@@ -71,9 +71,9 @@ async def atualizar_funcionario_put(
         if funcionario is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        funcionario, funcionarioData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            funcionario, funcionarioData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

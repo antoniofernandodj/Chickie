@@ -77,9 +77,9 @@ async def atualizar_preco_put(
         if preco is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        preco, itemData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            preco, itemData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

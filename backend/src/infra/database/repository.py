@@ -40,8 +40,7 @@ class Repository:
             values = list(kwargs.values())
             where_clause = " AND ".join([f"{c} = %s" for c in columns])
             query = f"SELECT * FROM {self.tablename} WHERE {where_clause};"
-            logging.debug(f"Query: {query}\n")
-            print(query, where_clause)
+            logging.debug(f"\nQuery: {query} Values: {values}")
 
         else:
             query = f"SELECT * FROM {self.tablename}"
@@ -82,7 +81,7 @@ class Repository:
             query = "SELECT * FROM {} WHERE {};".format(
                 self.tablename, where_clause
             )
-            logging.debug(f"Query: {query} {values}\n")
+            logging.debug(f"\nQuery: {query} Values: {values}")
         else:
             query = f"SELECT * FROM {self.tablename}"
 
@@ -168,7 +167,7 @@ class Repository:
             self.tablename, column_clause, value_placeholder
         )
 
-        logging.info(f"Command: {command} {values}")
+        logging.info(f"\nCommand: {command} Values: {values}")
         async with self.lock:
             cursor = await self.connection.cursor()
             await cursor.execute(command, values)
@@ -194,7 +193,7 @@ class Repository:
         query = "UPDATE {} SET {} WHERE uuid = '{}';".format(
             self.tablename, set_clause, item.uuid
         )
-        logging.info(f"Command: {query} {values}")
+        logging.info(f"\nCommand: {query} Values: {values}")
         async with self.lock:
             cursor = await self.connection.cursor()
             await cursor.execute(query, values)
@@ -216,7 +215,7 @@ class Repository:
         """
         uuid = item.uuid
         query = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
-        logging.debug(f"Query: {query} {uuid}\n")
+        logging.info(f"Query: {query} uuid = {uuid}\n")
 
         async with self.lock:
             cursor = await self.connection.cursor()
@@ -237,7 +236,7 @@ class Repository:
             int: The number of rows affected by the delete operation.
         """
         query = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
-        logging.debug(f"Query: {query} {uuid}\n")
+        logging.info(f"Query: {query} uuid = {uuid}\n")
 
         async with self.lock:
             cursor = await self.connection.cursor()

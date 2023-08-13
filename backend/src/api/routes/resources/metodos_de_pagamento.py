@@ -82,10 +82,10 @@ async def atualizar_metodo_de_pagamento_put(
         if metodo_de_pagamento is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        metodo_de_pagamento,
-        metodo_de_pagamento_Data.model_dump(),  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            metodo_de_pagamento,
+            metodo_de_pagamento_Data.model_dump(),  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

@@ -10,6 +10,9 @@ uic:
 qt:
 	poetry run python qt.py
 
+test:
+	poetry run python -m pytest . -vv
+
 celeryWorker:
 	poetry run celery -A scheduler worker --loglevel=info
 

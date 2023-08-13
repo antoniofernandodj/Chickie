@@ -5,7 +5,7 @@ from src.api import security
 from src.infra.database.manager import DatabaseConnectionManager
 from src.infra.database.repository import Repository
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Path
 from typing import Any
 from src.schemas import LojaSignIn, Token, Loja, UsuarioSignIn, Cliente
 from typing import Annotated
@@ -15,6 +15,25 @@ from src import use_cases
 
 router = APIRouter(prefix="/loja", tags=["Loja", "Auth"])
 current_company = Annotated[Loja, Depends(security.current_company)]
+
+
+NotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND, detail="Categoria não encontrada"
+)
+
+
+@router.get("/{uuid}")
+async def requisitar_loja(
+    uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
+):
+    async with DatabaseConnectionManager() as connection:
+        repository = Repository(Loja, connection=connection)
+        result = await repository.find_one(uuid=uuid)
+
+        if result is None:
+            raise NotFoundException
+
+    return result
 
 
 @router.post("/login", response_model=Token)

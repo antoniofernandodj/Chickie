@@ -96,9 +96,9 @@ async def atualizar_categoria_put(
         if categoria is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        categoria, itemData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            categoria, itemData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

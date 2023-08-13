@@ -73,9 +73,9 @@ async def atualizar_entregador_put(
         if entregador is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        entregador, entregadorData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            entregador, entregadorData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

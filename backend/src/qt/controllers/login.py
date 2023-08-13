@@ -24,10 +24,18 @@ class LoginController:
         login = self.view.lineEditLogin.text()
         senha = self.view.lineEditSenha.text()
 
-        response = httpx.post(
-            f"{self.host}/loja/login",
-            data={"username": login, "password": senha},
-        )
+        try:
+            response = httpx.post(
+                f"{self.host}/loja/login",
+                data={"username": login, "password": senha},
+            )
+        except httpx.ConnectError:
+            QMessageBox.critical(
+                self.window,
+                "Erro de conexão",
+                "Erro na coneção com a api",
+            )
+            return
 
         if response.status_code != 200:
             QMessageBox.critical(

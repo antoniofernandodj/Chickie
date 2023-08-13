@@ -89,9 +89,9 @@ async def atualizar_status_patch(
         if status is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        status, statusData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            status, statusData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

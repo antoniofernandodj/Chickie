@@ -90,9 +90,9 @@ async def atualizar_zona_de_entrega_patch(
         if zona_de_entrega is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        zona_de_entrega, zona_de_entregaData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            zona_de_entrega, zona_de_entregaData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 

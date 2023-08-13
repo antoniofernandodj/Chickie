@@ -1,7 +1,7 @@
 import json
 from contextlib import suppress
 from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import QMessageBox, QTableWidgetItem
+from PySide6.QtWidgets import QMessageBox
 
 from src.qt.controllers.base import BaseController
 
@@ -16,6 +16,7 @@ class MainController(BaseController):
 
     def __init__(self, view: "MainView", app, window: "MainWindow"):
         super().__init__()
+
         self.view = view
         self.app = app
         self.window = window
@@ -83,15 +84,6 @@ class MainController(BaseController):
         )
         self.totalPedido += produto.preco
         self.refreshtextBrowserTotalPedido()
-
-        rowPosition = self.view.tableWidgetItemPedido.rowCount()
-        self.view.tableWidgetItemPedido.insertRow(rowPosition)
-
-        itemColunaNome = QTableWidgetItem(produto.nome)
-        itemColunaPreco = QTableWidgetItem(produto.preco)
-
-        self.tableWidget.setItem(rowPosition, 0, itemColunaNome)
-        self.tableWidget.setItem(rowPosition, 1, itemColunaPreco)
 
     def removerItemDaLista(self):
         selected_items = self.view.listWidgetItemPedido.selectedItems()

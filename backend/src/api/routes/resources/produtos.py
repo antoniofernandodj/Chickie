@@ -89,9 +89,9 @@ async def atualizar_produto_patch(
         if produto is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        produto, produtoData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            produto, produtoData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 
