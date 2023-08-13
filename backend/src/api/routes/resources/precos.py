@@ -13,7 +13,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Preço não encontrado"
 )
@@ -48,7 +48,10 @@ async def requisitar_preco(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_precos(preco: Preco):
+async def cadastrar_precos(
+    preco: Preco,
+    current_company: current_company,
+):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
         try:
@@ -61,7 +64,8 @@ async def cadastrar_precos(preco: Preco):
 
 @router.patch("/{uuid}")
 async def atualizar_preco_patch(
-    uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
+    uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")],
+    current_company: current_company,
 ):
     return {}
 
@@ -70,6 +74,7 @@ async def atualizar_preco_patch(
 async def atualizar_preco_put(
     itemData: Preco,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")],
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
@@ -86,7 +91,8 @@ async def atualizar_preco_put(
 
 @router.delete("/{uuid}")
 async def remover_preco(
-    uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
+    uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")],
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)

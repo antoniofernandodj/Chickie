@@ -3,6 +3,7 @@ from faker import Faker
 import json
 
 f = Faker()
+
 categoria_nome = f.word()
 categoria_descricao = f.sentence()
 
@@ -45,14 +46,6 @@ def test_requisitar_categoria(client: TestClient, loja_uuid: str):
     valid_uuid = json.loads(response.text)[0]["uuid"]
     response = client.get(f"/categorias/{valid_uuid}")
     assert response.status_code == 200
-    # Add more assertions based on your expected response
-
-
-# def test_atualizar_categoria_patch(client: TestClient):
-#     # Assuming you have a valid UUID for testing
-#     valid_uuid = "valid-uuid"
-#     response = client.patch(f"/categorias/{valid_uuid}")
-#     assert response.status_code == 200
 
 
 def test_atualizar_categoria_put_unauthorized(

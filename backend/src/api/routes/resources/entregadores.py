@@ -16,7 +16,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Entregador não encontrado"
 )
@@ -51,7 +51,10 @@ async def requisitar_entregador(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_entregadores(entregador: Entregador):
+async def cadastrar_entregadores(
+    entregador: Entregador,
+    current_company: current_company,
+):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)
         try:
@@ -64,6 +67,7 @@ async def cadastrar_entregadores(entregador: Entregador):
 
 @router.put("/{uuid}")
 async def atualizar_entregador_put(
+    current_company: current_company,
     entregadorData: Entregador,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer put")],
 ):
@@ -82,6 +86,7 @@ async def atualizar_entregador_put(
 
 @router.patch("/{uuid}")
 async def atualizar_entregador_patch(
+    current_company: current_company,
     entregadorData: Entregador,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")],
 ):
@@ -100,7 +105,8 @@ async def atualizar_entregador_patch(
 
 @router.delete("/{uuid}")
 async def remover_entregador(
-    uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")]
+    current_company: current_company,
+    uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)

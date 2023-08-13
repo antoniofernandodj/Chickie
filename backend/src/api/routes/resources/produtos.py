@@ -14,7 +14,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado"
 )
@@ -49,7 +49,10 @@ async def requisitar_produto(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_produtos(produto: Produto):
+async def cadastrar_produtos(
+    produto: Produto,
+    current_company: current_company,
+):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
         try:
@@ -63,6 +66,7 @@ async def cadastrar_produtos(produto: Produto):
 @router.put("/{uuid}")
 async def atualizar_produto_put(
     produtoData: Produto,
+    current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")],
 ):
     async with DatabaseConnectionManager() as connection:
@@ -71,9 +75,9 @@ async def atualizar_produto_put(
         if produto is None:
             raise NotFoundException
 
-    num_rows_affected = await repository.update(
-        produto, produtoData.model_dump()  # type: ignore
-    )
+        num_rows_affected = await repository.update(
+            produto, produtoData.model_dump()  # type: ignore
+        )
 
     return {"num_rows_affected": num_rows_affected}
 
@@ -82,6 +86,7 @@ async def atualizar_produto_put(
 async def atualizar_produto_patch(
     produtoData: Produto,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")],
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
@@ -98,7 +103,8 @@ async def atualizar_produto_patch(
 
 @router.delete("/{uuid}")
 async def remover_produto(
-    uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
+    uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")],
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)

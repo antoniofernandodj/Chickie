@@ -14,7 +14,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Pedido não encontrado"
 )
@@ -63,7 +63,7 @@ async def cadastrar_pedidos(pedido: Pedido):
 @router.patch("/{uuid}")
 async def atualizar_pedido_patch(
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
-    current_user: current_user,
+    current_company: current_company,
 ):
     return {"uuid": uuid}
 
@@ -71,8 +71,8 @@ async def atualizar_pedido_patch(
 @router.put("/{uuid}")
 async def atualizar_pedido_put(
     itemData: Pedido,
-    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer put")],
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)
@@ -89,8 +89,8 @@ async def atualizar_pedido_put(
 
 @router.delete("/{uuid}")
 async def remover_pedido(
-    current_user: current_user,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")],
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)

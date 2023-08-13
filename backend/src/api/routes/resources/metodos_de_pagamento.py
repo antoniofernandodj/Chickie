@@ -14,7 +14,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail="Metodo de pagamento não encontrado",
@@ -58,6 +58,7 @@ async def requisitar_metodo_de_pagamento(
 @router.post("/", status_code=201)
 async def cadastrar_metodos_de_pagamento(
     metodo_de_pagamento: MetodoDePagamento,
+    current_company: current_company,
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(MetodoDePagamento, connection=connection)
@@ -72,6 +73,7 @@ async def cadastrar_metodos_de_pagamento(
 @router.put("/{uuid}")
 async def atualizar_metodo_de_pagamento_put(
     metodo_de_pagamento_Data: MetodoDePagamento,
+    current_company: current_company,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer put")
     ],
@@ -93,6 +95,7 @@ async def atualizar_metodo_de_pagamento_put(
 @router.patch("/{uuid}")
 async def atualizar_metodo_de_pagamento_patch(
     metodo_de_pagamentoData: MetodoDePagamento,
+    current_company: current_company,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer patch")
     ],
@@ -113,9 +116,10 @@ async def atualizar_metodo_de_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_metodo_de_pagamento(
+    current_company: current_company,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
-    ]
+    ],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(MetodoDePagamento, connection=connection)

@@ -14,7 +14,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Funcionario não encontrado"
 )
@@ -49,7 +49,10 @@ async def requisitar_funcionario(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_funcionarios(funcionario: Funcionario):
+async def cadastrar_funcionarios(
+    funcionario: Funcionario,
+    current_company: current_company,
+):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Funcionario, connection=connection)
         try:
@@ -62,6 +65,7 @@ async def cadastrar_funcionarios(funcionario: Funcionario):
 
 @router.put("/{uuid}")
 async def atualizar_funcionario_put(
+    current_company: current_company,
     funcionarioData: Funcionario,
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer put")],
 ):
@@ -80,6 +84,7 @@ async def atualizar_funcionario_put(
 
 @router.patch("/{uuid}")
 async def atualizar_funcionario_patch(
+    current_company: current_company,
     funcionarioData: Funcionario,
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")],
 ):
@@ -98,7 +103,8 @@ async def atualizar_funcionario_patch(
 
 @router.delete("/{uuid}")
 async def remover_funcionario(
-    uuid: Annotated[str, Path(title="O uuid do funcionario a fazer delete")]
+    current_company: current_company,
+    uuid: Annotated[str, Path(title="O uuid do funcionario a fazer delete")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Funcionario, connection=connection)
