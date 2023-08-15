@@ -6,9 +6,9 @@ from sqlalchemy.types import Text
 class Entregador(Base):
     __tablename__ = "entregadores"
     uuid = Col(String(36), unique=True, primary_key=True)
-    nome = Col(Text, nullable=False)
+    nome = Col(Text, unique=True, nullable=False)
     telefone = Col(Text)
     celular = Col(Text)
     veiculo = Col(Text)
     placa_veiculo = Col(Text)
-    loja_uuid = Col(Text, ForeignKey("lojas.uuid"))
+    loja_uuid = Col(Text, ForeignKey("lojas.uuid"), nullable=False)

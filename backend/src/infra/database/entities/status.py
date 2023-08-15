@@ -6,7 +6,7 @@ from sqlalchemy.types import Text
 class Status(Base):
     __tablename__ = "status"
 
-    uuid = Col(String(36), primary_key=True)
-    nome = Col(Text)
+    uuid = Col(String(36), primary_key=True, unique=True)
+    nome = Col(Text, nullable=False)
     descricao = Col(Text)
-    loja_uuid = Col(String(36), ForeignKey("lojas.uuid"))
+    loja_uuid = Col(String(36), ForeignKey("lojas.uuid"), nullable=False)

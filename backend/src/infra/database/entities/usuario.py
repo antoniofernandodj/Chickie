@@ -7,11 +7,11 @@ class Usuario(Base):
     __tablename__ = "usuarios"
 
     uuid = Col(Str(36), primary_key=True)
-    nome = Col(Text)
-    username = Col(Text)
-    email = Col(Text)
+    nome = Col(Text, nullable=False)
+    username = Col(Text, nullable=False, unique=True)
+    email = Col(Text, nullable=False, unique=True)
     telefone = Col(Text)
     celular = Col(Text)
-    password_hash = Col(Text)
+    password_hash = Col(Text, nullable=False)
 
-    endereco_uuid = Col(Str(40), FK("enderecos.uuid"))
+    endereco_uuid = Col(Str(40), FK("enderecos.uuid"), nullable=False)

@@ -7,13 +7,13 @@ from sqlalchemy.types import Float, String as Str, DateTime
 class Pedido(Base):
     __tablename__ = "pedidos"
 
-    uuid = Col(Str(36), primary_key=True)
+    uuid = Col(Str(36), primary_key=True, unique=True)
     data_hora = Col(DateTime, default=datetime.utcnow)
-    status_uuid = Col(Str(36), FK("status.uuid"))
-    frete = Col(Float)
-    loja_uuid = Col(Str(36), FK("lojas.uuid"))
-    endereco_uuid = Col(Str(36), FK("enderecos.uuid"))
-    usuario_uuid = Col(Str(36), FK("usuarios.uuid"))
+    status_uuid = Col(Str(36), FK("status.uuid"), nullable=False)
+    frete = Col(Float, nullable=False)
+    loja_uuid = Col(Str(36), FK("lojas.uuid"), nullable=False)
+    endereco_uuid = Col(Str(36), FK("enderecos.uuid"), nullable=False)
+    usuario_uuid = Col(Str(36), FK("usuarios.uuid"), nullable=False)
 
     @property
     def total(self):

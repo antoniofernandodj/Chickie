@@ -17,7 +17,7 @@ class DiasDaSemana(enum.Enum):
 class Preco(Base):
     __tablename__ = "precos"
 
-    uuid = Col(Str(36), primary_key=True)
-    produto_uuid = Col(Str(36), FK("produtos.uuid"))
+    uuid = Col(Str(36), primary_key=True, unique=True)
+    produto_uuid = Col(Str(36), FK("produtos.uuid"), nullable=False)
     valor = Col(Float)
     dia_da_semana = Col(Enum(DiasDaSemana))  # type: ignore

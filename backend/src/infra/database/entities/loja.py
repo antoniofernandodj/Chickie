@@ -1,55 +1,15 @@
-from src.infra.database.entities import Base, Usuario
-from src.infra.database import session
+from src.infra.database.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey
 from sqlalchemy.types import String as Str, Text
-
-
-class UsuarioNaoEncontradoException(Exception):
-    pass
-
-
-class LojaNaoEncontradaException(Exception):
-    pass
-
-
-class UsuarioJaVinculadoException(Exception):
-    pass
 
 
 class Loja(Base):
     __tablename__ = "lojas"
     uuid = Col(Str(36), unique=True, primary_key=True)
-    nome = Col(Text)
-    username = Col(Text)
-    email = Col(Text)
+    nome = Col(Text, nullable=False)
+    username = Col(Text, unique=True)
+    email = Col(Text, unique=True)
     telefone = Col(Text)
     celular = Col(Text)
-    password_hash = Col(Text)
-    endereco_uuid = Col(Str(36), ForeignKey("enderecos.uuid"))
-
-    def vincular_comprador(self, comprador: Usuario):
-        from src.infra.database import entities as e
-
-        try:
-            db = session.get()
-
-            usuario = (
-                db.query(e.Usuario).filter_by(uuid=comprador.uuid).first()
-            )
-            loja = db.query(e.Loja).filter_by(uuid=self.uuid).first()
-
-            if usuario is None:
-                raise UsuarioNaoEncontradoException(
-                    f"Usuário com UUID {comprador.uuid} não encontrado."
-                )
-
-            if loja is None:
-                raise LojaNaoEncontradaException(
-                    f"Loja com UUID {self.uuid} não encontrada."
-                )
-
-            loja.usuarios.append(usuario)
-            db.commit()
-
-        finally:
-            db.close()
+    password_hash = Col(Text, nullable=False)
+    endereco_uuid = Col(Str(36), ForeignKey("enderecos.uuid"), nullable=False)
