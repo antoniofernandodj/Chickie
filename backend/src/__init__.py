@@ -21,7 +21,4 @@ def create_app(args: list) -> FastAPI:
     ext.middlewares.init_app(app)
     ext.logging.init_app(app)
 
-    with suppress(RuntimeError):
-        asyncio.run(ext.init_commands.init_app())
-
     return app

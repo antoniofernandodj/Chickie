@@ -5,8 +5,8 @@ from src import use_cases
 from config import settings as s
 
 
-async def init_app():
-    async with DatabaseConnectionManager() as connection:
+async def init_app(args: list):
+    async with DatabaseConnectionManager(args) as connection:
         loja_repository = Repository(Loja, connection=connection)
         loja = await loja_repository.find_one(nome=s.LOJA_NOME)
         if loja is not None:

@@ -114,7 +114,7 @@ from config import settings as s
 
 
 def init_app(app: Union[FastAPI, None] = None):
-    logger = logging.getLogger("CHICKI_LOGGER")
+    logger = logging.getLogger("CHICKIE_LOGGER")
     fmt = "%(asctime)s [%(levelname)s] %(message)s"
     datefmt = "[%d/%m/%Y] [%Hh%Mmin%Ss]"
     codes = {

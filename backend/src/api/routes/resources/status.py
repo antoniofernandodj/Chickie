@@ -14,7 +14,7 @@ from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
 
-current_user = Annotated[Loja, Depends(security.current_company)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Status não encontrado"
 )
@@ -49,7 +49,7 @@ async def requisitar_muitos_status(
 
 
 @router.post("/", status_code=201)
-async def cadastrar_Statuss(status: Status):
+async def cadastrar_status(current_company: current_company, status: Status):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)
         try:
@@ -62,26 +62,9 @@ async def cadastrar_Statuss(status: Status):
 
 @router.put("/{uuid}")
 async def atualizar_status_put(
+    current_company: current_company,
     statusData: Status,
     uuid: Annotated[str, Path(title="O uuid do status a fazer put")],
-):
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Status, connection=connection)
-        status = await repository.find_one(uuid=uuid)
-        if status is None:
-            raise NotFoundException
-
-    num_rows_affected = await repository.update(
-        status, statusData.model_dump()  # type: ignore
-    )
-
-    return {"num_rows_affected": num_rows_affected}
-
-
-@router.patch("/{uuid}")
-async def atualizar_status_patch(
-    statusData: Status,
-    uuid: Annotated[str, Path(title="O uuid do Status a fazer patch")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)
@@ -96,9 +79,18 @@ async def atualizar_status_patch(
     return {"num_rows_affected": num_rows_affected}
 
 
+@router.patch("/{uuid}")
+async def atualizar_status_patch(
+    statusData: Status,
+    uuid: Annotated[str, Path(title="O uuid do Status a fazer patch")],
+):
+    return {}
+
+
 @router.delete("/{uuid}")
 async def remover_status(
-    uuid: Annotated[str, Path(title="O uuid do status a fazer delete")]
+    current_company: current_company,
+    uuid: Annotated[str, Path(title="O uuid do status a fazer delete")],
 ):
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)

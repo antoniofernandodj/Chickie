@@ -2,19 +2,48 @@ from config import settings as s
 import aiopg
 import psycopg2
 from psycopg2 import sql
+from typing import Optional
 
 
 class DatabaseConnectionManager:
-    CONNECTION_STRING_DB = "dbname={0} user={1} password={2} host={3}".format(
-        s.POSTGRES_DATABASE_DEV,
-        s.POSTGRES_USERNAME,
-        s.POSTGRES_PASSWORD,
-        s.POSTGRES_HOST,
-    )
-
     CONNECTION_STRING = "user={0} password={1} host={2}".format(
         s.POSTGRES_USERNAME, s.POSTGRES_PASSWORD, s.POSTGRES_HOST
     )
+
+    def __init__(self, args: Optional[list] = None):
+        self.CONNECTION_STRING_DB = self.get_connection_string_db(args)
+
+    def get_connection_string_db(self, args: Optional[list]):
+        if args is None:
+            CONNECTION_STRING_DB = (
+                "dbname={0} user={1} password={2} host={3}".format(
+                    s.POSTGRES_DATABASE,
+                    s.POSTGRES_USERNAME,
+                    s.POSTGRES_PASSWORD,
+                    s.POSTGRES_HOST,
+                )
+            )
+            return CONNECTION_STRING_DB
+
+        if "test" in [item.lower() for item in args]:
+            CONNECTION_STRING_DB = (
+                "dbname={0} user={1} password={2} host={3}".format(
+                    "test",
+                    s.POSTGRES_USERNAME,
+                    s.POSTGRES_PASSWORD,
+                    s.POSTGRES_HOST,
+                )
+            )
+        else:
+            CONNECTION_STRING_DB = (
+                "dbname={0} user={1} password={2} host={3}".format(
+                    s.POSTGRES_DATABASE,
+                    s.POSTGRES_USERNAME,
+                    s.POSTGRES_PASSWORD,
+                    s.POSTGRES_HOST,
+                )
+            )
+        return CONNECTION_STRING_DB
 
     async def __aenter__(self):
         self.pool = await aiopg.create_pool(self.CONNECTION_STRING_DB)
@@ -68,7 +97,7 @@ class SyncDatabaseConnectionManager:
         self.connection_pool = psycopg2.pool.SimpleConnectionPool(
             minconn=1,
             maxconn=10,
-            dbname=s.POSTGRES_DATABASE_DEV,
+            dbname=s.POSTGRES_DATABASE,
             user=s.POSTGRES_USERNAME,
             password=s.POSTGRES_PASSWORD,
             host=s.POSTGRES_HOST,

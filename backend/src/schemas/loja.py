@@ -13,6 +13,7 @@ class Loja(BaseModel):
     celular: str
     password_hash: str
 
+    endereco_uuid: Optional[str] = None
     password: Optional[str] = None
     uuid: Optional[str] = None
 

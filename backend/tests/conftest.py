@@ -1,11 +1,13 @@
-from fastapi.testclient import TestClient
 from config import settings as s
+
+s.POSTGRES_DATABASE = "test"
+
+from fastapi.testclient import TestClient  # noqa
 from src.schemas import Loja  # noqa
 import json  # noqa
 import pytest  # noqa
 import sys  # noqa
-
-from src import create_app
+from src import create_app  # noqa
 
 
 @pytest.fixture

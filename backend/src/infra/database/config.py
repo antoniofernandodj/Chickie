@@ -11,21 +11,19 @@ database_url = "{0}+{1}://{2}:{3}@{4}/{5}".format(
     s.POSTGRES_USERNAME,
     s.POSTGRES_PASSWORD,
     s.POSTGRES_HOST,
-    s.POSTGRES_DATABASE_DEV,
+    s.POSTGRES_DATABASE,
 )
 
 engine = create_engine(database_url)
 
 
-async def init_database():
+async def init_database(database_name: str):
     from src.infra.database.entities import Base
 
     # await DatabaseConnectionManager.create_database(
     #     name=s.POSTGRES_DATABASE_PROD
     # )
-    await DatabaseConnectionManager.create_database(
-        name=s.POSTGRES_DATABASE_DEV
-    )
+    await DatabaseConnectionManager.create_database(name=database_name)
     Base.metadata.create_all(engine)
 
 
