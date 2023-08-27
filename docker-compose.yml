@@ -1,0 +1,89 @@
+# command: "hypercorn --workers 1 --bind 0.0.0.0:8000 src.wsgi:app"
+# command: "hypercorn --workers 2 --log-level info --error-log ./log/ERROR_LOG.log --access-log ./log/ACCESS_LOG.log --bind localhost:8000 asgi:app"
+# command: "hypercorn --workers 2 --log-level info --bind localhost:8000 asgi:app"
+# command: "gunicorn -w 4 -k uvicorn.workers.UvicornWorker asgi:app"
+
+version: '3'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./backend
+      dockerfile: ./dockerfiles/api.dockerfile
+    command: uvicorn --loop uvloop --port 8000 --log-level info --timeout-keep-alive 300 asgi:app
+
+    volumes:
+      - ./backend/src:/usr/app/src
+    restart: "on-failure"
+    env_file:
+      - ./infra.secrets.toml
+    network_mode: "host"
+    environment:
+      CHICKIE_MYENV: prod
+    depends_on:
+      - cache
+      - rabbitmq
+      - mongodb
+      - database
+
+  database:
+    image: postgres
+    volumes:
+      - /var/local/lib/postgresql/volumes/Chickie:/var/lib/postgresql/data
+    env_file:
+      - infra.secrets.toml
+    ports:
+      - "5432:5432"
+  
+  cache:
+    image: redis
+    restart: always
+    env_file:
+      - infra.secrets.toml
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - cache:/data
+      - ./config/redis.secrets.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      CHICKIE_MYENV: "prod"
+    ports: 
+      - 25672:25672
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - /docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
+    env_file:
+      - ./infra.secrets.toml
+    restart: always
+
+  mongodb:
+    image: mongo:4.0.8
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod --auth
+    env_file:
+      - ./backend/config/.secrets.infra.toml
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodbdata:/data/db
+
+  # mq-worker:
+  
+  # frontend:
+
+  # backend:
+
+
+
+volumes:
+  cache:
+  postgres-data:
+  mongodbdata:
