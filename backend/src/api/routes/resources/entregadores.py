@@ -26,6 +26,15 @@ router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
 
 @router.get("/")
 async def requisitar_entregadores(loja_uuid: Optional[str] = Query(None)):
+    """
+    Requisita todos os entregadores cadastrados.
+
+    Args:
+        loja_uuid (str, optional): O UUID da loja para filtrar os entregadores. Default é None.
+
+    Returns:
+        List[Entregador]: Uma lista contendo todos os entregadores cadastrados.
+    """
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -40,6 +49,15 @@ async def requisitar_entregadores(loja_uuid: Optional[str] = Query(None)):
 async def requisitar_entregador(
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer get")]
 ):
+    """
+    Requisita um entregador específico com base no UUID.
+
+    Args:
+        uuid (str): O UUID do entregador.
+
+    Returns:
+        Entregador: O entregador correspondente ao UUID.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -55,6 +73,16 @@ async def cadastrar_entregadores(
     entregador: Entregador,
     current_company: current_company,
 ):
+    """
+    Cadastra um novo entregador.
+
+    Args:
+        entregador (Entregador): Os dados do entregador a ser cadastrado.
+        current_company (Loja): A loja atual, obtida através do token de autenticação.
+
+    Returns:
+        dict: Um dicionário contendo o UUID do entregador cadastrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)
         try:
@@ -71,6 +99,17 @@ async def atualizar_entregador_put(
     entregadorData: Entregador,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer put")],
 ):
+    """
+    Atualiza um entregador utilizando o método PUT.
+
+    Args:
+        current_company (Loja): A loja atual, obtida através do token de autenticação.
+        entregadorData (Entregador): Os dados atualizados do entregador.
+        uuid (str): O UUID do entregador a ser atualizado.
+
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas pela atualização.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)
         entregador = await repository.find_one(uuid=uuid)
@@ -108,6 +147,16 @@ async def remover_entregador(
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")],
 ):
+    """
+    Remove um entregador com base no UUID.
+
+    Args:
+        current_company (Loja): A loja atual, obtida através do token de autenticação.
+        uuid (str): O UUID do entregador a ser removido.
+
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Entregador, connection=connection)
         try:

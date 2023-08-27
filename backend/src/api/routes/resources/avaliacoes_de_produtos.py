@@ -27,6 +27,12 @@ router = APIRouter(
 
 @router.get("/")
 async def requisitar_avaliacoes():
+    """
+    Requisita todas as avaliações de produtos.
+
+    Returns:
+        List[AvaliacaoDeProduto]: Uma lista contendo todas as avaliações de produtos.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(AvaliacaoDeProduto, connection=connection)
         results = await repository.find_all()
@@ -38,6 +44,15 @@ async def requisitar_avaliacoes():
 async def requisitar_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
 ):
+    """
+    Requisita uma avaliação de produto específica com base no UUID.
+
+    Args:
+        uuid (str): O UUID da avaliação.
+
+    Returns:
+        AvaliacaoDeProduto: A avaliação de produto correspondente ao UUID.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(AvaliacaoDeProduto, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -50,6 +65,15 @@ async def requisitar_avaliacao(
 
 @router.post("/", status_code=201)
 async def cadastrar_avaliacoes(avaliacao: AvaliacaoDeProduto):
+    """
+    Cadastra uma nova avaliação de produto.
+
+    Args:
+        avaliacao (AvaliacaoDeProduto): Os dados da avaliação a ser cadastrada.
+
+    Returns:
+        dict: Um dicionário contendo o UUID da avaliação cadastrada.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(AvaliacaoDeProduto, connection=connection)
         try:
@@ -65,6 +89,16 @@ async def atualizar_avaliacao_put(
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
 ):
+    """
+    Atualiza uma avaliação de produto utilizando o método PUT.
+
+    Args:
+        avaliacaoData (AvaliacaoDeProduto): Os dados atualizados da avaliação.
+        uuid (str): O UUID da avaliação a ser atualizada.
+
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas pela atualização.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(AvaliacaoDeProduto, connection=connection)
         avaliacao = await repository.find_one(uuid=uuid)
@@ -101,6 +135,15 @@ async def atualizar_avaliacao_patch(
 async def remover_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ):
+    """
+    Remove uma avaliação de produto com base no UUID.
+
+    Args:
+        uuid (str): O UUID da avaliação a ser removida.
+
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(AvaliacaoDeProduto, connection=connection)
         try:

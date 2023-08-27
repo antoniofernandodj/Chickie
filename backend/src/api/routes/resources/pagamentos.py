@@ -24,6 +24,15 @@ router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
 @router.get("/")
 async def requisitar_pagamentos(loja_uuid: Optional[str] = Query(None)):
+    """
+    Requisita pagamentos cadastrados na plataforma.
+    
+    Args:
+        loja_uuid (Optional[str]): O uuid da loja, caso necessário.
+    
+    Returns:
+        list[Pagamento]: Lista de pagamentos encontrados.
+    """
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -38,6 +47,18 @@ async def requisitar_pagamentos(loja_uuid: Optional[str] = Query(None)):
 async def requisitar_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ):
+    """
+    Busca um pagamento pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid do pagamento a ser buscado.
+    
+    Returns:
+        Pagamento: O pagamento encontrado.
+    
+    Raises:
+        HTTPException: Se o pagamento não for encontrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -50,6 +71,18 @@ async def requisitar_pagamento(
 
 @router.post("/", status_code=201)
 async def cadastrar_pagamentos(pagamento: Pagamento):
+    """
+    Cadastra um novo pagamento na plataforma.
+    
+    Args:
+        pagamento (Pagamento): Os detalhes do pagamento a ser cadastrado.
+    
+    Returns:
+        dict: Um dicionário contendo o uuid do pagamento cadastrado.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante o cadastro.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
         try:
@@ -65,6 +98,19 @@ async def atualizar_pagamento_put(
     pagamento_Data: Pagamento,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ):
+    """
+    Atualiza um pagamento utilizando o método HTTP PUT.
+    
+    Args:
+        pagamento_Data (Pagamento): Os novos dados do pagamento.
+        uuid (str): O uuid do pagamento a ser atualizado.
+    
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+    
+    Raises:
+        HTTPException: Se o pagamento não for encontrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
         pagamento = await repository.find_one(uuid=uuid)
@@ -100,6 +146,18 @@ async def atualizar_pagamento_patch(
 async def remover_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ):
+    """
+    Remove um pagamento pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid do pagamento a ser removido.
+    
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante a remoção.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pagamento, connection=connection)
         try:

@@ -23,6 +23,15 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 
 @router.get("/")
 async def requisitar_precos(loja_uuid: Optional[str] = Query(None)):
+    """
+    Obtém uma lista de todos os preços cadastrados.
+
+    Args:
+        loja_uuid (str, opcional): UUID da loja para filtrar os preços.
+
+    Returns:
+        list: Uma lista contendo os preços encontrados.
+    """
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -37,6 +46,15 @@ async def requisitar_precos(loja_uuid: Optional[str] = Query(None)):
 async def requisitar_preco(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ):
+    """
+    Obtém detalhes de um preço pelo seu UUID.
+
+    Args:
+        uuid (str): UUID do preço.
+
+    Returns:
+        Preco: Os detalhes do preço.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -52,6 +70,16 @@ async def cadastrar_precos(
     preco: Preco,
     current_company: current_company,
 ):
+    """
+    Cadastra um novo preço.
+
+    Args:
+        preco (Preco): Dados do preço a ser cadastrado.
+        current_company (Loja): Dados da loja autenticada (dependência).
+
+    Returns:
+        dict: Um dicionário contendo o UUID do preço cadastrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
         try:
@@ -76,6 +104,17 @@ async def atualizar_preco_put(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")],
     current_company: current_company,
 ):
+    """
+    Atualiza um preço completamente usando PUT.
+
+    Args:
+        itemData (Preco): Dados do preço para atualização.
+        uuid (str): UUID do preço a ser atualizado.
+        current_company (Loja): Dados da loja autenticada (dependência).
+
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
         preco = await repository.find_one(uuid=uuid)
@@ -94,6 +133,16 @@ async def remover_preco(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")],
     current_company: current_company,
 ):
+    """
+    Remove um preço.
+
+    Args:
+        uuid (str): UUID do preço a ser removido.
+        current_company (Loja): Dados da loja autenticada (dependência).
+
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Preco, connection=connection)
         try:

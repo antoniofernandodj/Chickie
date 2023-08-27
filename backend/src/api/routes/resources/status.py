@@ -23,7 +23,16 @@ router = APIRouter(prefix="/status", tags=["Status"])
 
 
 @router.get("/")
-async def requisitar_um_status(loja_uuid: Optional[str] = Query(None)):
+async def requisitar_varios_status(loja_uuid: Optional[str] = Query(None)):
+    """
+    Requisita status cadastrados na plataforma.
+    
+    Args:
+        loja_uuid (Optional[str]): O uuid da loja, caso necessário.
+    
+    Returns:
+        list[Status]: Lista de status encontrados.
+    """
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -35,9 +44,21 @@ async def requisitar_um_status(loja_uuid: Optional[str] = Query(None)):
 
 
 @router.get("/{uuid}")
-async def requisitar_muitos_status(
+async def requisitar_status(
     uuid: Annotated[str, Path(title="O uuid do status a fazer get")]
 ):
+    """
+    Busca um status pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid do status a ser buscado.
+    
+    Returns:
+        Status: O status encontrado.
+    
+    Raises:
+        HTTPException: Se o status não for encontrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -50,6 +71,19 @@ async def requisitar_muitos_status(
 
 @router.post("/", status_code=201)
 async def cadastrar_status(current_company: current_company, status: Status):
+    """
+    Cadastra um novo status na plataforma.
+    
+    Args:
+        current_company: A empresa atual autenticada.
+        status (Status): Os detalhes do status a ser cadastrado.
+    
+    Returns:
+        dict: Um dicionário contendo o uuid do status cadastrado.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante o cadastro.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)
         try:
@@ -66,6 +100,20 @@ async def atualizar_status_put(
     statusData: Status,
     uuid: Annotated[str, Path(title="O uuid do status a fazer put")],
 ):
+    """
+    Atualiza um status utilizando o método HTTP PUT.
+    
+    Args:
+        current_company: A empresa atual autenticada.
+        statusData (Status): Os novos dados do status.
+        uuid (str): O uuid do status a ser atualizado.
+    
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+    
+    Raises:
+        HTTPException: Se o status não for encontrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)
         status = await repository.find_one(uuid=uuid)
@@ -92,6 +140,19 @@ async def remover_status(
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do status a fazer delete")],
 ):
+    """
+    Remove um status pelo seu uuid.
+    
+    Args:
+        current_company: A empresa atual autenticada.
+        uuid (str): O uuid do status a ser removido.
+    
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante a remoção.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Status, connection=connection)
         try:

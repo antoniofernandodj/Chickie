@@ -17,6 +17,15 @@ class Usuario(BaseModel):
     uuid: Optional[str] = None
 
     def authenticate(self, senha_usuario: str) -> bool:
+        """
+        Autentica a senha do usuário comparando-a com o hash armazenado.
+
+        Args:
+            senha_usuario (str): A senha fornecida pelo usuário.
+
+        Returns:
+            bool: True se a senha estiver correta, False caso contrário.
+        """
         if self.password_hash is None:
             raise
         hash_bytes = base64.b64decode(self.password_hash.encode("utf-8"))

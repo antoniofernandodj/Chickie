@@ -24,6 +24,18 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 
 @router.get("/")
 async def requisitar_produtos(loja_uuid: Optional[str] = Query(None)):
+    """
+    Requisita os produtos cadastrados na plataforma.
+    Aceita um uuid como query para buscar os
+    produtos de uma empresa específica
+
+    Args:
+        loja_uuid (Optional[str]): O uuid da empresa,
+        caso necessário
+    
+    Returns:
+        list[Produto]
+    """
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -38,6 +50,18 @@ async def requisitar_produtos(loja_uuid: Optional[str] = Query(None)):
 async def requisitar_produto(
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ):
+    """
+    Busca um produto pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid do produto a ser buscado.
+    
+    Returns:
+        Produto: O produto encontrado.
+    
+    Raises:
+        HTTPException: Se o produto não for encontrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -53,6 +77,19 @@ async def cadastrar_produtos(
     produto: Produto,
     current_company: current_company,
 ):
+    """
+    Cadastra um novo produto na plataforma.
+    
+    Args:
+        produto (Produto): Os detalhes do produto a ser cadastrado.
+        current_company: A empresa atual autenticada.
+    
+    Returns:
+        dict: Um dicionário contendo o uuid do produto cadastrado.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante o cadastro.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
         try:
@@ -69,6 +106,20 @@ async def atualizar_produto_put(
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")],
 ):
+    """
+    Atualiza um produto utilizando o método HTTP PUT.
+    
+    Args:
+        uuid (str): O uuid do produto a ser atualizado.
+        produtoData (Produto): Os novos dados do produto.
+        current_company: A empresa atual autenticada.
+    
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+    
+    Raises:
+        HTTPException: Se o produto não for encontrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
         produto = await repository.find_one(uuid=uuid)
@@ -106,6 +157,19 @@ async def remover_produto(
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")],
     current_company: current_company,
 ):
+    """
+    Remove um produto pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid do produto a ser removido.
+        current_company: A empresa atual autenticada.
+    
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante a remoção.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Produto, connection=connection)
         try:

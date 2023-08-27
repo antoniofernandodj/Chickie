@@ -24,6 +24,12 @@ router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 
 @router.get("/")
 async def requisitar_zonas_de_entrega():
+    """
+    Requisita todas as zonas de entrega cadastradas na plataforma.
+    
+    Returns:
+        list[ZonaDeEntrega]: Lista de zonas de entrega encontradas.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
         results = await repository.find_all()
@@ -35,6 +41,18 @@ async def requisitar_zonas_de_entrega():
 async def requisitar_zona_de_entrega(
     uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
+    """
+    Busca uma zona de entrega pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid da zona de entrega a ser buscada.
+    
+    Returns:
+        ZonaDeEntrega: A zona de entrega encontrada.
+    
+    Raises:
+        HTTPException: Se a zona de entrega não for encontrada.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -47,6 +65,18 @@ async def requisitar_zona_de_entrega(
 
 @router.post("/", status_code=201)
 async def cadastrar_zonas_de_entrega(zona_de_entrega: ZonaDeEntrega):
+    """
+    Cadastra uma nova zona de entrega na plataforma.
+    
+    Args:
+        zona_de_entrega (ZonaDeEntrega): Os detalhes da zona de entrega a ser cadastrada.
+    
+    Returns:
+        dict: Um dicionário contendo o uuid da zona de entrega cadastrada.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante o cadastro.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
         try:
@@ -64,6 +94,19 @@ async def atualizar_zona_de_entrega_put(
         str, Path(title="O uuid do método de pagemento a fazer put")
     ],
 ):
+    """
+    Atualiza uma zona de entrega utilizando o método HTTP PUT.
+    
+    Args:
+        zona_de_entrega_Data (ZonaDeEntrega): Os novos dados da zona de entrega.
+        uuid (str): O uuid da zona de entrega a ser atualizada.
+    
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+    
+    Raises:
+        HTTPException: Se a zona de entrega não for encontrada.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
         zona_de_entrega = await repository.find_one(uuid=uuid)
@@ -103,6 +146,18 @@ async def remover_zona_de_entrega(
         str, Path(title="O uuid do método de pagemento a fazer delete")
     ]
 ):
+    """
+    Remove uma zona de entrega pelo seu uuid.
+    
+    Args:
+        uuid (str): O uuid da zona de entrega a ser removida.
+    
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    
+    Raises:
+        HTTPException: Se ocorrer um erro durante a remoção.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(ZonaDeEntrega, connection=connection)
         try:

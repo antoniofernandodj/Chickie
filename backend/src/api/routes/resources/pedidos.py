@@ -24,6 +24,15 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 @router.get("/")
 async def requisitar_pedidos(loja_uuid: Optional[str] = Query(None)):
+    """
+    Obtém uma lista de todos os pedidos cadastrados.
+
+    Args:
+        loja_uuid (str, opcional): UUID da loja para filtrar os pedidos.
+
+    Returns:
+        list: Uma lista contendo os pedidos encontrados.
+    """
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -38,6 +47,15 @@ async def requisitar_pedidos(loja_uuid: Optional[str] = Query(None)):
 async def requisitar_pedido(
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer get")]
 ):
+    """
+    Obtém detalhes de um pedido pelo seu UUID.
+
+    Args:
+        uuid (str): UUID do pedido.
+
+    Returns:
+        Pedido: Os detalhes do pedido.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -50,6 +68,15 @@ async def requisitar_pedido(
 
 @router.post("/", status_code=201)
 async def cadastrar_pedidos(pedido: Pedido):
+    """
+    Cadastra um novo pedido.
+
+    Args:
+        pedido (Pedido): Dados do pedido a ser cadastrado.
+
+    Returns:
+        dict: Um dicionário contendo o UUID do pedido cadastrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)
         try:
@@ -74,6 +101,17 @@ async def atualizar_pedido_put(
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer put")],
     current_company: current_company,
 ):
+    """
+    Atualiza um pedido completamente usando PUT.
+
+    Args:
+        itemData (Pedido): Dados do pedido para atualização.
+        uuid (str): UUID do pedido a ser atualizado.
+        current_company (Loja): Dados da loja autenticada (dependência).
+
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)
         pedido = await repository.find_one(uuid=uuid)
@@ -92,6 +130,16 @@ async def remover_pedido(
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")],
     current_company: current_company,
 ):
+    """
+    Remove um pedido.
+
+    Args:
+        uuid (str): UUID do pedido a ser removido.
+        current_company (Loja): Dados da loja autenticada (dependência).
+
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Pedido, connection=connection)
         try:

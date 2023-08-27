@@ -18,6 +18,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def authenticate_user(
     username: str, password: str
 ) -> Optional[Usuario]:
+    """
+    Autentica um usuário com base no nome de usuário e senha fornecidos.
+    
+    Args:
+        username (str): O nome de usuário do usuário.
+        password (str): A senha do usuário.
+    
+    Returns:
+        Optional[Usuario]: O objeto do usuário autenticado ou None se a autenticação falhar.
+    """
     async with DatabaseConnectionManager() as connection:
         user_repo = Repository(Usuario, connection=connection)
         user = await user_repo.find_one(username=username)
@@ -34,6 +44,16 @@ async def authenticate_user(
 async def authenticate_company(
     username: str, password: str
 ) -> Optional[Loja]:
+    """
+    Autentica uma loja com base no nome de usuário e senha fornecidos.
+    
+    Args:
+        username (str): O nome de usuário da loja.
+        password (str): A senha da loja.
+    
+    Returns:
+        Optional[Loja]: O objeto da loja autenticada ou None se a autenticação falhar.
+    """
     async with DatabaseConnectionManager() as connection:
         loja_repo = Repository(Loja, connection=connection)
         loja = await loja_repo.find_one(username=username)
@@ -48,6 +68,16 @@ async def authenticate_company(
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    """
+    Cria um token de acesso JWT com os dados fornecidos.
+    
+    Args:
+        data (dict): Os dados a serem codificados no token.
+        expires_delta (timedelta | None, optional): A duração de validade do token. Se None, será usado o tempo padrão.
+    
+    Returns:
+        str: O token de acesso JWT.
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -65,6 +95,18 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 async def current_user(
     token: Annotated[str, Depends(oauth2_scheme)]
 ) -> Usuario:
+    """
+    Obtém o objeto do usuário atualmente autenticado.
+    
+    Args:
+        token (Annotated[str, Depends(oauth2_scheme)]): O token de acesso JWT.
+    
+    Returns:
+        Usuario: O objeto do usuário autenticado.
+    
+    Raises:
+        HTTPException: Se a autenticação falhar.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -94,6 +136,18 @@ async def current_user(
 async def current_company(
     token: Annotated[str, Depends(oauth2_scheme)]
 ) -> Loja:
+    """
+    Obtém o objeto da loja atualmente autenticada.
+    
+    Args:
+        token (Annotated[str, Depends(oauth2_scheme)]): O token de acesso JWT.
+    
+    Returns:
+        Loja: O objeto da loja autenticada.
+    
+    Raises:
+        HTTPException: Se a autenticação falhar.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

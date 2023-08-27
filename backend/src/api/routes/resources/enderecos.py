@@ -22,6 +22,12 @@ router = APIRouter(prefix="/enderecos", tags=["Endereços"])
 
 @router.get("/")
 async def requisitar_enderecos():
+    """
+    Requisita todos os endereços cadastrados.
+
+    Returns:
+        List[Endereco]: Uma lista contendo todos os endereços cadastrados.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Endereco, connection=connection)
         results = await repository.find_all()
@@ -33,6 +39,15 @@ async def requisitar_enderecos():
 async def requisitar_endereco(
     uuid: Annotated[str, Path(title="O uuid do endereço a fazer get")]
 ):
+    """
+    Requisita um endereço específico com base no UUID.
+
+    Args:
+        uuid (str): O UUID do endereço.
+
+    Returns:
+        Endereco: O endereço correspondente ao UUID.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Endereco, connection=connection)
         result = await repository.find_one(uuid=uuid)
@@ -45,6 +60,15 @@ async def requisitar_endereco(
 
 @router.post("/", status_code=201)
 async def cadastrar_enderecos(endereco: Endereco):
+    """
+    Cadastra um novo endereço.
+
+    Args:
+        endereco (Endereco): Os dados do endereço a ser cadastrado.
+
+    Returns:
+        dict: Um dicionário contendo o UUID do endereço cadastrado.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Endereco, connection=connection)
         try:
@@ -67,6 +91,16 @@ async def atualizar_endereco_put(
     itemData: Endereco,
     uuid: Annotated[str, Path(title="O uuid do endereco a fazer put")],
 ):
+    """
+    Atualiza um endereço utilizando o método PUT.
+
+    Args:
+        itemData (Endereco): Os dados atualizados do endereço.
+        uuid (str): O UUID do endereço a ser atualizado.
+
+    Returns:
+        dict: Um dicionário contendo o número de linhas afetadas pela atualização.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Endereco, connection=connection)
         endereco = await repository.find_one(uuid=uuid)
@@ -84,6 +118,15 @@ async def atualizar_endereco_put(
 async def remover_endereco(
     uuid: Annotated[str, Path(title="O uuid do endereço a fazer delete")]
 ):
+    """
+    Remove um endereço com base no UUID.
+
+    Args:
+        uuid (str): O UUID do endereço a ser removido.
+
+    Returns:
+        dict: Um dicionário contendo o número de itens removidos.
+    """
     async with DatabaseConnectionManager() as connection:
         repository = Repository(Endereco, connection=connection)
         try:
