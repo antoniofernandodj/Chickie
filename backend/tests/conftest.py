@@ -19,11 +19,8 @@ def client():
 
 @pytest.fixture
 def loja_uuid(client: TestClient):
-    response = client.post(
-        "/loja/login",
-        data={"username": s.LOJA_USERNAME, "password": s.LOJA_SENHA},
-    )
-
+    data = {"username": s.LOJA_USERNAME, "password": s.LOJA_SENHA}
+    response = client.post("/loja/login", data=data)
     return json.loads(response.text)["uuid"]
 
 

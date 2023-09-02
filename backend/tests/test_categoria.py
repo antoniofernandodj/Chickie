@@ -42,7 +42,6 @@ def test_requisitar_categorias(client: TestClient, loja_uuid: str):
 
 def test_requisitar_categoria(client: TestClient, loja_uuid: str):
     response = client.get("/categorias/", params={"nome": categoria_nome})
-
     valid_uuid = json.loads(response.text)[0]["uuid"]
     response = client.get(f"/categorias/{valid_uuid}")
     assert response.status_code == 200

@@ -57,7 +57,8 @@ async def requisitar_categorias(
 
 @router.get("/{uuid}")
 async def requisitar_categoria(
-    uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")]
+    uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
+    nome: Optional[str] = Query(None)
 ):
     """
     Requisita uma categoria de produto específica com base no UUID.
@@ -68,6 +69,10 @@ async def requisitar_categoria(
     Returns:
         CategoriaProdutos: A categoria de produto correspondente ao UUID.
     """
+    kwargs = {}
+    if nome is not None:
+        kwargs["nome"] = nome
+
     async with DatabaseConnectionManager() as connection:
         repository = Repository(CategoriaProdutos, connection=connection)
         result = await repository.find_one(uuid=uuid)
