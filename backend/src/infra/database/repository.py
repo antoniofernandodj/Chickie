@@ -15,6 +15,13 @@ class Repository:
         Args:
             model (Any): The Pydantic model representing the database table.
             connection (Connection): The aiopg database connection.
+        Example:
+            async with DatabaseConnectionManager() as connection:
+                repository = Repository(Endereco, connection=connection)
+                try:
+                    itens_removed = await repository.delete_from_uuid(uuid=uuid)
+                except Exception as error:
+                    raise HTTPException(status_code=500, detail=str(error))
         """
         self.lock = Lock()
         self.model = model
