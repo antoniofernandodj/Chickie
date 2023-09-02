@@ -8,5 +8,5 @@ class ItemPedido(Base):
     uuid = Col(Str(36), unique=True, primary_key=True)
     quantidade = Col(Int)
     produto_uuid = Col(Str(36), FK("produtos.uuid"))
-    pedido_uuid = Col(Str(36), FK("pedidos.uuid"))
+    pedido_uuid = Col(Str(36), FK("pedidos.uuid", ondelete="CASCADE"))
     loja_uuid = Col(Str(36), FK("lojas.uuid"))

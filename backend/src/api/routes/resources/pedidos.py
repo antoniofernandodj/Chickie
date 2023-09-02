@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -9,7 +9,7 @@ from fastapi import (  # noqa
 )
 from typing import Optional
 from src.api import security
-from src.schemas import Loja, Pedido
+from src.schemas import Loja, Pedido, PedidoItens, ItemPedido
 from src.infra.database.repository import Repository
 from src.infra.database.manager import DatabaseConnectionManager
 
@@ -33,14 +33,31 @@ async def requisitar_pedidos(loja_uuid: Optional[str] = Query(None)):
     Returns:
         list: Uma lista contendo os pedidos encontrados.
     """
+    pedidos_itens = []
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pedido, connection=connection)
-        results = await repository.find_all(**kwargs)
 
-    return results
+    async with DatabaseConnectionManager() as connection:
+        pedido_repository = Repository(Pedido, connection=connection)
+        itens_repository = Repository(ItemPedido, connection=connection)
+        pedidos: List[PedidoItens] = await pedido_repository.find_all(**kwargs)
+
+        for pedido in pedidos:
+            items: List[ItemPedido] = await itens_repository.find_all(
+                pedido_uuid=pedido.uuid
+            )
+            pedido_itens = PedidoItens(
+                status=pedido.status,
+                frete=pedido.frete,
+                loja_uuid=pedido.loja_uuid,
+                endereco_uuid=pedido.endereco_uuid,
+                uuid=pedido.uuid,
+                itens_pedido=items
+            )
+            pedidos_itens.append(pedido_itens)
+
+    return pedidos_itens
 
 
 @router.get("/{uuid}")
@@ -57,17 +74,26 @@ async def requisitar_pedido(
         Pedido: Os detalhes do pedido.
     """
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pedido, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
+        pedido_repository = Repository(Pedido, connection=connection)
+        itens_repository = Repository(ItemPedido, connection=connection)
+        pedido: Optional[Pedido] = await pedido_repository.find_one(uuid=uuid)
+        if pedido is None:
             raise NotFoundException
+        
+        items: List[ItemPedido] = await itens_repository.find_all(pedido_uuid=uuid)
 
-    return result
+        return PedidoItens(
+            status=pedido.status,
+            frete=pedido.frete,
+            loja_uuid=pedido.loja_uuid,
+            endereco_uuid=pedido.endereco_uuid,
+            uuid=pedido.uuid,
+            itens_pedido=items
+        )
 
 
 @router.post("/", status_code=201)
-async def cadastrar_pedidos(pedido: Pedido):
+async def cadastrar_pedidos(pedido: PedidoItens):
     """
     Cadastra um novo pedido.
 
@@ -77,14 +103,22 @@ async def cadastrar_pedidos(pedido: Pedido):
     Returns:
         dict: Um dicionário contendo o UUID do pedido cadastrado.
     """
+    itens = pedido.itens_pedido
+    itens_uuid = []
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pedido, connection=connection)
+        pedido_repository = Repository(Pedido, connection=connection)
+        itens_repository = Repository(ItemPedido, connection=connection)
         try:
-            uuid = await repository.save(pedido)
+            pedido_uuid = await pedido_repository.save(pedido)
+            for item in itens:
+                item.loja_uuid = pedido_uuid
+                uuid = await itens_repository.save(item)
+                itens_uuid.append(uuid)
+
         except Exception as error:
             raise HTTPException(status_code=500, detail=str(error))
 
-    return {"uuid": uuid}
+    return {"pedido_uuid": pedido_uuid, itens_uuid: itens_uuid}
 
 
 @router.patch("/{uuid}")
@@ -140,11 +174,30 @@ async def remover_pedido(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
+    itens_removed = 0
+    pedidos_removed = 0
     async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pedido, connection=connection)
+        pedido_repository = Repository(Pedido, connection=connection)
+        itens_repository = Repository(ItemPedido, connection=connection)
         try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
+            itens_pedido: List[ItemPedido] = await itens_repository.find_all(
+                pedido_uuid=uuid
+            )
+            for item in itens_pedido:
+                if item.uuid is None:
+                    continue
+                i = await itens_repository.delete_from_uuid(
+                    uuid=item.uuid
+                )
+                itens_removed += i
+
+            pedidos_removed = await pedido_repository.delete_from_uuid(
+                uuid=uuid
+            )
         except Exception as error:
             raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return {
+        "pedidos_removed": pedidos_removed,
+        'itens_removed': itens_pedido
+    }
