@@ -27,7 +27,6 @@ class Repository:
         self.model = model
         self.connection = connection
         self.columns = list(model.model_fields.keys())  # type: ignore
-        self.values = list(model.model_fields.values())  # type: ignore
         self.tablename: str = model.__tablename__  # type: ignore
 
     async def find_one(self, **kwargs) -> Optional[Any]:
