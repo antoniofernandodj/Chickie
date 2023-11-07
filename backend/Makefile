@@ -1,4 +1,4 @@
-api:
+dev:
 	poetry run uvicorn --reload asgi:app
 
 ct:
