@@ -14,7 +14,9 @@ categoria_descricao_2 = f.sentence()
 def test_cadastrar_categorias_unauthorized(
     client: TestClient, loja_uuid: str
 ):
+    print('tentando')
     payload = {"nome": categoria_nome, "descricao": categoria_descricao}
+    print({'payload': payload})
     response = client.post("/categorias/", json=payload)
     assert response.status_code == 401
 

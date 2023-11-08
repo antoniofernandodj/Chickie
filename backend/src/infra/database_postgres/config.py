@@ -5,14 +5,16 @@ from src.infra.database_mongo.manager import DatabaseConnectionManager
 from sqlalchemy.orm.session import sessionmaker
 
 
-database_url = "{0}+{1}://{2}:{3}@{4}/{5}".format(
-    "postgresql",
-    "psycopg2",
-    s.POSTGRES_USERNAME,
-    s.POSTGRES_PASSWORD,
-    s.POSTGRES_HOST,
-    s.POSTGRES_DATABASE,
-)
+# database_url = "{0}+{1}://{2}:{3}@{4}/{5}".format(
+#     "postgresql",
+#     "psycopg2",
+#     s.POSTGRES_USERNAME,
+#     s.POSTGRES_PASSWORD,
+#     s.POSTGRES_HOST,
+#     s.POSTGRES_DATABASE,
+# )
+
+database_url = s.POSTGRES_URL
 
 engine = create_engine(database_url)
 
@@ -27,10 +29,18 @@ async def init_database(database_name: str):
     Base.metadata.create_all(engine)
 
 
-def get_db():
-    while True:
+def get_session():
+    session = None
+    trying = True
+    while trying:
         try:
             Session = sessionmaker(engine)
-            return Session()
+            session = Session()
+            yield session
+            trying = False
         except Exception:
+            print('Waiting db...')
             sleep(5)
+
+    if session:
+        session.close()

@@ -4,9 +4,17 @@ from time import sleep
 
 
 def get():
-    while True:
+    session = None
+    trying = True
+    while trying:
         try:
             Session = sessionmaker(engine)
-            return Session()
+            session = Session()
+            yield session
+            trying = False
         except Exception:
+            print('Waiting db...')
             sleep(5)
+
+    if session:
+        session.close()

@@ -1,7 +1,4 @@
 from config import settings as s
-
-s.POSTGRES_DATABASE = "test"
-
 from fastapi.testclient import TestClient  # noqa
 from src.schemas import Loja  # noqa
 import json  # noqa
