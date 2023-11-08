@@ -1,5 +1,5 @@
-from src.infra.database.manager import DatabaseConnectionManager
-from src.infra.database.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
 from src.schemas import Usuario, UsuarioSignIn
 import base64
 import bcrypt

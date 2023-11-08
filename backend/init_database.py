@@ -10,15 +10,15 @@ s.POSTGRES_DATABASE = arg
 
 import asyncio  # noqa
 
-from src.infra.database.entities import Base  # noqa
-from src.infra.database.config import engine  # noqa
+from src.infra.database_postgres.entities import Base  # noqa
+from src.infra.database_postgres.config import engine  # noqa
 from src.api import ext  # noqa
 
 
 async def create_database(database_name=arg or s.POSTGRES_DATABASE):
-    from src.infra import database
+    from src.infra import database_postgres
 
-    await database.config.init_database(database_name=database_name)
+    await database_postgres.config.init_database(database_name=database_name)
     Base.metadata.create_all(engine)
 
 

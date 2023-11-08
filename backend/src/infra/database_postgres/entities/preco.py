@@ -1,5 +1,5 @@
 import enum
-from src.infra.database.entities import Base
+from src.infra.database_postgres.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from sqlalchemy.types import Float, String as Str, Enum
 

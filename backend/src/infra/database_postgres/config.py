@@ -1,7 +1,7 @@
 from time import sleep
 from config import settings as s
 from sqlalchemy.engine import create_engine
-from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database_mongo.manager import DatabaseConnectionManager
 from sqlalchemy.orm.session import sessionmaker
 
 
@@ -18,7 +18,7 @@ engine = create_engine(database_url)
 
 
 async def init_database(database_name: str):
-    from src.infra.database.entities import Base
+    from src.infra.database_postgres.entities import Base
 
     # await DatabaseConnectionManager.create_database(
     #     name=s.POSTGRES_DATABASE_PROD

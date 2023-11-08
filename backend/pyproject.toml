@@ -36,6 +36,7 @@ celery = "^5.3.1"
 dropbox = "^11.36.2"
 dynaconf = "^3.2.2"
 motor = "^3.3.1"
+alembic = "^1.12.1"
 
 
 [tool.poetry.group.dev.dependencies]

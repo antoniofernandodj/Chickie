@@ -1,5 +1,5 @@
 from sqlalchemy import Column as Col, String, ForeignKey, Float
-from src.infra.database.entities import Base
+from src.infra.database_postgres.entities import Base
 from sqlalchemy.types import Text
 
 

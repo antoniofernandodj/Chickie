@@ -1,4 +1,4 @@
-from src.infra.database.entities.endereco import UF
+from src.infra.database_postgres.entities.endereco import UF
 from PySide6.QtWidgets import QMainWindow
 from src.qt.controllers import MainController
 from src.qt.models import CategoriasModel, ProdutosModel, StatusModel

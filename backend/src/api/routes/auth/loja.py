@@ -2,8 +2,8 @@
 from fastapi.routing import APIRouter
 from datetime import timedelta
 from src.api import security
-from src.infra.database.manager import DatabaseConnectionManager
-from src.infra.database.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status, Path
 from typing import Any

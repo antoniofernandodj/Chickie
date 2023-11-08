@@ -1,4 +1,4 @@
-from src.infra.database.interfaces.interfaces import CommandInterface
+from src.infra.database_postgres.interfaces.interfaces import CommandInterface
 from typing import Any
 from src.event import Event
 

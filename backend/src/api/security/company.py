@@ -1,9 +1,9 @@
 from typing import Annotated, Optional
-from src.infra.database.repository import Repository
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from config import settings as s
-from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.schemas import TokenData, Loja
 from src.api.security.scheme import oauth2_scheme
 

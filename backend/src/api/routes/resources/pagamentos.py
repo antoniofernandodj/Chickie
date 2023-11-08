@@ -10,8 +10,8 @@ from fastapi import (  # noqa
 from typing import Optional
 from src.api import security
 from src.schemas import Loja, Pagamento
-from src.infra.database.repository import Repository
-from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
 
 
 current_user = Annotated[Loja, Depends(security.current_user)]

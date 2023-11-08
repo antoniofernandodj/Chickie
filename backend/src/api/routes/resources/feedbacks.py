@@ -8,8 +8,8 @@ from fastapi import (  # noqa
     Query,
 )
 from src.schemas import Feedback
-from src.infra.database.repository import Repository
-from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
 
 
 NotFoundException = HTTPException(
@@ -157,8 +157,8 @@ from fastapi import (  # noqa
     Query,
 )
 from src.schemas import Feedback
-from src.infra.database.repository import Repository
-from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
 
 
 NotFoundException = HTTPException(

@@ -8,8 +8,8 @@ from fastapi import (  # noqa
     Query,
 )
 from src.schemas import Endereco
-from src.infra.database.repository import Repository
-from src.infra.database.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
 
 
 repo_name = "endereco"

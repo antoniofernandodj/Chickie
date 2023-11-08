@@ -1,8 +1,8 @@
 from src.event import store
 import logging
-from src.infra.database.manager import DatabaseConnectionManager
-from src.infra.database.interfaces import CommandInterface
-from src.infra.database.commands import (
+from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.infra.database_postgres.interfaces import CommandInterface
+from src.infra.database_postgres.commands import (
     CreateCommand,
     UpdateCommand,
     DeleteCommand

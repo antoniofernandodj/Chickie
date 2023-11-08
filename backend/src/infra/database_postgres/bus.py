@@ -1,7 +1,7 @@
 import typing as t
-from src.infra.database.handlers import database_handler, event_handler
+from src.infra.database_postgres.handlers import database_handler, event_handler
 from typing import Any
-from src.infra.database.commands import (
+from src.infra.database_postgres.commands import (
     CreateCommand, UpdateCommand, DeleteCommand
 )
 

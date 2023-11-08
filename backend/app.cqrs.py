@@ -4,14 +4,14 @@ import random
 import secrets
 
 from faker import Faker
-from src.infra.database.bus import get_message_bus
-from src.infra.database.commands import (
+from src.infra.database_postgres.bus import get_message_bus
+from src.infra.database_postgres.commands import (
     CreateCommand,
     DeleteCommand,
     UpdateCommand
 )
-from src.infra.database.manager import DatabaseConnectionManager
-from src.infra.database.repository import Repository
+from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.infra.database_postgres.repository import Repository
 from src.schemas import Usuario
 
 f = Faker()

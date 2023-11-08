@@ -1,4 +1,4 @@
-from src.infra.database.entities import Base
+from src.infra.database_postgres.entities import Base
 from sqlalchemy import (
     Column as Col,
     Integer,

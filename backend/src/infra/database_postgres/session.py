@@ -1,4 +1,4 @@
-from src.infra.database.config import engine
+from src.infra.database_postgres.config import engine
 from sqlalchemy.orm.session import sessionmaker
 from time import sleep
 

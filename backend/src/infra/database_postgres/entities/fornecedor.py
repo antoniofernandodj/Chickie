@@ -1,6 +1,6 @@
 from sqlalchemy import Column as Col, String, ForeignKey
 from sqlalchemy.types import Float, Text
-from src.infra.database.entities import Base
+from src.infra.database_postgres.entities import Base
 
 
 class Fornecedor(Base):
