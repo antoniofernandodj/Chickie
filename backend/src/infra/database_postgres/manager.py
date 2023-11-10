@@ -3,9 +3,10 @@ import aiopg
 import psycopg2
 from psycopg2 import sql
 from typing import Optional
-
+from asyncio import Lock
 
 class DatabaseConnectionManager:
+
     CONNECTION_STRING = "user={0} password={1} host={2}".format(
         s.POSTGRES_USERNAME, s.POSTGRES_PASSWORD, s.POSTGRES_HOST
     )
@@ -47,7 +48,6 @@ class DatabaseConnectionManager:
     
     @classmethod
     async def get_connection(cls):
-
         CONNECTION_STRING_DB = (
             "dbname={0} user={1} password={2} host={3}".format(
                 s.POSTGRES_DATABASE,
@@ -58,6 +58,7 @@ class DatabaseConnectionManager:
         )
 
         pool = await aiopg.create_pool(CONNECTION_STRING_DB)
+        
         connection = await pool.acquire()
         yield connection
         connection.close()
@@ -108,78 +109,3 @@ class DatabaseConnectionManager:
                         await cursor.execute(name)
 
                     cursor.close()
-
-
-class SyncDatabaseConnectionManager:
-    def __init__(self):
-        self.connection_pool = psycopg2.pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=10,
-            dbname=s.POSTGRES_DATABASE,
-            user=s.POSTGRES_USERNAME,
-            password=s.POSTGRES_PASSWORD,
-            host=s.POSTGRES_HOST,
-        )
-
-    def __enter__(self):
-        self.connection = self.connection_pool.getconn()
-        self.connection.autocommit = True
-        return self.connection
-
-    def __exit__(self, exception_type, exception_value, traceback):
-        if self.connection:
-            self.connection_pool.putconn(self.connection)
-
-    @classmethod
-    def create_database(cls, name):
-        conn = None
-        try:
-            conn = psycopg2.connect(
-                dbname="postgres",
-                user=s.POSTGRES_USERNAME,
-                password=s.POSTGRES_PASSWORD,
-                host=s.POSTGRES_HOST,
-            )
-            conn.autocommit = True
-            cursor = conn.cursor()
-            cursor.execute(
-                sql.SQL(
-                    "SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s"
-                ),
-                (name,),
-            )
-            exists = cursor.fetchone()
-            if not exists:
-                cursor.execute(
-                    sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name))
-                )
-        finally:
-            if conn:
-                conn.close()
-
-    @classmethod
-    def remove_database(cls, name):
-        conn = None
-        try:
-            conn = psycopg2.connect(
-                dbname="postgres",
-                user=s.POSTGRES_USERNAME,
-                password=s.POSTGRES_PASSWORD,
-                host=s.POSTGRES_HOST,
-            )
-            conn.autocommit = True
-            cursor = conn.cursor()
-            cursor.execute(
-                sql.SQL(
-                    "SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s"
-                ),
-                (name,),
-            )
-            exists = cursor.fetchone()
-            if exists:
-                cursor.execute(
-                    sql.SQL("DROP DATABASE {}").format(sql.Identifier(name))
-                )
-        finally:
-            if conn:
-                conn.close()
