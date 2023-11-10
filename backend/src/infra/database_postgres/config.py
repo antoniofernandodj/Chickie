@@ -1,7 +1,7 @@
 from time import sleep
 from config import settings as s
 from sqlalchemy.engine import create_engine
-from src.infra.database_mongo.manager import DatabaseConnectionManager
+from src.infra.database_postgres.manager import DatabaseConnectionManager
 from sqlalchemy.orm.session import sessionmaker
 
 
