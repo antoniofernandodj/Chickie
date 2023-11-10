@@ -1,5 +1,26 @@
 dev:
-	poetry run uvicorn --reload asgi:app
+	cd .. && \
+	docker build \
+		-t antoniofernandodj/chickie:dev \
+		-f ./backend/dockerfiles/api.dockerfile backend && \
+	docker compose up api-dev
+
+stop:
+	cd .. && \
+	docker compose down
+
+build_push:
+	cd .. && \
+	docker build \
+		-t antoniofernandodj/chickie:${v} \
+		-f ./backend/dockerfiles/api.dockerfile backend && \
+	docker push antoniofernandodj/chickie:${v}
+
+build:
+	cd .. && \
+	docker build \
+		-t antoniofernandodj/chickie:${v} \
+		-f ./backend/dockerfiles/api.dockerfile backend
 
 ct:
 	poetry run mypy --check-untyped-defs asgi.py

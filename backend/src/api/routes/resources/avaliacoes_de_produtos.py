@@ -1,22 +1,14 @@
-#
 from typing import Annotated
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
     status,
-    Path,
-    Depends,
-    Query,
+    Path
 )
-from src.api import security
-from src.schemas import Loja, AvaliacaoDeProduto
+from src.schemas import AvaliacaoDeProduto
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
-
-
-current_user = Annotated[Loja, Depends(security.current_user)]
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Avaliação não encontrada"
+from src.dependencies import (
+    connection_dependency
 )
 
 router = APIRouter(
@@ -24,24 +16,27 @@ router = APIRouter(
     tags=["Avaliações de produtos"]
 )
 
+NotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND, detail="Avaliação não encontrada"
+)
 
 @router.get("/")
-async def requisitar_avaliacoes():
+async def requisitar_avaliacoes(connection: connection_dependency):
     """
     Requisita todas as avaliações de produtos.
 
     Returns:
         List[AvaliacaoDeProduto]: Uma lista contendo todas as avaliações de produtos.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(AvaliacaoDeProduto, connection=connection)
-        results = await repository.find_all()
+    repository = Repository(AvaliacaoDeProduto, connection=connection)
+    results = await repository.find_all()
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_avaliacao(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
 ):
     """
@@ -53,18 +48,19 @@ async def requisitar_avaliacao(
     Returns:
         AvaliacaoDeProduto: A avaliação de produto correspondente ao UUID.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(AvaliacaoDeProduto, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
-            raise NotFoundException
+    repository = Repository(AvaliacaoDeProduto, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
 
     return result
 
 
 @router.post("/", status_code=201)
-async def cadastrar_avaliacoes(avaliacao: AvaliacaoDeProduto):
+async def cadastrar_avaliacoes(
+    connection: connection_dependency,
+    avaliacao: AvaliacaoDeProduto
+):
     """
     Cadastra uma nova avaliação de produto.
 
@@ -74,18 +70,18 @@ async def cadastrar_avaliacoes(avaliacao: AvaliacaoDeProduto):
     Returns:
         dict: Um dicionário contendo o UUID da avaliação cadastrada.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(AvaliacaoDeProduto, connection=connection)
-        try:
-            uuid = await repository.save(avaliacao)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(AvaliacaoDeProduto, connection=connection)
+    try:
+        uuid = await repository.save(avaliacao)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
 
 @router.put("/{uuid}")
 async def atualizar_avaliacao_put(
+    connection: connection_dependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
 ):
@@ -99,12 +95,11 @@ async def atualizar_avaliacao_put(
     Returns:
         dict: Um dicionário contendo o número de linhas afetadas pela atualização.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(AvaliacaoDeProduto, connection=connection)
-        avaliacao = await repository.find_one(uuid=uuid)
-        if avaliacao is None:
-            raise NotFoundException
-
+    repository = Repository(AvaliacaoDeProduto, connection=connection)
+    avaliacao = await repository.find_one(uuid=uuid)
+    if avaliacao is None:
+        raise NotFoundException
+    
     num_rows_affected = await repository.update(
         avaliacao, avaliacaoData.model_dump()  # type: ignore
     )
@@ -115,14 +110,14 @@ async def atualizar_avaliacao_put(
 @router.patch("/{uuid}")
 async def atualizar_avaliacao_patch(
     avaliacaoData: AvaliacaoDeProduto,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
 ):
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(AvaliacaoDeProduto, connection=connection)
-        avaliacao = await repository.find_one(uuid=uuid)
-        if avaliacao is None:
-            raise NotFoundException
-
+    repository = Repository(AvaliacaoDeProduto, connection=connection)
+    avaliacao = await repository.find_one(uuid=uuid)
+    if avaliacao is None:
+        raise NotFoundException
+    
     num_rows_affected = await repository.update(
         avaliacao,
         avaliacaoData.model_dump()  # type: ignore
@@ -133,6 +128,7 @@ async def atualizar_avaliacao_patch(
 
 @router.delete("/{uuid}")
 async def remover_avaliacao(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ):
     """
@@ -144,11 +140,10 @@ async def remover_avaliacao(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(AvaliacaoDeProduto, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(AvaliacaoDeProduto, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

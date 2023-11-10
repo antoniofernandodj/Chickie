@@ -4,26 +4,26 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Depends,
-    Query,
+    Query
 )
 from typing import Optional
-from src.api import security
-from src.schemas import Loja, Pagamento
+from src.schemas import Pagamento
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
-
-
-current_user = Annotated[Loja, Depends(security.current_user)]
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Pagamento não encontrado"
+from src.dependencies import (
+    connection_dependency
 )
 
 router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
+NotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND, detail="Pagamento não encontrado"
+)
 
 @router.get("/")
-async def requisitar_pagamentos(loja_uuid: Optional[str] = Query(None)):
+async def requisitar_pagamentos(
+    connection: connection_dependency,
+    loja_uuid: Optional[str] = Query(None)
+):
     """
     Requisita pagamentos cadastrados na plataforma.
     
@@ -36,15 +36,16 @@ async def requisitar_pagamentos(loja_uuid: Optional[str] = Query(None)):
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pagamento, connection=connection)
-        results = await repository.find_all(**kwargs)
+
+    repository = Repository(Pagamento, connection=connection)
+    results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_pagamento(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ):
     """
@@ -59,18 +60,19 @@ async def requisitar_pagamento(
     Raises:
         HTTPException: Se o pagamento não for encontrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pagamento, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
-            raise NotFoundException
+    repository = Repository(Pagamento, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
 
     return result
 
 
 @router.post("/", status_code=201)
-async def cadastrar_pagamentos(pagamento: Pagamento):
+async def cadastrar_pagamentos(
+    connection: connection_dependency,
+    pagamento: Pagamento
+):
     """
     Cadastra um novo pagamento na plataforma.
     
@@ -83,12 +85,11 @@ async def cadastrar_pagamentos(pagamento: Pagamento):
     Raises:
         HTTPException: Se ocorrer um erro durante o cadastro.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pagamento, connection=connection)
-        try:
-            uuid = await repository.save(pagamento)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Pagamento, connection=connection)
+    try:
+        uuid = await repository.save(pagamento)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
@@ -96,6 +97,7 @@ async def cadastrar_pagamentos(pagamento: Pagamento):
 @router.put("/{uuid}")
 async def atualizar_pagamento_put(
     pagamento_Data: Pagamento,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ):
     """
@@ -111,15 +113,14 @@ async def atualizar_pagamento_put(
     Raises:
         HTTPException: Se o pagamento não for encontrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pagamento, connection=connection)
-        pagamento = await repository.find_one(uuid=uuid)
-        if pagamento is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            pagamento, pagamento_Data.model_dump()  # type: ignore
-        )
+    repository = Repository(Pagamento, connection=connection)
+    pagamento = await repository.find_one(uuid=uuid)
+    if pagamento is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        pagamento, pagamento_Data.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
@@ -127,14 +128,14 @@ async def atualizar_pagamento_put(
 @router.patch("/{uuid}")
 async def atualizar_pagamento_patch(
     pagamentoData: Pagamento,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ):
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pagamento, connection=connection)
-        pagamento = await repository.find_one(uuid=uuid)
-        if pagamento is None:
-            raise NotFoundException
-
+    repository = Repository(Pagamento, connection=connection)
+    pagamento = await repository.find_one(uuid=uuid)
+    if pagamento is None:
+        raise NotFoundException
+    
     num_rows_affected = await repository.update(
         pagamento, pagamentoData.model_dump()  # type: ignore
     )
@@ -144,6 +145,7 @@ async def atualizar_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_pagamento(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ):
     """
@@ -158,11 +160,10 @@ async def remover_pagamento(
     Raises:
         HTTPException: Se ocorrer um erro durante a remoção.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Pagamento, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Pagamento, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

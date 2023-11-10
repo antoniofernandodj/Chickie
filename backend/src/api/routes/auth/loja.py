@@ -1,20 +1,35 @@
 # from src.presenters import controllers
 from fastapi.routing import APIRouter
-from datetime import timedelta
 from src.api import security
 from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status, Path
 from typing import Any
-from src.schemas import LojaSignIn, Token, Loja, UsuarioSignIn, Cliente
+from src.schemas import (
+    LojaSignIn,
+    Token,
+    Loja,
+    UsuarioSignIn,
+    Cliente
+)
+
 from typing import Annotated
-from config import settings as s
 from src import use_cases
+from src.schemas import Loja, Usuario
+from typing import Annotated
+from src.api import security
+from fastapi import (  # noqa
+    Depends
+)
+
+
+current_user = Annotated[Usuario, Depends(security.current_user)]
+current_company = Annotated[Loja, Depends(security.current_company)]
+
 
 
 router = APIRouter(prefix="/loja", tags=["Loja", "Auth"])
-current_company = Annotated[Loja, Depends(security.current_company)]
 
 
 NotFoundException = HTTPException(

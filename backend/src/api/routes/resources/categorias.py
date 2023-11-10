@@ -4,19 +4,16 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Depends,
     Query,
 )
-from src.api import security
-from src.schemas import CategoriaProdutos, Loja
+from src.schemas import CategoriaProdutos
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
-
-
-current_company = Annotated[Loja, Depends(security.current_company)]
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Categoria não encontrada"
+from src.dependencies import (
+    connection_dependency,
+    current_company
 )
+
+
 
 router = APIRouter(
     prefix="/categorias",
@@ -27,10 +24,16 @@ router = APIRouter(
     # }
 )
 
+NotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND, detail="Categoria não encontrada"
+)
+
 
 @router.get("/")
 async def requisitar_categorias(
-    nome: Optional[str] = Query(None), loja_uuid: Optional[str] = Query(None)
+    connection: connection_dependency,
+    nome: Optional[str] = Query(None),
+    loja_uuid: Optional[str] = Query(None)
 ):
     """
     Requisita todas as categorias de produtos ou filtra por nome e/ou UUID da loja.
@@ -48,15 +51,15 @@ async def requisitar_categorias(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(CategoriaProdutos, connection=connection)
-        results = await repository.find_all(**kwargs)
+    repository = Repository(CategoriaProdutos, connection=connection)
+    results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_categoria(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
     nome: Optional[str] = Query(None)
 ):
@@ -73,12 +76,10 @@ async def requisitar_categoria(
     if nome is not None:
         kwargs["nome"] = nome
 
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(CategoriaProdutos, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
-            raise NotFoundException
+    repository = Repository(CategoriaProdutos, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
 
     return result
 
@@ -86,6 +87,7 @@ async def requisitar_categoria(
 @router.post("/", status_code=201)
 async def cadastrar_categorias(
     categoria: CategoriaProdutos,
+    connection: connection_dependency,
     current_company: current_company,
 ):
     """
@@ -98,12 +100,11 @@ async def cadastrar_categorias(
     Returns:
         dict: Um dicionário contendo o UUID da categoria cadastrada.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(CategoriaProdutos, connection=connection)
-        try:
-            uuid = await repository.save(categoria)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(CategoriaProdutos, connection=connection)
+    try:
+        uuid = await repository.save(categoria)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
@@ -118,6 +119,7 @@ async def atualizar_categoria_patch(
 
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
+    connection: connection_dependency,
     current_company: current_company,
     itemData: CategoriaProdutos,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
@@ -133,24 +135,24 @@ async def atualizar_categoria_put(
     Returns:
         dict: Um dicionário contendo o número de linhas afetadas pela atualização.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(CategoriaProdutos, connection=connection)
-        try:
-            categoria = await repository.find_one(uuid=uuid)
-        except Exception as error:
-            return {"error": str(error)}
-        if categoria is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            categoria, itemData.model_dump()  # type: ignore
-        )
+    repository = Repository(CategoriaProdutos, connection=connection)
+    try:
+        categoria = await repository.find_one(uuid=uuid)
+    except Exception as error:
+        return {"error": str(error)}
+    if categoria is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        categoria, itemData.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")
 async def remover_categoria(
+    connection: connection_dependency,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
 ):
@@ -164,11 +166,10 @@ async def remover_categoria(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(CategoriaProdutos, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(CategoriaProdutos, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

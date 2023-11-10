@@ -4,26 +4,28 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Depends,
     Query,
 )
 from typing import Optional
-from src.api import security
-from src.schemas import Loja, Produto
+from src.schemas import Produto
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.dependencies import (
+    connection_dependency,
+    current_company
+)
 
 
-current_company = Annotated[Loja, Depends(security.current_company)]
+router = APIRouter(prefix="/produtos", tags=["Produto"])
+
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado"
 )
 
-router = APIRouter(prefix="/produtos", tags=["Produto"])
-
-
 @router.get("/")
-async def requisitar_produtos(loja_uuid: Optional[str] = Query(None)):
+async def requisitar_produtos(
+    connection: connection_dependency,
+    loja_uuid: Optional[str] = Query(None)
+):
     """
     Requisita os produtos cadastrados na plataforma.
     Aceita um uuid como query para buscar os
@@ -39,15 +41,16 @@ async def requisitar_produtos(loja_uuid: Optional[str] = Query(None)):
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Produto, connection=connection)
-        results = await repository.find_all(**kwargs)
+
+    repository = Repository(Produto, connection=connection)
+    results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_produto(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ):
     """
@@ -62,13 +65,11 @@ async def requisitar_produto(
     Raises:
         HTTPException: Se o produto não for encontrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Produto, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
-            raise NotFoundException
-
+    repository = Repository(Produto, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
+    
     return result
 
 
@@ -76,6 +77,7 @@ async def requisitar_produto(
 async def cadastrar_produtos(
     produto: Produto,
     current_company: current_company,
+    connection: connection_dependency
 ):
     """
     Cadastra um novo produto na plataforma.
@@ -90,12 +92,11 @@ async def cadastrar_produtos(
     Raises:
         HTTPException: Se ocorrer um erro durante o cadastro.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Produto, connection=connection)
-        try:
-            uuid = await repository.save(produto)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Produto, connection=connection)
+    try:
+        uuid = await repository.save(produto)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
@@ -104,7 +105,8 @@ async def cadastrar_produtos(
 async def atualizar_produto_put(
     produtoData: Produto,
     current_company: current_company,
-    uuid: Annotated[str, Path(title="O uuid do produto a fazer put")],
+    connection: connection_dependency,
+    uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
 ):
     """
     Atualiza um produto utilizando o método HTTP PUT.
@@ -120,15 +122,14 @@ async def atualizar_produto_put(
     Raises:
         HTTPException: Se o produto não for encontrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Produto, connection=connection)
-        produto = await repository.find_one(uuid=uuid)
-        if produto is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            produto, produtoData.model_dump()  # type: ignore
-        )
+    repository = Repository(Produto, connection=connection)
+    produto = await repository.find_one(uuid=uuid)
+    if produto is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        produto, produtoData.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
@@ -136,26 +137,27 @@ async def atualizar_produto_put(
 @router.patch("/{uuid}")
 async def atualizar_produto_patch(
     produtoData: Produto,
-    uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")],
     current_company: current_company,
+    connection: connection_dependency,
+    uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")]
 ):
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Produto, connection=connection)
-        produto = await repository.find_one(uuid=uuid)
-        if produto is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            produto, produtoData.model_dump()  # type: ignore
-        )
+    repository = Repository(Produto, connection=connection)
+    produto = await repository.find_one(uuid=uuid)
+    if produto is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        produto, produtoData.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")
 async def remover_produto(
-    uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")],
     current_company: current_company,
+    connection: connection_dependency,
+    uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
 ):
     """
     Remove um produto pelo seu uuid.
@@ -170,11 +172,10 @@ async def remover_produto(
     Raises:
         HTTPException: Se ocorrer um erro durante a remoção.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Produto, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Produto, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

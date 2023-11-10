@@ -4,25 +4,27 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Depends,
-    Query,
+    Query
 )
-from src.api import security
-from src.schemas import Preco, Loja
+from src.schemas import Preco
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.dependencies import (
+    connection_dependency,
+    current_company
+)
 
 
-current_company = Annotated[Loja, Depends(security.current_company)]
+router = APIRouter(prefix="/precos", tags=["Preços"])
+
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Preço não encontrado"
 )
 
-router = APIRouter(prefix="/precos", tags=["Preços"])
-
-
 @router.get("/")
-async def requisitar_precos(loja_uuid: Optional[str] = Query(None)):
+async def requisitar_precos(
+    connection: connection_dependency,
+    loja_uuid: Optional[str] = Query(None)
+):
     """
     Obtém uma lista de todos os preços cadastrados.
 
@@ -35,15 +37,16 @@ async def requisitar_precos(loja_uuid: Optional[str] = Query(None)):
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Preco, connection=connection)
-        results = await repository.find_all(**kwargs)
+
+    repository = Repository(Preco, connection=connection)
+    results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_preco(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ):
     """
@@ -55,12 +58,10 @@ async def requisitar_preco(
     Returns:
         Preco: Os detalhes do preço.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Preco, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
-            raise NotFoundException
+    repository = Repository(Preco, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
 
     return result
 
@@ -69,6 +70,7 @@ async def requisitar_preco(
 async def cadastrar_precos(
     preco: Preco,
     current_company: current_company,
+    connection: connection_dependency
 ):
     """
     Cadastra um novo preço.
@@ -80,20 +82,19 @@ async def cadastrar_precos(
     Returns:
         dict: Um dicionário contendo o UUID do preço cadastrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Preco, connection=connection)
-        try:
-            uuid = await repository.save(preco)
-        except Exception as error:
-            return {"error": str(error)}
+    repository = Repository(Preco, connection=connection)
+    try:
+        uuid = await repository.save(preco)
+    except Exception as error:
+        return {"error": str(error)}
 
     return {"uuid": uuid}
 
 
 @router.patch("/{uuid}")
 async def atualizar_preco_patch(
-    uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")],
     current_company: current_company,
+    uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
 ):
     return {}
 
@@ -101,8 +102,9 @@ async def atualizar_preco_patch(
 @router.put("/{uuid}")
 async def atualizar_preco_put(
     itemData: Preco,
-    uuid: Annotated[str, Path(title="O uuid do preco a fazer put")],
     current_company: current_company,
+    connection: connection_dependency,
+    uuid: Annotated[str, Path(title="O uuid do preco a fazer put")]
 ):
     """
     Atualiza um preço completamente usando PUT.
@@ -115,23 +117,23 @@ async def atualizar_preco_put(
     Returns:
         dict: Um dicionário contendo o número de linhas afetadas na atualização.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Preco, connection=connection)
-        preco = await repository.find_one(uuid=uuid)
-        if preco is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            preco, itemData.model_dump()  # type: ignore
-        )
+    repository = Repository(Preco, connection=connection)
+    preco = await repository.find_one(uuid=uuid)
+    if preco is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        preco, itemData.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.delete("/{uuid}")
 async def remover_preco(
-    uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")],
     current_company: current_company,
+    connection: connection_dependency,
+    uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
 ):
     """
     Remove um preço.
@@ -143,11 +145,10 @@ async def remover_preco(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Preco, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Preco, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

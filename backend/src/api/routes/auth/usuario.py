@@ -1,5 +1,3 @@
-# from src.presenters import controllers
-from datetime import timedelta
 from typing import Any, Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -8,14 +6,21 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.requests import Request
 
 from src.api import security
-from src.schemas import Usuario
 from src.schemas import Token, UsuarioSignIn
-from config import settings as s
 from src import use_cases
+from src.schemas import Loja, Usuario
+from typing import Annotated
+from src.api import security
+from fastapi import (  # noqa
+    Depends
+)
+
+
+current_user = Annotated[Usuario, Depends(security.current_user)]
+current_company = Annotated[Loja, Depends(security.current_company)]
 
 
 router = APIRouter(prefix="/user", tags=["Usuario", "Auth"])
-current_user = Annotated[Usuario, Depends(security.current_user)]
 
 
 @router.post("/login", response_model=Token)
@@ -46,6 +51,7 @@ async def login_post(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
     access_token = security.create_access_token(data={"sub": user.username})
     return {
         "access_token": access_token,

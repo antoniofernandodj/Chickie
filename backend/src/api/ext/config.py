@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+import os
 
 
 def init_app(app: FastAPI):
@@ -9,7 +10,7 @@ def init_app(app: FastAPI):
     
     openapi_schema = get_openapi(
         title="Chickie",
-        version="0.1.0",
+        version=os.getenv('APP_VERSION') or '',
         description="App de entrega de refeições",
         routes=app.routes
     )

@@ -4,26 +4,28 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Depends,
-    Query,
+    Query
 )
 from typing import Optional
-from src.api import security
-from src.schemas import Loja, Funcionario
+from src.schemas import Funcionario
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.dependencies import (
+    connection_dependency,
+    current_company
+)
 
 
-current_company = Annotated[Loja, Depends(security.current_company)]
+router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
+
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Funcionario não encontrado"
 )
 
-router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
-
-
 @router.get("/")
-async def requisitar_funcionarios(loja_uuid: Optional[str] = Query(None)):
+async def requisitar_funcionarios(
+    connection: connection_dependency,
+    loja_uuid: Optional[str] = Query(None)
+):
     """
     Requisita todos os funcionários cadastrados, com opção de filtro por UUID da loja.
 
@@ -36,15 +38,16 @@ async def requisitar_funcionarios(loja_uuid: Optional[str] = Query(None)):
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Funcionario, connection=connection)
-        results = await repository.find_all(**kwargs)
+
+    repository = Repository(Funcionario, connection=connection)
+    results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_funcionario(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do funcionário a fazer get")]
 ):
     """
@@ -56,13 +59,12 @@ async def requisitar_funcionario(
     Returns:
         Funcionario: O funcionário correspondente ao UUID.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Funcionario, connection=connection)
-        result = await repository.find_one(uuid=uuid)
 
-        if result is None:
-            raise NotFoundException
-
+    repository = Repository(Funcionario, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
+    
     return result
 
 
@@ -70,6 +72,7 @@ async def requisitar_funcionario(
 async def cadastrar_funcionarios(
     funcionario: Funcionario,
     current_company: current_company,
+    connection: connection_dependency
 ):
     """
     Cadastra um novo funcionário.
@@ -81,21 +84,21 @@ async def cadastrar_funcionarios(
     Returns:
         dict: Um dicionário contendo o UUID do funcionário cadastrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Funcionario, connection=connection)
-        try:
-            uuid = await repository.save(funcionario)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Funcionario, connection=connection)
+    try:
+        uuid = await repository.save(funcionario)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
 
 @router.put("/{uuid}")
 async def atualizar_funcionario_put(
-    current_company: current_company,
     funcionarioData: Funcionario,
-    uuid: Annotated[str, Path(title="O uuid do funcionario a fazer put")],
+    current_company: current_company,
+    connection: connection_dependency,
+    uuid: Annotated[str, Path(title="O uuid do funcionario a fazer put")]
 ):
     """
     Atualiza os dados de um funcionário utilizando o método HTTP PUT.
@@ -108,31 +111,30 @@ async def atualizar_funcionario_put(
     Returns:
         dict: Um dicionário contendo o número de linhas afetadas na atualização.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Funcionario, connection=connection)
-        funcionario = await repository.find_one(uuid=uuid)
-        if funcionario is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            funcionario, funcionarioData.model_dump()  # type: ignore
-        )
+    repository = Repository(Funcionario, connection=connection)
+    funcionario = await repository.find_one(uuid=uuid)
+    if funcionario is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        funcionario, funcionarioData.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.patch("/{uuid}")
 async def atualizar_funcionario_patch(
-    current_company: current_company,
     funcionarioData: Funcionario,
+    current_company: current_company,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")],
 ):
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Funcionario, connection=connection)
-        funcionario = await repository.find_one(uuid=uuid)
-        if funcionario is None:
-            raise NotFoundException
-
+    repository = Repository(Funcionario, connection=connection)
+    funcionario = await repository.find_one(uuid=uuid)
+    if funcionario is None:
+        raise NotFoundException
+    
     num_rows_affected = await repository.update(
         funcionario, funcionarioData.model_dump()  # type: ignore
     )
@@ -143,6 +145,7 @@ async def atualizar_funcionario_patch(
 @router.delete("/{uuid}")
 async def remover_funcionario(
     current_company: current_company,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer delete")],
 ):
     """
@@ -155,11 +158,10 @@ async def remover_funcionario(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Funcionario, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Funcionario, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from . import resources, auth
 import tomli
+import os
 
 with open("pyproject.toml", "rb") as toml_file:
     toml_data = tomli.load(toml_file)
@@ -23,7 +24,7 @@ def init_app(app: FastAPI) -> None:
         bem como links para as rotas disponíveis e detalhes sobre as ações (rotas) do aplicativo.
         """
         return {
-            "version": version,
+            "version": os.getenv('APP_VERSION'),
             "name": name,
             "description": description,
             "links": [

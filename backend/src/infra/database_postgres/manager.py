@@ -44,6 +44,24 @@ class DatabaseConnectionManager:
                 )
             )
         return CONNECTION_STRING_DB
+    
+    @classmethod
+    async def get_connection(cls):
+
+        CONNECTION_STRING_DB = (
+            "dbname={0} user={1} password={2} host={3}".format(
+                s.POSTGRES_DATABASE,
+                s.POSTGRES_USERNAME,
+                s.POSTGRES_PASSWORD,
+                s.POSTGRES_HOST,
+            )
+        )
+
+        pool = await aiopg.create_pool(CONNECTION_STRING_DB)
+        connection = await pool.acquire()
+        yield connection
+        connection.close()
+        pool.close()
 
     async def __aenter__(self):
         self.pool = await aiopg.create_pool(self.CONNECTION_STRING_DB)

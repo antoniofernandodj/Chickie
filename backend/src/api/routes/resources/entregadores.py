@@ -1,31 +1,31 @@
-#
-#
 from typing import Annotated
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
     status,
     Path,
-    Depends,
-    Query,
+    Query
 )
 from typing import Optional
-from src.api import security
-from src.schemas import Loja, Entregador
+from src.schemas import Entregador
 from src.infra.database_postgres.repository import Repository
-from src.infra.database_postgres.manager import DatabaseConnectionManager
+from src.dependencies import (
+    connection_dependency,
+    current_company
+)
 
 
-current_company = Annotated[Loja, Depends(security.current_company)]
+router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
+
 NotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail="Entregador não encontrado"
 )
 
-router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
-
-
 @router.get("/")
-async def requisitar_entregadores(loja_uuid: Optional[str] = Query(None)):
+async def requisitar_entregadores(
+    connection: connection_dependency,
+    loja_uuid: Optional[str] = Query(None)
+):
     """
     Requisita todos os entregadores cadastrados.
 
@@ -38,15 +38,16 @@ async def requisitar_entregadores(loja_uuid: Optional[str] = Query(None)):
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Entregador, connection=connection)
-        results = await repository.find_all()
+
+    repository = Repository(Entregador, connection=connection)
+    results = await repository.find_all(**kwargs)
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_entregador(
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer get")]
 ):
     """
@@ -58,12 +59,10 @@ async def requisitar_entregador(
     Returns:
         Entregador: O entregador correspondente ao UUID.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Entregador, connection=connection)
-        result = await repository.find_one(uuid=uuid)
-
-        if result is None:
-            raise NotFoundException
+    repository = Repository(Entregador, connection=connection)
+    result = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException
 
     return result
 
@@ -72,6 +71,7 @@ async def requisitar_entregador(
 async def cadastrar_entregadores(
     entregador: Entregador,
     current_company: current_company,
+    connection: connection_dependency,
 ):
     """
     Cadastra um novo entregador.
@@ -83,20 +83,20 @@ async def cadastrar_entregadores(
     Returns:
         dict: Um dicionário contendo o UUID do entregador cadastrado.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Entregador, connection=connection)
-        try:
-            uuid = await repository.save(entregador)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Entregador, connection=connection)
+    try:
+        uuid = await repository.save(entregador)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
 
 @router.put("/{uuid}")
 async def atualizar_entregador_put(
-    current_company: current_company,
     entregadorData: Entregador,
+    current_company: current_company,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer put")],
 ):
     """
@@ -110,31 +110,30 @@ async def atualizar_entregador_put(
     Returns:
         dict: Um dicionário contendo o número de linhas afetadas pela atualização.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Entregador, connection=connection)
-        entregador = await repository.find_one(uuid=uuid)
-        if entregador is None:
-            raise NotFoundException
-
-        num_rows_affected = await repository.update(
-            entregador, entregadorData.model_dump()  # type: ignore
-        )
+    repository = Repository(Entregador, connection=connection)
+    entregador = await repository.find_one(uuid=uuid)
+    if entregador is None:
+        raise NotFoundException
+    
+    num_rows_affected = await repository.update(
+        entregador, entregadorData.model_dump()  # type: ignore
+    )
 
     return {"num_rows_affected": num_rows_affected}
 
 
 @router.patch("/{uuid}")
 async def atualizar_entregador_patch(
-    current_company: current_company,
     entregadorData: Entregador,
+    connection: connection_dependency,
+    current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")],
 ):
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Entregador, connection=connection)
-        entregador = await repository.find_one(uuid=uuid)
-        if entregador is None:
-            raise NotFoundException
-
+    repository = Repository(Entregador, connection=connection)
+    entregador = await repository.find_one(uuid=uuid)
+    if entregador is None:
+        raise NotFoundException
+    
     num_rows_affected = await repository.update(
         entregador, entregadorData.model_dump()  # type: ignore
     )
@@ -145,6 +144,7 @@ async def atualizar_entregador_patch(
 @router.delete("/{uuid}")
 async def remover_entregador(
     current_company: current_company,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")],
 ):
     """
@@ -157,11 +157,10 @@ async def remover_entregador(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Entregador, connection=connection)
-        try:
-            itens_removed = await repository.delete_from_uuid(uuid=uuid)
-        except Exception as error:
-            raise HTTPException(status_code=500, detail=str(error))
+    repository = Repository(Entregador, connection=connection)
+    try:
+        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"itens_removed": itens_removed}

@@ -6,47 +6,51 @@
 version: '3'
 
 services:
-  api:
-    container_name: api
-    build:
-      context: ./backend
-      dockerfile: ./dockerfiles/api.dockerfile
-    command: uvicorn --loop uvloop --port 8000 --log-level info --timeout-keep-alive 300 asgi:app
 
+  api-dev:
+    container_name: api-dev
+    ports:
+      - "8000:8000"
     volumes:
       - ./backend/src:/usr/app/src
+    command: bash -c "
+      uvicorn asgi:app \
+        --host 0.0.0.0 \
+        --port 8000"
     restart: "on-failure"
     env_file:
       - ./infra.secrets.toml
-    network_mode: "host"
     environment:
       CHICKIE_MYENV: prod
-    depends_on:
-      - cache
-      - rabbitmq
-      - mongodb
-      - database
+      APP_VERSION: "dev"
+    image: antoniofernandodj/chickie:dev
 
-  database:
-    image: postgres
-    volumes:
-      - /var/local/lib/postgresql/volumes/Chickie:/var/lib/postgresql/data
-    env_file:
-      - infra.secrets.toml
-    ports:
-      - "5432:5432"
+    # depends_on:
+      # - cache
+      # - rabbitmq
+      # - mongodb
+      # - database
+
+  # database:
+  #   image: postgres
+  #   volumes:
+  #     - /var/local/lib/postgresql/volumes/Chickie:/var/lib/postgresql/data
+  #   env_file:
+  #     - infra.secrets.toml
+  #   ports:
+  #     - "5432:5432"
   
-  cache:
-    image: redis
-    restart: always
-    env_file:
-      - infra.secrets.toml
-    command: redis-server /usr/local/etc/redis/redis.conf
-    volumes:
-      - cache:/data
-      - ./config/redis.secrets.conf:/usr/local/etc/redis/redis.conf
-    ports:
-      - "6379:6379"
+  # cache:
+  #   image: redis
+  #   restart: always
+  #   env_file:
+  #     - infra.secrets.toml
+  #   command: redis-server /usr/local/etc/redis/redis.conf
+  #   volumes:
+  #     - cache:/data
+  #     - ./config/redis.secrets.conf:/usr/local/etc/redis/redis.conf
+  #   ports:
+  #     - "6379:6379"
 
   rabbitmq:
     image: rabbitmq:3-management
