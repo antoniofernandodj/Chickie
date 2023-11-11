@@ -109,7 +109,14 @@ async def signin(loja: LojaSignIn) -> Any:
     Returns:
         dict: Um dicionário contendo o uuid da loja cadastrada.
     """
-    uuid = await use_cases.lojas.registrar(loja_data=loja)
+    try:
+        uuid = await use_cases.lojas.registrar(loja_data=loja)
+    except use_cases.lojas.UnvalidPasswordException:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Senha inválida! A senha deve ser maior que 5"
+        )
+    
     return {"uuid": uuid}
 
 
@@ -149,6 +156,7 @@ async def cadastrar_cliente(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="uuid da loja em falta",
         )
+    
     usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
     cliente = Cliente(usuario_uuid=usuario_uuid, loja_uuid=usuario.loja_uuid)
     async with DatabaseConnectionManager() as connection:

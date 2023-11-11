@@ -22,3 +22,10 @@ class Loja(BaseModel):
             raise
         hash_bytes = base64.b64decode(self.password_hash.encode("utf-8"))
         return bcrypt.checkpw(senha_loja.encode("utf-8"), hash_bytes)
+
+    # class Config:
+    #     schema_extra = {
+    #         'example': {
+
+    #         }
+    #     }

@@ -9,3 +9,12 @@ class CategoriaProdutos(BaseModel):
     loja_uuid: str
 
     uuid: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                'nome': 'str',
+                'descricao': 'str',
+                'loja_uuid': 'str'
+            }
+        }

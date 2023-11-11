@@ -13,3 +13,16 @@ class ZonaDeEntrega(BaseModel):
     taxa_de_entrega: float
     loja_uuid: str
     uuid: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                'nome': 'str',
+                'cidade': 'str',
+                'uf': 'str',
+                'bairro': 'str',
+                'cep': 'str',
+                'taxa_de_entrega': 'float',
+                'loja_uuid': 'str',
+            }
+        }

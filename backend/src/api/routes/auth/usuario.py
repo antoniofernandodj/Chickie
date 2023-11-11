@@ -11,9 +11,6 @@ from src import use_cases
 from src.schemas import Loja, Usuario
 from typing import Annotated
 from src.api import security
-from fastapi import (  # noqa
-    Depends
-)
 
 
 current_user = Annotated[Usuario, Depends(security.current_user)]
@@ -73,7 +70,14 @@ async def signin(usuario: UsuarioSignIn) -> Any:
     Returns:
         dict: Um dicionário contendo o uuid do usuário cadastrado.
     """
-    uuid = await use_cases.usuarios.registrar(user_data=usuario)
+    try:
+        uuid = await use_cases.usuarios.registrar(user_data=usuario)
+    except use_cases.usuarios.UnvalidPasswordException:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Senha inválida! A senha deve ser maior que 5"
+        )
+
     return {"uuid": uuid}
 
 

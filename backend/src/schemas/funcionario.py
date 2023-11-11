@@ -13,3 +13,17 @@ class Funcionario(BaseModel):
     celular: str
     pasword_hash: str
     uuid: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                'loja_uuid': 'str',
+                'cargo': 'str',
+                'nome': 'str',
+                'username': 'str',
+                'email': 'str',
+                'telefone': 'str',
+                'celular': 'str',
+                'pasword_hash': 'str'
+            }
+        }

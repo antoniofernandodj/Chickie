@@ -8,3 +8,12 @@ class Preco(BaseModel):
     valor: float
     dia_da_semana: str
     uuid: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                'produto_uuid': 'str',
+                'valor': 'float',
+                'dia_da_semana': 'str'
+            }
+        }

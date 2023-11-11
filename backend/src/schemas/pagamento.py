@@ -7,3 +7,11 @@ class Pagamento(BaseModel):
     pedido_uuid: str
     metodo_pagamento: str
     uuid: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                'pedido_uuid': 'str',
+                'metodo_pagamento': 'str'
+            }
+        }
