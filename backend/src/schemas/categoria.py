@@ -10,11 +10,12 @@ class CategoriaProdutos(BaseModel):
 
     uuid: Optional[str] = None
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        'json_schema_extra': {
             'example': {
-                'nome': 'str',
-                'descricao': 'str',
-                'loja_uuid': 'str'
+                'nome': 'Bebidas',
+                'descricao': 'Categoria destinada a catalogar as bebidas não alcoólicas da loja',
+                'loja_uuid': '7613fa2f-8cde-4c66-bbb3-511a63546c9b'
             }
         }
+    }

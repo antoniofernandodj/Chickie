@@ -13,3 +13,17 @@ class Login(BaseModel):
 
     #         }
     #     }
+    model_config = {
+        'json_schema_extra': {
+            'examples': [
+                {
+                    'password': 'minha_senha',
+                    'email': 'user123@email.com',
+                },
+                {
+                    'password': 'minha_senha',
+                    'username': 'user123',
+                }
+            ]
+        }
+    }

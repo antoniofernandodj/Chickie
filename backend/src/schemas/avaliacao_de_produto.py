@@ -10,12 +10,13 @@ class AvaliacaoDeProduto(BaseModel):
     produto_uuid: str
     uuid: Optional[str] = None
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        'json_schema_extra': {
             'example': {
-                'descricao': 'str',
-                'nota': 'int',
-                'usuario_uuid': 'str',
-                'produto_uuid': 'str'
+                'descricao': 'Adorei o produto, qualidade excelente!',
+                'nota': 3,
+                'usuario_uuid': '8077977c-c5d2-4660-af39-5a15d5f3d565',
+                'produto_uuid': '6187967d-c5d7-4640-af33-5a13a5c3g587'
             }
         }
+    }
