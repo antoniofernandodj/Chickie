@@ -5,13 +5,14 @@ from typing import Optional
 class Pagamento(BaseModel):
     __tablename__ = "pagamentos"
     pedido_uuid: str
-    metodo_pagamento: str
+    metodo_pagamento_uuid: str
     uuid: Optional[str] = None
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        'json_schema_extra': {
             'example': {
-                'pedido_uuid': 'str',
-                'metodo_pagamento': 'str'
+                'pedido_uuid': '7613fa2f-8cde-4c66-bbb3-511a63546c9b',
+                'metodo_pagamento': '7613fa2f-8cde-4c66-bbb3-511a63546c9b'
             }
         }
+    }

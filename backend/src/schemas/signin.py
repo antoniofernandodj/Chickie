@@ -6,25 +6,34 @@ class UsuarioSignIn(BaseModel):
     nome: str
     username: str
     email: str
-    telefone: str
     celular: str
     endereco_uuid: str
     password: str
-    loja_uuid: Optional[str] = None
+    telefone: Optional[str] = None
 
-    class Config:
-        json_schema_extra = {
-            'example': {
-                'nome': 'str',
-                'username': 'str',
-                'email': 'str',
-                'telefone': 'str',
-                'celular': 'str',
-                'endereco_uuid': 'str',
-                'password': 'str',
-                'loja_uuid': 'Optional[str]'
-            }
+    model_config = {
+        'json_schema_extra': {
+            'examples': [
+                {
+                    'nome': 'User',
+                    'username': 'user',
+                    'email': 'user@email.com',
+                    'telefone': '2127856985',
+                    'celular': '21965896325',
+                    'endereco_uuid': '8077977c-c5d2-4660-af39-5a15d5f3d565',
+                    'password': 'minha_senha',
+                },
+                {
+                    'nome': 'User',
+                    'username': 'user',
+                    'email': 'user@email.com',
+                    'celular': '21963258741',
+                    'endereco_uuid': '8077977c-c5d2-4660-af39-5a15d5f3d565',
+                    'password': 'minha_senha',
+                }
+            ]
         }
+    }
 
 
 

@@ -12,13 +12,14 @@ class Produto(BaseModel):
 
     uuid: Optional[str] = None
 
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        'json_schema_extra': {
             'example': {
-                'nome': 'str',
-                'descricao': 'str',
-                'preco': 'float',
-                'categoria_uuid': 'str',
-                'loja_uuid': 'str'
+                'nome': 'American Grill',
+                'descricao': 'Sanduíche tal com molho tal, pão tal e carne tal',
+                'preco': 30.35,
+                'categoria_uuid': '8077977c-c5d2-4660-af39-5a15d5f3d565',
+                'loja_uuid': '7613fa2f-8cde-4c66-bbb3-511a63546c9b'
             }
         }
+    }
