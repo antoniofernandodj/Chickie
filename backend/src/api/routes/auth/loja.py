@@ -134,33 +134,33 @@ async def home(current_company: current_company):
     return {"msg": "ok"}
 
 
-@router.post("/cliente", status_code=status.HTTP_201_CREATED)
-async def cadastrar_cliente(
-    current_company: current_company, usuario: UsuarioSignIn
-) -> Any:
-    """
-    Cadastra um novo cliente associado à loja autenticada.
+# @router.post("/cliente", status_code=status.HTTP_201_CREATED)
+# async def cadastrar_cliente(
+#     current_company: current_company, usuario: UsuarioSignIn
+# ) -> Any:
+#     """
+#     Cadastra um novo cliente associado à loja autenticada.
     
-    Args:
-        current_company (Loja): O objeto da loja autenticada.
-        usuario (UsuarioSignIn): Os detalhes do cliente a ser cadastrado.
+#     Args:
+#         current_company (Loja): O objeto da loja autenticada.
+#         usuario (UsuarioSignIn): Os detalhes do cliente a ser cadastrado.
     
-    Returns:
-        dict: Um dicionário contendo o uuid do usuário (cliente) cadastrado.
+#     Returns:
+#         dict: Um dicionário contendo o uuid do usuário (cliente) cadastrado.
     
-    Raises:
-        HTTPException: Se não for fornecido o uuid da loja.
-    """
-    if usuario.loja_uuid is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="uuid da loja em falta",
-        )
+#     Raises:
+#         HTTPException: Se não for fornecido o uuid da loja.
+#     """
+#     if usuario.loja_uuid is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="uuid da loja em falta",
+#         )
     
-    usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
-    cliente = Cliente(usuario_uuid=usuario_uuid, loja_uuid=usuario.loja_uuid)
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Cliente, connection=connection)
-        await repository.save(cliente)
+#     usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
+#     cliente = Cliente(usuario_uuid=usuario_uuid, loja_uuid=usuario.loja_uuid)
+#     async with DatabaseConnectionManager() as connection:
+#         repository = Repository(Cliente, connection=connection)
+#         await repository.save(cliente)
 
-    return {"uuid": usuario_uuid}
+#     return {"uuid": usuario_uuid}

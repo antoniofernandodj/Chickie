@@ -7,7 +7,7 @@ class Pagamento(Base):
 
     uuid = Col(String(36), primary_key=True, unique=True)
     pedido_uuid = Col(String(36), ForeignKey("pedidos.uuid"), nullable=False)
-    metodo_pagamento = Col(
+    metodo_pagamento_uuid = Col(
         String(36), ForeignKey("metodos_pagamento.uuid"), nullable=False
     )
 
