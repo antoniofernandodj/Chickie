@@ -20,8 +20,10 @@ def init_app(app: FastAPI) -> None:
         """
         Rota para obter informações sobre o aplicativo e as rotas disponíveis.
 
-        Retorna um JSON contendo informações sobre a versão, nome e descrição do aplicativo,
-        bem como links para as rotas disponíveis e detalhes sobre as ações (rotas) do aplicativo.
+        Retorna um JSON contendo informações sobre a versão,
+        nome e descrição do aplicativo,
+        bem como links para as rotas disponíveis e detalhes sobre as ações
+        (rotas) do aplicativo.
         """
         return {
             "version": os.getenv('APP_VERSION'),
