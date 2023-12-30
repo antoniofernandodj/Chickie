@@ -83,7 +83,7 @@ async def atualizar_endereco_patch(
 
 @router.put("/{uuid}")
 async def atualizar_endereco_put(
-    itemData: Endereco,
+    item_data: Endereco,
     repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do endereco a fazer put")],
 ) -> Dict[str, int]:
@@ -92,7 +92,7 @@ async def atualizar_endereco_put(
     Atualiza um endereço utilizando o método PUT.
 
     Args:
-        itemData (Endereco): Os dados atualizados do endereço.
+        item_data (Endereco): Os dados atualizados do endereço.
         uuid (str): O UUID do endereço a ser atualizado.
 
     Returns:
@@ -104,7 +104,7 @@ async def atualizar_endereco_put(
         raise NotFoundException("Endereço não encontrado")
 
     num_rows_affected = await repository.update(
-        endereco, itemData.model_dump()  # type: ignore
+        endereco, item_data.model_dump()  # type: ignore
     )
 
     return {"num_rows_affected": num_rows_affected}
