@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Dict, List
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -29,7 +29,8 @@ async def requisitar_categorias(
     repository: categoria_repository_dependency,
     nome: Optional[str] = Query(None),
     loja_uuid: Optional[str] = Query(None)
-):
+) -> List[CategoriaProdutos]:
+
     """
     Requisita todas as categorias de produtos ou filtra por
     nome e/ou UUID da loja.
@@ -48,7 +49,7 @@ async def requisitar_categorias(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results = await repository.find_all(**kwargs)
+    results: List[CategoriaProdutos] = await repository.find_all(**kwargs)
 
     return results
 
@@ -58,7 +59,8 @@ async def requisitar_categoria(
     repository: categoria_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
     nome: Optional[str] = Query(None)
-):
+) -> CategoriaProdutos:
+
     """
     Requisita uma categoria de produto específica com base no UUID.
 
@@ -72,7 +74,7 @@ async def requisitar_categoria(
     if nome is not None:
         kwargs["nome"] = nome
 
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[CategoriaProdutos] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Categoria não encontrada")
 
@@ -84,7 +86,8 @@ async def cadastrar_categorias(
     categoria: CategoriaProdutos,
     repository: categoria_repository_dependency,
     current_company: current_company,
-):
+) -> Dict[str, str]:
+
     """
     Cadastra uma nova categoria de produtos.
 
@@ -117,7 +120,8 @@ async def atualizar_categoria_put(
     current_company: current_company,
     itemData: CategoriaProdutos,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
-):
+) -> Dict[str, int]:
+
     """
     Atualiza uma categoria de produtos utilizando o método PUT.
 
@@ -133,7 +137,7 @@ async def atualizar_categoria_put(
     try:
         categoria = await repository.find_one(uuid=uuid)
     except Exception as error:
-        return {"error": str(error)}
+        raise HTTPException(status_code=500, detail=str(error))
     if categoria is None:
         raise NotFoundException("Categoria não encontrada")
 
@@ -149,7 +153,7 @@ async def remover_categoria(
     repository: categoria_repository_dependency,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
-):
+) -> Dict[str, int]:
     """
     Remove uma categoria de produtos com base no UUID.
 

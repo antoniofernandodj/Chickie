@@ -2,9 +2,8 @@ from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
 from src.schemas import Loja, LojaSignIn, Endereco
 from src.api.security import HashService
-from src.exceptions import UnvalidPasswordException
+from src.exceptions import InvalidPasswordException
 from typing import Optional
-
 
 
 def validate_password(password: Optional[str]) -> bool:
@@ -21,7 +20,7 @@ async def registrar(loja_data: LojaSignIn) -> str:
 
         valid = validate_password(loja_data.password)
         if not valid:
-            raise UnvalidPasswordException
+            raise InvalidPasswordException
 
         loja_repo = Repository(Loja, connection=connection)
         endereco_repo = Repository(Endereco, connection=connection)

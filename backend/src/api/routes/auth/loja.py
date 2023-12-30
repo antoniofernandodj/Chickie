@@ -1,41 +1,30 @@
 # from src.presenters import controllers
+from src.exceptions import UnauthorizedException, NotFoundException
 from fastapi.routing import APIRouter
 from src.api import security
-from src.infra.database_postgres.manager import DatabaseConnectionManager
-from src.infra.database_postgres.repository import Repository
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends, HTTPException, status, Path
-from typing import Any
+from src.dependencies import (
+    current_company,
+    oauth2_password_request_form_dependency
+)
+from src.dependencies import loja_repository_dependency
+from fastapi import HTTPException, status, Path
+from typing import Any, Optional, List
 from src.schemas import (
     LojaSignIn,
-    Usuario,
     Token,
-    Loja,
-    # UsuarioSignIn,
-    # Cliente
+    Loja
 )
 
 from typing import Annotated
 from src import use_cases
-from fastapi import (  # noqa
-    Depends
-)
-
-
-current_user = Annotated[Usuario, Depends(security.current_user)]
-current_company = Annotated[Loja, Depends(security.current_company)]
 
 
 router = APIRouter(prefix="/loja", tags=["Loja", "Auth"])
 
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Categoria não encontrada"
-)
-
-
 @router.get("/{uuid}")
 async def requisitar_loja(
+    repository: loja_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
 ):
     """
@@ -50,19 +39,37 @@ async def requisitar_loja(
     Raises:
         HTTPException: Se a loja não for encontrada.
     """
-    async with DatabaseConnectionManager() as connection:
-        repository = Repository(Loja, connection=connection)
-        result = await repository.find_one(uuid=uuid)
+    result: Optional[Loja] = await repository.find_one(uuid=uuid)
+    if result is None:
+        raise NotFoundException('Loja não encontrada')
 
-        if result is None:
-            raise NotFoundException
+    return result
+
+
+@router.get("/")
+async def requisitar_lojas(
+    repository: loja_repository_dependency,
+):
+    """
+    Busca uma loja pelo seu uuid.
+
+    Args:
+        uuid (str): O uuid da loja a ser buscada.
+
+    Returns:
+        Loja: A loja encontrada.
+
+    Raises:
+        HTTPException: Se a loja não for encontrada.
+    """
+    result: List[Loja] = await repository.find_all()
 
     return result
 
 
 @router.post("/login", response_model=Token)
 async def login_post(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: oauth2_password_request_form_dependency
 ) -> Any:
     """
     Realiza o login de uma loja.
@@ -76,24 +83,20 @@ async def login_post(
     Raises:
         HTTPException: Se as credenciais forem inválidas.
     """
-    user = await security.authenticate_company(
+    loja = await security.authenticate_company(
         form_data.username, form_data.password
     )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    if not loja:
+        raise UnauthorizedException("Incorrect username or password")
 
-    access_token = security.create_access_token(data={"sub": user.username})
+    access_token = security.create_access_token(data={"sub": loja.username})
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "uuid": user.uuid,
-        "nome": user.nome,
-        "username": user.username,
-        "email": user.email,
+        "uuid": loja.uuid,
+        "nome": loja.nome,
+        "username": loja.username,
+        "email": loja.email,
     }
 
 
@@ -112,7 +115,7 @@ async def signin(loja: LojaSignIn) -> Any:
     """
     try:
         uuid = await use_cases.lojas.registrar(loja_data=loja)
-    except use_cases.lojas.UnvalidPasswordException:
+    except use_cases.lojas.InvalidPasswordException:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Senha inválida! A senha deve ser maior que 5"

@@ -73,7 +73,7 @@ async def signin(usuario: UsuarioSignIn) -> Any:
     """
     try:
         uuid = await use_cases.usuarios.registrar(user_data=usuario)
-    except use_cases.usuarios.UnvalidPasswordException:
+    except use_cases.usuarios.InvalidPasswordException:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Senha inválida! A senha deve ser maior que 5"

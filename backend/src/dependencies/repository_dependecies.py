@@ -11,6 +11,7 @@ from src.schemas import (
     PedidoItens,
     Status,
     ZonaDeEntrega,
+    ItemPedido,
     CategoriaProdutos,
     MetodoDePagamento
 )
@@ -79,6 +80,11 @@ def get_metodo_de_pagamento_repository(connection: connection_dependency):
     return repository
 
 
+def get_item_pedido_repository(connection: connection_dependency):
+    repository = Repository(ItemPedido, connection=connection)
+    return repository
+
+
 produto_repository_dependency = Annotated[
     Repository, Depends(get_produto_repository)
 ]
@@ -125,4 +131,9 @@ categoria_repository_dependency = Annotated[
 
 metodo_de_pagamento_repository_dependency = Annotated[
     Repository, Depends(get_metodo_de_pagamento_repository)
+]
+
+
+item_pedido_repository_dependency = Annotated[
+    Repository, Depends(get_item_pedido_repository)
 ]

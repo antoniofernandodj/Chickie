@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List, Dict
 from src.exceptions import NotFoundException, ConflictException
 from starlette import status
 from fastapi import (  # noqa
@@ -9,10 +9,7 @@ from fastapi import (  # noqa
     Query
 )
 from src.schemas import Preco
-from src.dependencies import (
-    preco_repository_dependency,
-    current_company
-)
+from src.dependencies import preco_repository_dependency, current_company
 
 
 router = APIRouter(prefix="/precos", tags=["Preços"])
@@ -22,7 +19,7 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 async def requisitar_precos(
     repository: preco_repository_dependency,
     produto_uuid: Optional[str] = Query(None)
-):
+) -> List[Preco]:
     """
     Obtém uma lista de todos os preços cadastrados.
 
@@ -36,7 +33,7 @@ async def requisitar_precos(
     if produto_uuid is not None:
         kwargs["produto_uuid"] = produto_uuid
 
-    results = await repository.find_all(**kwargs)
+    results: List[Preco] = await repository.find_all(**kwargs)
 
     return results
 
@@ -45,7 +42,7 @@ async def requisitar_precos(
 async def requisitar_preco(
     repository: preco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
-):
+) -> Preco:
     """
     Obtém detalhes de um preço pelo seu UUID.
 
@@ -55,7 +52,7 @@ async def requisitar_preco(
     Returns:
         Preco: Os detalhes do preço.
     """
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[Preco] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Preço não encontrado")
 
@@ -67,7 +64,7 @@ async def cadastrar_precos(
     preco: Preco,
     current_company: current_company,
     repository: preco_repository_dependency
-):
+) -> Dict[str, str]:
     """
     Cadastra um novo preço especial para um dado produto.
 
@@ -89,7 +86,7 @@ async def cadastrar_precos(
     try:
         uuid = await repository.save(preco)
     except Exception as error:
-        return {"error": str(error)}
+        raise HTTPException(status_code=500, detail=str(error))
 
     return {"uuid": uuid}
 
@@ -108,7 +105,7 @@ async def atualizar_preco_put(
     current_company: current_company,
     repository: preco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")]
-):
+) -> Dict[str, int]:
     """
     Atualiza um preço completamente usando PUT.
 
@@ -137,7 +134,7 @@ async def remover_preco(
     current_company: current_company,
     repository: preco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
-):
+) -> Dict[str, int]:
     """
     Remove um preço.
 

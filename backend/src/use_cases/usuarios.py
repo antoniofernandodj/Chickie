@@ -2,9 +2,8 @@ from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
 from src.schemas import Usuario, UsuarioSignIn
 from src.api.security import HashService
-from src.exceptions import UnvalidPasswordException
+from src.exceptions import InvalidPasswordException
 from typing import Optional
-
 
 
 def validate_password(password: Optional[str]) -> bool:
@@ -21,7 +20,7 @@ async def registrar(user_data: UsuarioSignIn) -> str:
 
         valid = validate_password(user_data.password)
         if not valid:
-            raise UnvalidPasswordException
+            raise InvalidPasswordException
 
         user_repo = Repository(Usuario, connection=connection)
 

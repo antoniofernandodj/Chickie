@@ -1,4 +1,5 @@
 from src.schemas import Loja, Usuario
+from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from src.api import security
 from fastapi import (  # noqa
@@ -16,8 +17,12 @@ from src.dependencies.repository_dependecies import (  # noqa
     zona_de_entrega_repository_dependency,
     categoria_repository_dependency,
     metodo_de_pagamento_repository_dependency,
+    item_pedido_repository_dependency
 )
 
 
 current_user = Annotated[Usuario, Depends(security.current_user)]
 current_company = Annotated[Loja, Depends(security.current_company)]
+oauth2_password_request_form_dependency = Annotated[
+    OAuth2PasswordRequestForm, Depends()
+]

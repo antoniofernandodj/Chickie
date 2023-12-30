@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List, Dict, Optional
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,7 +7,6 @@ from fastapi import (  # noqa
     Path,
     Query
 )
-from typing import Optional
 from src.schemas import Pagamento
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
@@ -21,7 +20,7 @@ router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 async def requisitar_pagamentos(
     connection: connection_dependency,
     loja_uuid: Optional[str] = Query(None)
-):
+) -> List[Pagamento]:
     """
     Requisita pagamentos cadastrados na plataforma.
 
@@ -36,7 +35,7 @@ async def requisitar_pagamentos(
         kwargs["loja_uuid"] = loja_uuid
 
     repository = Repository(Pagamento, connection=connection)
-    results = await repository.find_all(**kwargs)
+    results: List[Pagamento] = await repository.find_all(**kwargs)
 
     return results
 
@@ -45,7 +44,7 @@ async def requisitar_pagamentos(
 async def requisitar_pagamento(
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
-):
+) -> Pagamento:
     """
     Busca um pagamento pelo seu uuid.
 
@@ -59,7 +58,7 @@ async def requisitar_pagamento(
         HTTPException: Se o pagamento não for encontrado.
     """
     repository = Repository(Pagamento, connection=connection)
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[Pagamento] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Pagamento não encontrado")
 
@@ -70,7 +69,7 @@ async def requisitar_pagamento(
 async def cadastrar_pagamentos(
     connection: connection_dependency,
     pagamento: Pagamento
-):
+) -> Dict[str, str]:
     """
     Cadastra um novo pagamento na plataforma.
 
@@ -97,7 +96,7 @@ async def atualizar_pagamento_put(
     pagamento_Data: Pagamento,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
-):
+) -> Dict[str, int]:
     """
     Atualiza um pagamento utilizando o método HTTP PUT.
 
@@ -129,7 +128,7 @@ async def atualizar_pagamento_patch(
     pagamentoData: Pagamento,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
-):
+) -> Dict[str, int]:
     repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
@@ -146,7 +145,7 @@ async def atualizar_pagamento_patch(
 async def remover_pagamento(
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
-):
+) -> Dict[str, int]:
     """
     Remove um pagamento pelo seu uuid.
 

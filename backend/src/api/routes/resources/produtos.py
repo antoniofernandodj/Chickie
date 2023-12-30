@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional, List, Dict
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,7 +7,6 @@ from fastapi import (  # noqa
     Path,
     Query,
 )
-from typing import Optional
 from src.schemas import Produto
 from src.dependencies import (
     produto_repository_dependency,
@@ -23,7 +22,8 @@ async def requisitar_produtos(
     repository: produto_repository_dependency,
     loja_uuid: Optional[str] = Query(None),
     categoria_uuid: Optional[str] = Query(None)
-):
+) -> List[Produto]:
+
     """
     Requisita os produtos cadastrados na plataforma.
     Aceita um uuid como query para buscar os
@@ -42,7 +42,7 @@ async def requisitar_produtos(
     if categoria_uuid is not None:
         kwargs["categoria_uuid"] = categoria_uuid
 
-    results = await repository.find_all(**kwargs)
+    results: List[Produto] = await repository.find_all(**kwargs)
 
     return results
 
@@ -51,7 +51,8 @@ async def requisitar_produtos(
 async def requisitar_produto(
     repository: produto_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
-):
+) -> Produto:
+
     """
     Busca um produto pelo seu uuid.
 
@@ -64,11 +65,11 @@ async def requisitar_produto(
     Raises:
         HTTPException: Se o produto não for encontrado.
     """
-    result = await repository.find_one(uuid=uuid)
-    if result is None:
+    produto: Optional[Produto] = await repository.find_one(uuid=uuid)
+    if produto is None:
         raise NotFoundException("Produto não encontrado")
 
-    return result
+    return produto
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -76,7 +77,8 @@ async def cadastrar_produtos(
     repository: produto_repository_dependency,
     produto: Produto,
     current_company: current_company,
-):
+) -> Dict[str, str]:
+
     """
     Cadastra um novo produto na plataforma.
 
@@ -104,7 +106,8 @@ async def atualizar_produto_put(
     current_company: current_company,
     repository: produto_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
-):
+) -> Dict[str, int]:
+
     """
     Atualiza um produto utilizando o método HTTP PUT.
 
@@ -137,8 +140,9 @@ async def atualizar_produto_patch(
     current_company: current_company,
     repository: produto_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")]
-):
-    produto = await repository.find_one(uuid=uuid)
+) -> Dict[str, int]:
+
+    produto: Optional[Produto] = await repository.find_one(uuid=uuid)
     if produto is None:
         raise NotFoundException("Produto não encontrado")
 
@@ -154,7 +158,7 @@ async def remover_produto(
     current_company: current_company,
     repository: produto_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
-):
+) -> Dict[str, int]:
     """
     Remove um produto pelo seu uuid.
 

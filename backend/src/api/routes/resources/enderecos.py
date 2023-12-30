@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional, List, Dict
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -17,14 +17,14 @@ router = APIRouter(prefix="/enderecos", tags=["Endereços"])
 @router.get("/")
 async def requisitar_enderecos(
     repository: endereco_repository_dependency
-):
+) -> List[Endereco]:
     """
     Requisita todos os endereços cadastrados.
 
     Returns:
         List[Endereco]: Uma lista contendo todos os endereços cadastrados.
     """
-    results = await repository.find_all()
+    results: List[Endereco] = await repository.find_all()
 
     return results
 
@@ -33,7 +33,7 @@ async def requisitar_enderecos(
 async def requisitar_endereco(
     repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do endereço a fazer get")]
-):
+) -> Endereco:
     """
     Requisita um endereço específico com base no UUID.
 
@@ -43,7 +43,7 @@ async def requisitar_endereco(
     Returns:
         Endereco: O endereço correspondente ao UUID.
     """
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[Endereco] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Endereço não encontrado")
 
@@ -76,7 +76,8 @@ async def cadastrar_enderecos(
 async def atualizar_endereco_patch(
     repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do endereço a fazer patch")]
-):
+) -> Dict[str, str]:
+
     return {"uuid": uuid}
 
 
@@ -85,7 +86,8 @@ async def atualizar_endereco_put(
     itemData: Endereco,
     repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do endereco a fazer put")],
-):
+) -> Dict[str, int]:
+    
     """
     Atualiza um endereço utilizando o método PUT.
 
@@ -112,7 +114,8 @@ async def atualizar_endereco_put(
 async def remover_endereco(
     repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do endereço a fazer delete")]
-):
+) -> Dict[str, int]:
+
     """
     Remove um endereço com base no UUID.
 

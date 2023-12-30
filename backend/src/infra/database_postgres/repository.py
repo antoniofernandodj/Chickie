@@ -19,7 +19,9 @@ class Repository:
             async with DatabaseConnectionManager() as connection:
                 repository = Repository(Endereco, connection=connection)
                 try:
-                    itens_removed = await repository.delete_from_uuid(uuid=uuid)
+                    itens_removed = await repository.delete_from_uuid(
+                        uuid=uuid
+                    )
                 except Exception as error:
                     raise HTTPException(status_code=500, detail=str(error))
         """

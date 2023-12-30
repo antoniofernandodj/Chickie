@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Dict, Optional, Union
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,10 +7,10 @@ from fastapi import (  # noqa
     Path,
     Query
 )
-from typing import Optional
 from src.schemas import Pedido, PedidoItens, ItemPedido
-from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
+    pedido_repository_dependency,
+    item_pedido_repository_dependency,
     connection_dependency,
     current_company
 )
@@ -21,10 +21,11 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 @router.get("/")
 async def requisitar_pedidos(
-    connection: connection_dependency,
+    pedido_repository: pedido_repository_dependency,
+    itens_repository: item_pedido_repository_dependency,
     current_company: current_company,
     loja_uuid: Optional[str] = Query(None)
-):
+) -> List[PedidoItens]:
     """
     Obtém uma lista de todos os pedidos cadastrados.
 
@@ -34,13 +35,11 @@ async def requisitar_pedidos(
     Returns:
         list: Uma lista contendo os pedidos encontrados.
     """
-    pedidos_itens = []
+    pedidos_itens: List[PedidoItens] = []
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    pedido_repository = Repository(Pedido, connection=connection)
-    itens_repository = Repository(ItemPedido, connection=connection)
     pedidos: List[PedidoItens] = await pedido_repository.find_all(**kwargs)
 
     for pedido in pedidos:
@@ -63,10 +62,11 @@ async def requisitar_pedidos(
 
 @router.get("/{uuid}")
 async def requisitar_pedido(
-    connection: connection_dependency,
+    pedido_repository: pedido_repository_dependency,
+    itens_repository: item_pedido_repository_dependency,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer get")]
-):
+) -> PedidoItens:
     """
     Obtém detalhes de um pedido pelo seu UUID.
 
@@ -76,8 +76,6 @@ async def requisitar_pedido(
     Returns:
         Pedido: Os detalhes do pedido.
     """
-    pedido_repository = Repository(Pedido, connection=connection)
-    itens_repository = Repository(ItemPedido, connection=connection)
     pedido: Optional[Pedido] = await pedido_repository.find_one(uuid=uuid)
     if pedido is None:
         raise NotFoundException("Pedido não encontrado")
@@ -98,8 +96,9 @@ async def requisitar_pedido(
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pedidos(
     pedido: PedidoItens,
-    connection: connection_dependency
-):
+    pedido_repository: pedido_repository_dependency,
+    itens_repository: item_pedido_repository_dependency,
+) -> Dict[str, Union[str, List[str]]]:
     """
     Cadastra um novo pedido.
 
@@ -112,8 +111,6 @@ async def cadastrar_pedidos(
     itens = pedido.itens_pedido
     itens_uuid = []
 
-    pedido_repository = Repository(Pedido, connection=connection)
-    itens_repository = Repository(ItemPedido, connection=connection)
     try:
         pedido_uuid = await pedido_repository.save(pedido)
         for item in itens:
@@ -130,19 +127,21 @@ async def cadastrar_pedidos(
 @router.patch("/{uuid}")
 async def atualizar_pedido_patch(
     current_company: current_company,
-    connection: connection_dependency,
+    pedido_repository: pedido_repository_dependency,
+    itens_repository: item_pedido_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
-):
+) -> Dict[str, str]:
+    
     return {"uuid": uuid}
 
 
 @router.put("/{uuid}")
 async def atualizar_pedido_put(
     itemData: Pedido,
-    connection: connection_dependency,
+    pedido_repository: pedido_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer put")],
     current_company: current_company,
-):
+) -> Dict[str, int]:
     """
     Atualiza um pedido completamente usando PUT.
 
@@ -155,12 +154,11 @@ async def atualizar_pedido_put(
         dict: Um dicionário contendo o número de linhas
         afetadas na atualização.
     """
-    repository = Repository(Pedido, connection=connection)
-    pedido = await repository.find_one(uuid=uuid)
+    pedido = await pedido_repository.find_one(uuid=uuid)
     if pedido is None:
         raise NotFoundException("Pedido não encontrado")
 
-    num_rows_affected = await repository.update(
+    num_rows_affected = await pedido_repository.update(
         pedido, itemData.model_dump()  # type: ignore
     )
 
@@ -170,9 +168,11 @@ async def atualizar_pedido_put(
 @router.delete("/{uuid}")
 async def remover_pedido(
     current_company: current_company,
+    pedido_repository: pedido_repository_dependency,
+    itens_repository: item_pedido_repository_dependency,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]
-):
+) -> Dict[str, int]:
     """
     Remove um pedido.
 
@@ -185,8 +185,7 @@ async def remover_pedido(
     """
     itens_removed = 0
     pedidos_removed = 0
-    pedido_repository = Repository(Pedido, connection=connection)
-    itens_repository = Repository(ItemPedido, connection=connection)
+
     try:
         itens_pedido: List[ItemPedido] = await itens_repository.find_all(
             pedido_uuid=uuid
@@ -206,5 +205,5 @@ async def remover_pedido(
 
     return {
         "pedidos_removed": pedidos_removed,
-        'itens_removed': itens_pedido
+        'itens_removed': itens_removed
     }

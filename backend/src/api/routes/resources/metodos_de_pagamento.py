@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List, Dict
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -9,10 +9,8 @@ from fastapi import (  # noqa
 )
 from typing import Optional
 from src.schemas import MetodoDePagamento
-from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
     metodo_de_pagamento_repository_dependency,
-    connection_dependency,
     current_company
 )
 
@@ -26,7 +24,8 @@ router = APIRouter(
 async def requisitar_metodos_de_pagamento(
     repository: metodo_de_pagamento_repository_dependency,
     loja_uuid: Optional[str] = Query(None),
-):
+) -> List[MetodoDePagamento]:
+
     """
     Obtém uma lista de todos os métodos de pagamento cadastrados.
 
@@ -41,7 +40,7 @@ async def requisitar_metodos_de_pagamento(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results = await repository.find_all(**kwargs)
+    results: List[MetodoDePagamento] = await repository.find_all(**kwargs)
 
     return results
 
@@ -52,7 +51,8 @@ async def requisitar_metodo_de_pagamento(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagamento a fazer get")
     ]
-):
+) -> MetodoDePagamento:
+
     """
     Obtém detalhes de um método de pagamento pelo seu UUID.
 
@@ -62,7 +62,7 @@ async def requisitar_metodo_de_pagamento(
     Returns:
         MetodoDePagamento: Os detalhes do método de pagamento.
     """
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[MetodoDePagamento] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
 
@@ -74,7 +74,8 @@ async def cadastrar_metodos_de_pagamento(
     repository: metodo_de_pagamento_repository_dependency,
     metodo_de_pagamento: MetodoDePagamento,
     current_company: current_company,
-):
+) -> Dict[str, str]:
+
     """
     Cadastra um novo método de pagamento.
 
@@ -102,7 +103,8 @@ async def atualizar_metodo_de_pagamento_put(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer put")
     ],
-):
+) -> Dict[str, int]:
+
     """
     Atualiza os dados de um método de pagamento utilizando o método HTTP PUT.
 
@@ -116,7 +118,9 @@ async def atualizar_metodo_de_pagamento_put(
         dict: Um dicionário contendo o número de linhas
         afetadas na atualização.
     """
-    metodo_de_pagamento = await repository.find_one(uuid=uuid)
+    metodo_de_pagamento: Optional[MetodoDePagamento] = await repository \
+        .find_one(uuid=uuid)
+
     if metodo_de_pagamento is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
 
@@ -130,17 +134,20 @@ async def atualizar_metodo_de_pagamento_put(
 
 @router.patch("/{uuid}")
 async def atualizar_metodo_de_pagamento_patch(
-    connection: connection_dependency,
+    repository: metodo_de_pagamento_repository_dependency,
     metodo_de_pagamentoData: MetodoDePagamento,
     current_company: current_company,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer patch")
     ],
-):
-    repository = Repository(MetodoDePagamento, connection=connection)
-    metodo_de_pagamento = await repository.find_one(uuid=uuid)
+) -> Dict[str, int]:
+
+    metodo_de_pagamento: Optional[MetodoDePagamento] = await repository \
+        .find_one(uuid=uuid)
+
     if metodo_de_pagamento is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
+
     num_rows_affected = await repository.update(
         metodo_de_pagamento,
         metodo_de_pagamentoData.model_dump(),  # type: ignore
@@ -156,7 +163,8 @@ async def remover_metodo_de_pagamento(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
     ],
-):
+) -> Dict[str, int]:
+
     """
     Remove um método de pagamento cadastrado.
 

@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional, Dict, List
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,7 +7,6 @@ from fastapi import (  # noqa
     Path,
     Query
 )
-from typing import Optional
 from src.schemas import Status
 from src.dependencies import (
     status_repository_dependency,
@@ -22,7 +21,7 @@ router = APIRouter(prefix="/status", tags=["Status"])
 async def requisitar_varios_status(
     repository: status_repository_dependency,
     loja_uuid: Optional[str] = Query(None)
-):
+) -> List[Status]:
     """
     Requisita status cadastrados na plataforma.
 
@@ -36,7 +35,7 @@ async def requisitar_varios_status(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results = await repository.find_all(**kwargs)
+    results: List[Status] = await repository.find_all(**kwargs)
 
     return results
 
@@ -45,7 +44,7 @@ async def requisitar_varios_status(
 async def requisitar_status(
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do status a fazer get")]
-):
+) -> Status:
     """
     Busca um status pelo seu uuid.
 
@@ -58,7 +57,7 @@ async def requisitar_status(
     Raises:
         HTTPException: Se o status não for encontrado.
     """
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[Status] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Status não encontrado")
 
@@ -70,7 +69,7 @@ async def cadastrar_status(
     status: Status,
     current_company: current_company,
     repository: status_repository_dependency
-):
+) -> Dict[str, str]:
     """
     Cadastra um novo status na plataforma.
 
@@ -98,7 +97,7 @@ async def atualizar_status_put(
     current_company: current_company,
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do status a fazer put")],
-):
+) -> Dict[str, int]:
     """
     Atualiza um status utilizando o método HTTP PUT.
 
@@ -130,7 +129,7 @@ async def atualizar_status_patch(
     statusData: Status,
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do Status a fazer patch")],
-):
+) -> Dict:
     return {}
 
 
@@ -139,7 +138,7 @@ async def remover_status(
     current_company: current_company,
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do status a fazer delete")]
-):
+) -> Dict[str, int]:
     """
     Remove um status pelo seu uuid.
 
