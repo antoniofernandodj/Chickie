@@ -1,4 +1,5 @@
 from typing import Annotated
+from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -17,9 +18,6 @@ from src.dependencies import (
 
 router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Funcionario não encontrado"
-)
 
 @router.get("/")
 async def requisitar_funcionarios(
@@ -27,13 +25,15 @@ async def requisitar_funcionarios(
     loja_uuid: Optional[str] = Query(None)
 ):
     """
-    Requisita todos os funcionários cadastrados, com opção de filtro por UUID da loja.
+    Requisita todos os funcionários cadastrados,
+    com opção de filtro por UUID da loja.
 
     Args:
         loja_uuid (str, optional): O UUID da loja para filtrar os funcionários.
 
     Returns:
-        List[Funcionario]: Uma lista contendo todos os funcionários cadastrados.
+        List[Funcionario]: Uma lista
+        contendo todos os funcionários cadastrados.
     """
     kwargs = {}
     if loja_uuid is not None:
@@ -63,12 +63,12 @@ async def requisitar_funcionario(
     repository = Repository(Funcionario, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Funcionario não encontrado")
+
     return result
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_funcionarios(
     funcionario: Funcionario,
     current_company: current_company,
@@ -109,13 +109,14 @@ async def atualizar_funcionario_put(
         uuid (str): O UUID do funcionário a ser atualizado.
 
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+        dict: Um dicionário contendo o número de linhas
+        afetadas na atualização.
     """
     repository = Repository(Funcionario, connection=connection)
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Funcionario não encontrado")
+
     num_rows_affected = await repository.update(
         funcionario, funcionarioData.model_dump()  # type: ignore
     )
@@ -133,8 +134,8 @@ async def atualizar_funcionario_patch(
     repository = Repository(Funcionario, connection=connection)
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Funcionario não encontrado")
+
     num_rows_affected = await repository.update(
         funcionario, funcionarioData.model_dump()  # type: ignore
     )

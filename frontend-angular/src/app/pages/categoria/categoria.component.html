@@ -1,0 +1,76 @@
+<a routerLink="/empresa/categorias">Categorias</a>
+
+<p>categoria {{ categoriaUUID }} works!</p>
+
+loja_uuid: {{ companyData?.uuid }}
+
+
+<h2>Cadastrar Produto</h2>
+
+<div>
+
+  Descricao
+  <input
+    type="text"
+    name="descricao"
+    id="descricao-input"
+    [(ngModel)]="descricaoValue"
+  >
+
+  Nome
+  <input
+    type="text"
+    name="nome"
+    id="nome-input"
+    (keyup.enter)="cadastrarProduto()"
+    [(ngModel)]="nomeValue"
+  >
+
+  preco
+  <input
+    type="number"
+    name="preco"
+    id="preco-input"
+    (keyup.enter)="cadastrarProduto()"
+    [(ngModel)]="precoValue"
+  >
+
+  <button
+    (click)="cadastrarProduto()">
+      Cadastrar
+    </button>
+</div>
+
+
+<h1>Produtos</h1>
+
+@if (this.companyProducts.value.length) {
+  <table>
+    <thead>
+      <tr>
+        <th>Nome do Produto</th>
+        <th>Descrição</th>
+        <th>Preço</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (produto of companyProducts.value; track $index) {
+        <tr id="">
+          <td>
+            <a [routerLink]='["/empresa/produtos", produto.uuid]'>
+              {{ produto.nome }}
+            </a>
+          </td>
+          <td>{{ produto.descricao }}</td>
+          <td>{{ produto.preco }}</td>
+          <td (click)="removerProduto(produto)">
+            <button>Remover</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+} @else {
+  <strong>Nenhum produto encontrado!</strong>
+}

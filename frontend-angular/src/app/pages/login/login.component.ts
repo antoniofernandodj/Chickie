@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { LoginService } from '../../services/login.service';
+import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,19 +11,33 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.component.sass'
 })
 export class LoginComponent {
-  loginValue: string;
-  passwordValue: string;
 
-  constructor(private service: LoginService) {
-    this.loginValue = "";
-    this.passwordValue = "";
+  loginCompanyValue: string;
+  passwordCompanyValue: string;
+
+  loginUserValue: string;
+  passwordUserValue: string;
+
+  constructor(private authService: AuthService, private router: Router) {
+    this.loginCompanyValue = "";
+    this.passwordCompanyValue = "";
+
+    this.loginUserValue= "";
+    this.passwordUserValue = "";
+
   }
 
   ngOnInit(): void { }
 
-  doLogin(): void {
-    this.service.doLogin(
-      this.loginValue, this.passwordValue
-    )
+  doCompanyLogin(): void {
+    this.authService.doCompanyLogin(this.loginCompanyValue, this.passwordCompanyValue)
+    this.authService.isLoginPage.next(false)
+    this.router.navigate(['/empresa/home']);
+  }
+
+  doUserLogin(): void {
+    this.authService.doUserLogin(this.loginUserValue, this.passwordUserValue)
+    this.authService.isLoginPage.next(false)
+    this.router.navigate(['/user/home']);
   }
 }

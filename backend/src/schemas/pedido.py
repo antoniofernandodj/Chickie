@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional, List, Annotated
-from datetime import datetime
 from .item_pedido import ItemPedido
 
 
 isodatetime = Annotated[str, 'isotime']
+
 
 class Pedido(BaseModel):
     __tablename__ = "pedidos"

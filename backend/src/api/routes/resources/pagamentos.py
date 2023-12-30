@@ -1,4 +1,5 @@
 from typing import Annotated
+from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -15,9 +16,6 @@ from src.dependencies import (
 
 router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Pagamento não encontrado"
-)
 
 @router.get("/")
 async def requisitar_pagamentos(
@@ -26,10 +24,10 @@ async def requisitar_pagamentos(
 ):
     """
     Requisita pagamentos cadastrados na plataforma.
-    
+
     Args:
         loja_uuid (Optional[str]): O uuid da loja, caso necessário.
-    
+
     Returns:
         list[Pagamento]: Lista de pagamentos encontrados.
     """
@@ -50,38 +48,38 @@ async def requisitar_pagamento(
 ):
     """
     Busca um pagamento pelo seu uuid.
-    
+
     Args:
         uuid (str): O uuid do pagamento a ser buscado.
-    
+
     Returns:
         Pagamento: O pagamento encontrado.
-    
+
     Raises:
         HTTPException: Se o pagamento não for encontrado.
     """
     repository = Repository(Pagamento, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
-        raise NotFoundException
+        raise NotFoundException("Pagamento não encontrado")
 
     return result
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pagamentos(
     connection: connection_dependency,
     pagamento: Pagamento
 ):
     """
     Cadastra um novo pagamento na plataforma.
-    
+
     Args:
         pagamento (Pagamento): Os detalhes do pagamento a ser cadastrado.
-    
+
     Returns:
         dict: Um dicionário contendo o uuid do pagamento cadastrado.
-    
+
     Raises:
         HTTPException: Se ocorrer um erro durante o cadastro.
     """
@@ -102,22 +100,23 @@ async def atualizar_pagamento_put(
 ):
     """
     Atualiza um pagamento utilizando o método HTTP PUT.
-    
+
     Args:
         pagamento_Data (Pagamento): Os novos dados do pagamento.
         uuid (str): O uuid do pagamento a ser atualizado.
-    
+
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas na atualização.
-    
+        dict: Um dicionário contendo o número de
+        linhas afetadas na atualização.
+
     Raises:
         HTTPException: Se o pagamento não for encontrado.
     """
     repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Pagamento não encontrado")
+
     num_rows_affected = await repository.update(
         pagamento, pagamento_Data.model_dump()  # type: ignore
     )
@@ -134,8 +133,8 @@ async def atualizar_pagamento_patch(
     repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Pagamento não encontrado")
+
     num_rows_affected = await repository.update(
         pagamento, pagamentoData.model_dump()  # type: ignore
     )
@@ -150,13 +149,13 @@ async def remover_pagamento(
 ):
     """
     Remove um pagamento pelo seu uuid.
-    
+
     Args:
         uuid (str): O uuid do pagamento a ser removido.
-    
+
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
-    
+
     Raises:
         HTTPException: Se ocorrer um erro durante a remoção.
     """

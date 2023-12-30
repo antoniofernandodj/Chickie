@@ -1,5 +1,5 @@
-from aiopg import Connection
 from typing import Annotated, List
+from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -18,13 +18,11 @@ from src.dependencies import (
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Pedido não encontrado"
-)
 
 @router.get("/")
 async def requisitar_pedidos(
     connection: connection_dependency,
+    current_company: current_company,
     loja_uuid: Optional[str] = Query(None)
 ):
     """
@@ -50,7 +48,7 @@ async def requisitar_pedidos(
             pedido_uuid=pedido.uuid
         )
         pedido_itens = PedidoItens(
-            status=pedido.status,
+            status_uuid=pedido.status_uuid,
             frete=pedido.frete,
             loja_uuid=pedido.loja_uuid,
             endereco_uuid=pedido.endereco_uuid,
@@ -66,6 +64,7 @@ async def requisitar_pedidos(
 @router.get("/{uuid}")
 async def requisitar_pedido(
     connection: connection_dependency,
+    current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer get")]
 ):
     """
@@ -81,12 +80,12 @@ async def requisitar_pedido(
     itens_repository = Repository(ItemPedido, connection=connection)
     pedido: Optional[Pedido] = await pedido_repository.find_one(uuid=uuid)
     if pedido is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Pedido não encontrado")
+
     items: List[ItemPedido] = await itens_repository.find_all(pedido_uuid=uuid)
 
     return PedidoItens(
-        status=pedido.status,
+        status_uuid=pedido.status_uuid,
         frete=pedido.frete,
         loja_uuid=pedido.loja_uuid,
         endereco_uuid=pedido.endereco_uuid,
@@ -96,7 +95,7 @@ async def requisitar_pedido(
     )
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pedidos(
     pedido: PedidoItens,
     connection: connection_dependency
@@ -153,13 +152,14 @@ async def atualizar_pedido_put(
         current_company (Loja): Dados da loja autenticada (dependência).
 
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+        dict: Um dicionário contendo o número de linhas
+        afetadas na atualização.
     """
     repository = Repository(Pedido, connection=connection)
     pedido = await repository.find_one(uuid=uuid)
     if pedido is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Pedido não encontrado")
+
     num_rows_affected = await repository.update(
         pedido, itemData.model_dump()  # type: ignore
     )

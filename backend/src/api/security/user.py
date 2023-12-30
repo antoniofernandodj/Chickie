@@ -13,13 +13,14 @@ async def authenticate_user(
 ) -> Optional[Usuario]:
     """
     Autentica um usuário com base no nome de usuário e senha fornecidos.
-    
+
     Args:
         username (str): O nome de usuário do usuário.
         password (str): A senha do usuário.
-    
+
     Returns:
-        Optional[Usuario]: O objeto do usuário autenticado ou None se a autenticação falhar.
+        Optional[Usuario]: O objeto do usuário autenticado
+        ou None se a autenticação falhar.
     """
     async with DatabaseConnectionManager() as connection:
         user_repo = Repository(Usuario, connection=connection)
@@ -33,18 +34,19 @@ async def authenticate_user(
 
         return user
 
+
 async def current_user(
     token: Annotated[str, Depends(oauth2_scheme)]
 ) -> Usuario:
     """
     Obtém o objeto do usuário atualmente autenticado.
-    
+
     Args:
         token (Annotated[str, Depends(oauth2_scheme)]): O token de acesso JWT.
-    
+
     Returns:
         Usuario: O objeto do usuário autenticado.
-    
+
     Raises:
         HTTPException: Se a autenticação falhar.
     """

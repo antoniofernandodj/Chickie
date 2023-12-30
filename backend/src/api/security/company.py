@@ -13,11 +13,11 @@ async def authenticate_company(
 ) -> Optional[Loja]:
     """
     Autentica uma loja com base no nome de usuário e senha fornecidos.
-    
+
     Args:
         username (str): O nome de usuário da loja.
         password (str): A senha da loja.
-    
+
     Returns:
         Optional[Loja]: O objeto da loja autenticada ou None se a autenticação falhar.
     """
@@ -33,22 +33,23 @@ async def authenticate_company(
 
         return loja
 
+
 async def current_company(
     token: Annotated[str, Depends(oauth2_scheme)]
 ) -> Loja:
     """
     Obtém o objeto da loja atualmente autenticada.
-    
+
     Args:
         token (Annotated[str, Depends(oauth2_scheme)]): O token de acesso JWT.
-    
+
     Returns:
         Loja: O objeto da loja autenticada.
-    
+
     Raises:
         HTTPException: Se a autenticação falhar.
     """
-    
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

@@ -1,0 +1,19 @@
+<nav>
+  isLoginPage: {{ isLoginPage.value }}
+  Logged: {{ isLoggedIn.value }}
+  Company Data: {{ !!companyData.value }}
+  User Data: {{ !!userData.value }}
+  <ul>
+    @if (isLoggedIn.value) {
+      <li><a routerLink="empresa/home">Home</a></li>
+      <li><a routerLink="empresa/produtos">Produtos</a></li>
+      <li><a routerLink="empresa/categorias">Categorias</a></li>
+      <li><a routerLink="empresa/pedidos">Pedidos</a></li>
+      <li><a routerLink="logout">Logout</a></li>
+    } @else {
+      @if (!isLoginPage.value) {
+        <li><a routerLink="login">Login</a></li>
+      }
+    }
+  </ul>
+</nav>

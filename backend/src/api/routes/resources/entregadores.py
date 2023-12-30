@@ -8,6 +8,7 @@ from fastapi import (  # noqa
 )
 from typing import Optional
 from src.schemas import Entregador
+from src.exceptions import NotFoundException
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
     connection_dependency,
@@ -17,9 +18,6 @@ from src.dependencies import (
 
 router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Entregador não encontrado"
-)
 
 @router.get("/")
 async def requisitar_entregadores(
@@ -30,7 +28,8 @@ async def requisitar_entregadores(
     Requisita todos os entregadores cadastrados.
 
     Args:
-        loja_uuid (str, optional): O UUID da loja para filtrar os entregadores. Default é None.
+        loja_uuid (str, optional): O UUID da loja para
+        filtrar os entregadores. Default é None.
 
     Returns:
         List[Entregador]: Uma lista contendo todos os entregadores cadastrados.
@@ -62,12 +61,12 @@ async def requisitar_entregador(
     repository = Repository(Entregador, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
-        raise NotFoundException
+        raise NotFoundException("Entregador não encontrado")
 
     return result
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_entregadores(
     entregador: Entregador,
     current_company: current_company,
@@ -78,7 +77,8 @@ async def cadastrar_entregadores(
 
     Args:
         entregador (Entregador): Os dados do entregador a ser cadastrado.
-        current_company (Loja): A loja atual, obtida através do token de autenticação.
+        current_company (Loja): A loja atual,
+        obtida através do token de autenticação.
 
     Returns:
         dict: Um dicionário contendo o UUID do entregador cadastrado.
@@ -103,18 +103,20 @@ async def atualizar_entregador_put(
     Atualiza um entregador utilizando o método PUT.
 
     Args:
-        current_company (Loja): A loja atual, obtida através do token de autenticação.
+        current_company (Loja): A loja atual, obtida através do
+        token de autenticação.
         entregadorData (Entregador): Os dados atualizados do entregador.
         uuid (str): O UUID do entregador a ser atualizado.
 
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas pela atualização.
+        dict: Um dicionário contendo o número de linhas afetadas
+        pela atualização.
     """
     repository = Repository(Entregador, connection=connection)
     entregador = await repository.find_one(uuid=uuid)
     if entregador is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Entregador não encontrado")
+
     num_rows_affected = await repository.update(
         entregador, entregadorData.model_dump()  # type: ignore
     )
@@ -132,8 +134,8 @@ async def atualizar_entregador_patch(
     repository = Repository(Entregador, connection=connection)
     entregador = await repository.find_one(uuid=uuid)
     if entregador is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Entregador não encontrado")
+
     num_rows_affected = await repository.update(
         entregador, entregadorData.model_dump()  # type: ignore
     )
@@ -151,7 +153,8 @@ async def remover_entregador(
     Remove um entregador com base no UUID.
 
     Args:
-        current_company (Loja): A loja atual, obtida através do token de autenticação.
+        current_company (Loja): A loja atual, obtida através do
+        token de autenticação.
         uuid (str): O UUID do entregador a ser removido.
 
     Returns:

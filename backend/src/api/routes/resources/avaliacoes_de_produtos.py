@@ -1,4 +1,5 @@
 from typing import Annotated
+from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -8,7 +9,7 @@ from fastapi import (  # noqa
 from src.schemas import AvaliacaoDeProduto
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
-    connection_dependency
+    connection_dependency,
 )
 
 router = APIRouter(
@@ -16,9 +17,6 @@ router = APIRouter(
     tags=["Avaliações de produtos"]
 )
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Avaliação não encontrada"
-)
 
 @router.get("/")
 async def requisitar_avaliacoes(connection: connection_dependency):
@@ -26,7 +24,8 @@ async def requisitar_avaliacoes(connection: connection_dependency):
     Requisita todas as avaliações de produtos.
 
     Returns:
-        List[AvaliacaoDeProduto]: Uma lista contendo todas as avaliações de produtos.
+        List[AvaliacaoDeProduto]: Uma lista contendo todas
+        as avaliações de produtos.
     """
     repository = Repository(AvaliacaoDeProduto, connection=connection)
     results = await repository.find_all()
@@ -51,12 +50,12 @@ async def requisitar_avaliacao(
     repository = Repository(AvaliacaoDeProduto, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
-        raise NotFoundException
+        raise NotFoundException("Avaliação não encontrada")
 
     return result
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_avaliacoes(
     connection: connection_dependency,
     avaliacao: AvaliacaoDeProduto
@@ -93,13 +92,14 @@ async def atualizar_avaliacao_put(
         uuid (str): O UUID da avaliação a ser atualizada.
 
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas pela atualização.
+        dict: Um dicionário contendo o número de linhas
+        afetadas pela atualização.
     """
     repository = Repository(AvaliacaoDeProduto, connection=connection)
     avaliacao = await repository.find_one(uuid=uuid)
     if avaliacao is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Avaliação não encontrada")
+
     num_rows_affected = await repository.update(
         avaliacao, avaliacaoData.model_dump()  # type: ignore
     )
@@ -116,8 +116,8 @@ async def atualizar_avaliacao_patch(
     repository = Repository(AvaliacaoDeProduto, connection=connection)
     avaliacao = await repository.find_one(uuid=uuid)
     if avaliacao is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Avaliação não encontrada")
+
     num_rows_affected = await repository.update(
         avaliacao,
         avaliacaoData.model_dump()  # type: ignore

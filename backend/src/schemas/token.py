@@ -1,10 +1,12 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+    nome: str
+    username: str
+    email: str
     uuid: str | None = None
 
 

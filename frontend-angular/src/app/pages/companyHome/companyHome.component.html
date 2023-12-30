@@ -1,0 +1,16 @@
+@if (companyData.value) {
+  <div>
+    {{ companyData.value.nome }},
+  </div>
+
+  <div>
+    email: {{ companyData.value.email }}
+  </div>
+
+  <div>
+    username: {{ companyData.value.username }}
+  </div>
+} @else {
+  <strong>Loading...</strong>
+}
+

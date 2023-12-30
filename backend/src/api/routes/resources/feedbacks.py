@@ -1,4 +1,5 @@
 from typing import Annotated
+from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -14,9 +15,6 @@ from src.dependencies import (
 
 router = APIRouter(prefix="/feedbacks", tags=["Feedbacks"])
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Feedback não encontrado"
-)
 
 @router.get("/")
 async def requisitar_feedbacks(connection: connection_dependency):
@@ -49,12 +47,12 @@ async def requisitar_feedback(
     repository = Repository(Feedback, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Feedback não encontrado")
+
     return result
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_feedbacks(
     connection: connection_dependency,
     feedback: Feedback,
@@ -91,13 +89,14 @@ async def atualizar_feedback_put(
         uuid (str): O UUID do feedback a ser atualizado.
 
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas pela atualização.
+        dict: Um dicionário contendo o número de linhas
+        afetadas pela atualização.
     """
     repository = Repository(Feedback, connection=connection)
     feedback = await repository.find_one(uuid=uuid)
     if feedback is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Feedback não encontrado")
+
     num_rows_affected = await repository.update(
         feedback, feedbackData.model_dump()  # type: ignore
     )
@@ -114,8 +113,8 @@ async def atualizar_feedback_patch(
     repository = Repository(Feedback, connection=connection)
     feedback = await repository.find_one(uuid=uuid)
     if feedback is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Feedback não encontrado")
+
     num_rows_affected = await repository.update(
         feedback, feedbackData.model_dump()  # type: ignore
     )

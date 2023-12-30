@@ -1,0 +1,59 @@
+
+<div>
+  <div>
+    Nome
+    <input
+      type="text"
+      id="nome-input"
+      (keyup.enter)="registerCategoria()"
+      [(ngModel)]="nomeValue"
+    >
+    Descricao
+    <input
+      type="text"
+      id="descricao-input"
+      (keyup.enter)="registerCategoria()"
+      [(ngModel)]="descricaoValue"
+    >
+
+    <button (click)="registerCategoria()">
+      Cadastrar
+    </button>
+  </div>
+</div>
+
+<h1>Categorias:</h1>
+
+<div id="table-container">
+  @if (categorias.value.length) {
+    <table id="categoria_table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Descricao</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (categoria of categorias.value; track $index) {
+          <tr>
+            <td>
+              <a [routerLink]="['/empresa/categorias', categoria.uuid]">
+                {{categoria.nome}}
+              </a>
+            </td>
+            <td>{{ categoria.descricao }}</td>
+            <td>
+              <button (click)="deleteCategoria(categoria)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+  </table>
+  } @else {
+    <strong>Nenhuma categoria encontrada!</strong>
+  }
+</div>
+

@@ -8,17 +8,15 @@ from fastapi import Depends, HTTPException, status, Path
 from typing import Any
 from src.schemas import (
     LojaSignIn,
+    Usuario,
     Token,
     Loja,
-    UsuarioSignIn,
-    Cliente
+    # UsuarioSignIn,
+    # Cliente
 )
 
 from typing import Annotated
 from src import use_cases
-from src.schemas import Loja, Usuario
-from typing import Annotated
-from src.api import security
 from fastapi import (  # noqa
     Depends
 )
@@ -26,7 +24,6 @@ from fastapi import (  # noqa
 
 current_user = Annotated[Usuario, Depends(security.current_user)]
 current_company = Annotated[Loja, Depends(security.current_company)]
-
 
 
 router = APIRouter(prefix="/loja", tags=["Loja", "Auth"])
@@ -43,13 +40,13 @@ async def requisitar_loja(
 ):
     """
     Busca uma loja pelo seu uuid.
-    
+
     Args:
         uuid (str): O uuid da loja a ser buscada.
-    
+
     Returns:
         Loja: A loja encontrada.
-    
+
     Raises:
         HTTPException: Se a loja não for encontrada.
     """
@@ -69,13 +66,13 @@ async def login_post(
 ) -> Any:
     """
     Realiza o login de uma loja.
-    
+
     Args:
         form_data (OAuth2PasswordRequestForm): Dados do formulário de login.
-    
+
     Returns:
         dict: Um dicionário contendo o token de acesso e o uuid da loja.
-    
+
     Raises:
         HTTPException: Se as credenciais forem inválidas.
     """
@@ -88,11 +85,15 @@ async def login_post(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     access_token = security.create_access_token(data={"sub": user.username})
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "uuid": user.uuid,
+        "nome": user.nome,
+        "username": user.username,
+        "email": user.email,
     }
 
 
@@ -102,10 +103,10 @@ async def login_post(
 async def signin(loja: LojaSignIn) -> Any:
     """
     Realiza o cadastro de uma nova loja.
-    
+
     Args:
         loja (LojaSignIn): Os detalhes da loja a ser cadastrada.
-    
+
     Returns:
         dict: Um dicionário contendo o uuid da loja cadastrada.
     """
@@ -116,7 +117,7 @@ async def signin(loja: LojaSignIn) -> Any:
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Senha inválida! A senha deve ser maior que 5"
         )
-    
+
     return {"uuid": uuid}
 
 
@@ -124,10 +125,10 @@ async def signin(loja: LojaSignIn) -> Any:
 async def home(current_company: current_company):
     """
     Rota de exemplo protegida por autenticação.
-    
+
     Args:
         current_company (Loja): O objeto da loja autenticada.
-    
+
     Returns:
         dict: Uma mensagem de resposta.
     """
@@ -140,14 +141,14 @@ async def home(current_company: current_company):
 # ) -> Any:
 #     """
 #     Cadastra um novo cliente associado à loja autenticada.
-    
+
 #     Args:
 #         current_company (Loja): O objeto da loja autenticada.
 #         usuario (UsuarioSignIn): Os detalhes do cliente a ser cadastrado.
-    
+
 #     Returns:
 #         dict: Um dicionário contendo o uuid do usuário (cliente) cadastrado.
-    
+
 #     Raises:
 #         HTTPException: Se não for fornecido o uuid da loja.
 #     """
@@ -156,7 +157,7 @@ async def home(current_company: current_company):
 #             status_code=status.HTTP_400_BAD_REQUEST,
 #             detail="uuid da loja em falta",
 #         )
-    
+
 #     usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
 #     cliente = Cliente(usuario_uuid=usuario_uuid, loja_uuid=usuario.loja_uuid)
 #     async with DatabaseConnectionManager() as connection:

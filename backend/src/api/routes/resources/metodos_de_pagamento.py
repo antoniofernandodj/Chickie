@@ -1,4 +1,5 @@
 from typing import Annotated
+from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -10,6 +11,7 @@ from typing import Optional
 from src.schemas import MetodoDePagamento
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
+    metodo_de_pagamento_repository_dependency,
     connection_dependency,
     current_company
 )
@@ -19,21 +21,18 @@ router = APIRouter(
     prefix="/metodos_de_pagamento", tags=["Métodos de pagamentos"]
 )
 
-NotFoundException = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="Metodo de pagamento não encontrado",
-)
 
 @router.get("/")
 async def requisitar_metodos_de_pagamento(
-    connection: connection_dependency,
+    repository: metodo_de_pagamento_repository_dependency,
     loja_uuid: Optional[str] = Query(None),
 ):
     """
     Obtém uma lista de todos os métodos de pagamento cadastrados.
 
     Args:
-        loja_uuid (str, opcional): UUID da loja para filtrar os métodos de pagamento.
+        loja_uuid (str, opcional): UUID da loja para
+        filtrar os métodos de pagamento.
 
     Returns:
         list: Uma lista contendo os métodos de pagamento encontrados.
@@ -42,7 +41,6 @@ async def requisitar_metodos_de_pagamento(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    repository = Repository(MetodoDePagamento, connection=connection)
     results = await repository.find_all()
 
     return results
@@ -50,7 +48,7 @@ async def requisitar_metodos_de_pagamento(
 
 @router.get("/{uuid}")
 async def requisitar_metodo_de_pagamento(
-    connection: connection_dependency,
+    repository: metodo_de_pagamento_repository_dependency,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagamento a fazer get")
     ]
@@ -64,17 +62,16 @@ async def requisitar_metodo_de_pagamento(
     Returns:
         MetodoDePagamento: Os detalhes do método de pagamento.
     """
-    repository = Repository(MetodoDePagamento, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Metodo de pagamento não encontrado")
+
     return result
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_metodos_de_pagamento(
-    connection: connection_dependency,
+    repository: metodo_de_pagamento_repository_dependency,
     metodo_de_pagamento: MetodoDePagamento,
     current_company: current_company,
 ):
@@ -82,13 +79,13 @@ async def cadastrar_metodos_de_pagamento(
     Cadastra um novo método de pagamento.
 
     Args:
-        metodo_de_pagamento (MetodoDePagamento): Dados do método de pagamento a ser cadastrado.
+        metodo_de_pagamento (MetodoDePagamento): Dados do método
+        de pagamento a ser cadastrado.
         current_company (Loja): Dados da loja autenticada (dependência).
 
     Returns:
         dict: Um dicionário contendo o UUID do método de pagamento cadastrado.
     """
-    repository = Repository(MetodoDePagamento, connection=connection)
     try:
         uuid = await repository.save(metodo_de_pagamento)
     except Exception as error:
@@ -99,8 +96,8 @@ async def cadastrar_metodos_de_pagamento(
 
 @router.put("/{uuid}")
 async def atualizar_metodo_de_pagamento_put(
-    connection: connection_dependency,
-    metodo_de_pagamento_Data: MetodoDePagamento,
+    repository: metodo_de_pagamento_repository_dependency,
+    metodo_de_pagamento_data: MetodoDePagamento,
     current_company: current_company,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer put")
@@ -110,21 +107,22 @@ async def atualizar_metodo_de_pagamento_put(
     Atualiza os dados de um método de pagamento utilizando o método HTTP PUT.
 
     Args:
-        metodo_de_pagamento_Data (MetodoDePagamento): Os novos dados do método de pagamento.
+        metodo_de_pagamento_Data (MetodoDePagamento): Os novos dados
+        do método de pagamento.
         current_company (Loja): Dados da loja autenticada (dependência).
         uuid (str): O UUID do método de pagamento a ser atualizado.
 
     Returns:
-        dict: Um dicionário contendo o número de linhas afetadas na atualização.
+        dict: Um dicionário contendo o número de linhas
+        afetadas na atualização.
     """
-    repository = Repository(MetodoDePagamento, connection=connection)
     metodo_de_pagamento = await repository.find_one(uuid=uuid)
     if metodo_de_pagamento is None:
-        raise NotFoundException
-    
+        raise NotFoundException("Metodo de pagamento não encontrado")
+
     num_rows_affected = await repository.update(
         metodo_de_pagamento,
-        metodo_de_pagamento_Data.model_dump(),  # type: ignore
+        metodo_de_pagamento_data.model_dump(),
     )
 
     return {"num_rows_affected": num_rows_affected}
@@ -142,7 +140,7 @@ async def atualizar_metodo_de_pagamento_patch(
     repository = Repository(MetodoDePagamento, connection=connection)
     metodo_de_pagamento = await repository.find_one(uuid=uuid)
     if metodo_de_pagamento is None:
-        raise NotFoundException
+        raise NotFoundException("Metodo de pagamento não encontrado")
     num_rows_affected = await repository.update(
         metodo_de_pagamento,
         metodo_de_pagamentoData.model_dump(),  # type: ignore
@@ -153,7 +151,7 @@ async def atualizar_metodo_de_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_metodo_de_pagamento(
-    connection: connection_dependency,
+    repository: metodo_de_pagamento_repository_dependency,
     current_company: current_company,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
@@ -169,7 +167,6 @@ async def remover_metodo_de_pagamento(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    repository = Repository(MetodoDePagamento, connection=connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

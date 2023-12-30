@@ -1,0 +1,16 @@
+
+@if (!!userData.value) {
+  <div>
+    {{ userData.value.nome }},
+  </div>
+
+  <div>
+    email: {{ userData.value.email }}
+  </div>
+
+  <div>
+    username: {{ userData.value.username }}
+  </div>
+} @else {
+  <strong>Loading...</strong>
+}
