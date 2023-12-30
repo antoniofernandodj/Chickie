@@ -87,7 +87,7 @@ async def atualizar_endereco_put(
     repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do endereco a fazer put")],
 ) -> Dict[str, int]:
-    
+
     """
     Atualiza um endereço utilizando o método PUT.
 
