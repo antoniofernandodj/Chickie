@@ -41,7 +41,7 @@ async def requisitar_metodos_de_pagamento(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results = await repository.find_all()
+    results = await repository.find_all(**kwargs)
 
     return results
 
