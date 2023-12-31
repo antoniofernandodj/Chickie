@@ -1,4 +1,4 @@
-from typing import Any, Annotated
+from typing import Any, Annotated, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.routing import APIRouter
@@ -6,13 +6,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.requests import Request
 
 from src.api import security
-from src.schemas import Token, UsuarioSignIn
+from src.schemas import Token, UsuarioSignIn, Endereco
 from src import use_cases
-from src.schemas import Loja, Usuario
-
-
-current_user = Annotated[Usuario, Depends(security.current_user)]
-current_company = Annotated[Loja, Depends(security.current_company)]
+from src.dependencies import (
+    current_user,
+    endereco_repository_dependency
+)
 
 
 router = APIRouter(prefix="/user", tags=["Usuario", "Auth"])
@@ -21,6 +20,7 @@ router = APIRouter(prefix="/user", tags=["Usuario", "Auth"])
 @router.post("/login", response_model=Token)
 async def login_post(
     request: Request,
+    endereco_repository: endereco_repository_dependency,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Any:
     """
@@ -47,15 +47,26 @@ async def login_post(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    endereco: Optional[Endereco] = await endereco_repository.find_one(
+        uuid=user.endereco_uuid
+    )
+
     access_token = security.create_access_token(data={"sub": user.username})
-    return {
+
+    response = {
         "access_token": access_token,
         "token_type": "bearer",
         "uuid": user.uuid,
         "nome": user.nome,
         "username": user.username,
         "email": user.email,
+        "celular": user.celular
     }
+
+    if endereco:
+        response['endereco'] = endereco
+
+    return response
 
 
 # Adicionar verificação para unico

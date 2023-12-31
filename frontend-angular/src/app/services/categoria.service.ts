@@ -5,7 +5,7 @@ import { AuthService, AuthData } from './auth.service';
 import { CategoriaBodyRequest, CategoriaResponse } from '../models/categoria';
 
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class CategoriaService {
 
   baseUrl: string
@@ -30,7 +30,7 @@ export class CategoriaService {
     let params = new HttpParams()
       .set('loja_uuid', companyUUID)
 
-    let observable = this.http.get(this.baseUrl, {params: params})
+    let observable = this.http.get(`${this.baseUrl}/`, {params: params})
     return observable
   }
 
@@ -40,8 +40,6 @@ export class CategoriaService {
     )
     return observable
   }
-
-  // update() {}
 
   delete(item: CategoriaResponse) {
 

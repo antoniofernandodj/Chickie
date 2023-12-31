@@ -66,6 +66,7 @@ class Repository:
 
             dict_result = dict(list(zip(column_names, result)))
             cursor.close()
+
             return self.model(**dict_result)  # type: ignore
 
         cursor.close()

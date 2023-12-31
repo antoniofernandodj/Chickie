@@ -1,19 +1,28 @@
 <nav>
   isLoginPage: {{ isLoginPage.value }}
-  Logged: {{ isLoggedIn.value }}
-  Company Data: {{ !!companyData.value }}
-  User Data: {{ !!userData.value }}
+  User Logged in: {{ userIsLoggedIn.value }}
+  Company Logged in: {{ companyIsLoggedIn.value}}
   <ul>
-    @if (isLoggedIn.value) {
-      <li><a routerLink="empresa/home">Home</a></li>
-      <li><a routerLink="empresa/produtos">Produtos</a></li>
-      <li><a routerLink="empresa/categorias">Categorias</a></li>
-      <li><a routerLink="empresa/pedidos">Pedidos</a></li>
-      <li><a routerLink="logout">Logout</a></li>
-    } @else {
+    @if (companyIsLoggedIn.value) {
+      <li><a routerLink="loja/home">Home</a></li>
+      <li><a routerLink="loja/produtos">Produtos</a></li>
+      <li><a routerLink="loja/categorias">Categorias</a></li>
+      <li><a routerLink="loja/pedidos">Pedidos</a></li>
+      <li><a routerLink="loja/status">Status</a></li>
+    }
+
+    @if (!userIsLoggedIn.value && !companyIsLoggedIn.value) {
+
       @if (!isLoginPage.value) {
         <li><a routerLink="login">Login</a></li>
       }
+
+    } @else {
+
+      <li><a routerLink="logout">Logout</a></li>
+
     }
+
+
   </ul>
 </nav>

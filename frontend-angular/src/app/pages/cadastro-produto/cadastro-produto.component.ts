@@ -26,15 +26,18 @@ export class CadastroProdutoComponent {
   companyProducts: BehaviorSubject<Array<ProdutoResponse>>
   companyCategorias: BehaviorSubject<Array<CategoriaResponse>>
   companyData: AuthData | null
+  companyUUID: string | null
 
   constructor(
     private produtoService: ProdutoService,
     private authService: AuthService,
-    private categoriaService: CategoriaService
+    private categoriaService: CategoriaService,
+    private route: ActivatedRoute,
   ) {
     this.companyCategorias = new BehaviorSubject<Array<CategoriaResponse>>([])
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([])
     this.companyData = this.authService.currentCompany()
+    this.companyUUID = null
 
     this.nomeValue = ''
     this.descricaoValue = ''
@@ -44,18 +47,25 @@ export class CadastroProdutoComponent {
 
   fetchProducts() {
     if (!this.companyData) {
+      this.route.params.subscribe(params => {
+        this.companyUUID = params['lojaID'];
+        this.fetchProducts()
+      })
       let msg =' Dados da empresa não encontrados!'
       alert(msg); throw new Error(msg)
     }
 
     this.produtoService.getAll(this.companyData.uuid).subscribe({
-      next: (res) => {
-        if (Array.isArray(res)) {
-          this.companyProducts.next(res)
+      next: (response) => {
+        if (Array.isArray(response)) {
+          this.companyProducts.next(response)
           this.fetchCategoriasForProducts()
         }
       },
-      error: (res) => { alert('Erro ao buscar pelos produtos') }
+      error: (response) => {
+        let msg = 'Erro ao buscar pelos produtos'
+        alert(msg); console.log(response); throw new Error(msg)
+      }
     })
   }
 
@@ -71,13 +81,17 @@ export class CadastroProdutoComponent {
         next: (response) => {
           produto.categoria = response
         },
-        error: (res) => { alert('Erro ao buscar pelas categorias') }
+        error: (response) => {
+          let msg = 'Erro ao buscar pelas categorias'
+          alert(msg); console.log(response); throw new Error(msg)
+        }
       })
     }
 
   }
 
   fetchCategorias() {
+
     if (!this.companyData) {
       alert('Dados da empresa não encontrados!')
       throw new Error('Dados da empresa não encontrados!')
@@ -89,8 +103,8 @@ export class CadastroProdutoComponent {
         }
       },
       error: (response) => {
-        alert('Dados de categorias não encontrados!')
-        throw new Error('Dados de categorias não encontrados!')
+        let msg = '101: Dados de categorias não encontrados!'
+        alert(msg); console.log(msg); throw new Error(msg)
       },
     })
   }

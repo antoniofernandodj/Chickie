@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from src.schemas import Endereco
 
 
 class Token(BaseModel):
@@ -7,6 +8,8 @@ class Token(BaseModel):
     nome: str
     username: str
     email: str
+    endereco: Endereco
+    celular: str | None = None
     uuid: str | None = None
 
 

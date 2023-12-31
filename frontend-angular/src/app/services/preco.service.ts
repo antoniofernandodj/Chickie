@@ -5,7 +5,7 @@ import { AuthService, AuthData } from './auth.service';
 import { PrecoBodyRequest, PrecoResponse } from '../models/preco';
 
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class PrecoService {
 
   baseUrl: string

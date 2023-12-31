@@ -19,7 +19,8 @@ async def authenticate_company(
         password (str): A senha da loja.
 
     Returns:
-        Optional[Loja]: O objeto da loja autenticada ou None se a autenticação falhar.
+        Optional[Loja]: O objeto da loja autenticada ou
+        None se a autenticação falhar.
     """
     async with DatabaseConnectionManager() as connection:
         loja_repo = Repository(Loja, connection=connection)
@@ -49,12 +50,13 @@ async def current_company(
     Raises:
         HTTPException: Se a autenticação falhar.
     """
-
+    print('veio aqui')
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    print({'token': token})
     try:
         payload = jwt.decode(
             token, s.SECRET_KEY, algorithms=[s.AUTH_ALGORITHM]

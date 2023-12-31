@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List, Dict, Optional
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,9 +7,9 @@ from fastapi import (  # noqa
     Path
 )
 from src.schemas import AvaliacaoDeProduto
-from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
     connection_dependency,
+    avaliacao_repository_dependency
 )
 
 router = APIRouter(
@@ -19,7 +19,11 @@ router = APIRouter(
 
 
 @router.get("/")
-async def requisitar_avaliacoes(connection: connection_dependency):
+async def requisitar_avaliacoes(
+    repository: avaliacao_repository_dependency,
+    connection: connection_dependency
+) -> List[AvaliacaoDeProduto]:
+
     """
     Requisita todas as avaliações de produtos.
 
@@ -27,17 +31,17 @@ async def requisitar_avaliacoes(connection: connection_dependency):
         List[AvaliacaoDeProduto]: Uma lista contendo todas
         as avaliações de produtos.
     """
-    repository = Repository(AvaliacaoDeProduto, connection=connection)
-    results = await repository.find_all()
+    results: List[AvaliacaoDeProduto] = await repository.find_all()
 
     return results
 
 
 @router.get("/{uuid}")
 async def requisitar_avaliacao(
-    connection: connection_dependency,
+    repository: avaliacao_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
-):
+) -> AvaliacaoDeProduto:
+
     """
     Requisita uma avaliação de produto específica com base no UUID.
 
@@ -47,8 +51,7 @@ async def requisitar_avaliacao(
     Returns:
         AvaliacaoDeProduto: A avaliação de produto correspondente ao UUID.
     """
-    repository = Repository(AvaliacaoDeProduto, connection=connection)
-    result = await repository.find_one(uuid=uuid)
+    result: Optional[AvaliacaoDeProduto] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Avaliação não encontrada")
 
@@ -57,9 +60,10 @@ async def requisitar_avaliacao(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_avaliacoes(
-    connection: connection_dependency,
+    repository: avaliacao_repository_dependency,
     avaliacao: AvaliacaoDeProduto
-):
+) -> Dict[str, str]:
+
     """
     Cadastra uma nova avaliação de produto.
 
@@ -69,7 +73,6 @@ async def cadastrar_avaliacoes(
     Returns:
         dict: Um dicionário contendo o UUID da avaliação cadastrada.
     """
-    repository = Repository(AvaliacaoDeProduto, connection=connection)
     try:
         uuid = await repository.save(avaliacao)
     except Exception as error:
@@ -80,10 +83,11 @@ async def cadastrar_avaliacoes(
 
 @router.put("/{uuid}")
 async def atualizar_avaliacao_put(
-    connection: connection_dependency,
+    repository: avaliacao_repository_dependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
-):
+) -> Dict[str, int]:
+
     """
     Atualiza uma avaliação de produto utilizando o método PUT.
 
@@ -95,7 +99,6 @@ async def atualizar_avaliacao_put(
         dict: Um dicionário contendo o número de linhas
         afetadas pela atualização.
     """
-    repository = Repository(AvaliacaoDeProduto, connection=connection)
     avaliacao = await repository.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
@@ -110,10 +113,10 @@ async def atualizar_avaliacao_put(
 @router.patch("/{uuid}")
 async def atualizar_avaliacao_patch(
     avaliacaoData: AvaliacaoDeProduto,
-    connection: connection_dependency,
+    repository: avaliacao_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
-):
-    repository = Repository(AvaliacaoDeProduto, connection=connection)
+) -> Dict[str, int]:
+
     avaliacao = await repository.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
@@ -128,19 +131,19 @@ async def atualizar_avaliacao_patch(
 
 @router.delete("/{uuid}")
 async def remover_avaliacao(
-    connection: connection_dependency,
+    repository: avaliacao_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
-):
+) -> Dict[str, int]:
+
     """
     Remove uma avaliação de produto com base no UUID.
 
     Args:
-        uuid (str): O UUID da avaliação a ser removida.
+        uuid (str): O UUID da avaliação a ser removida.e
 
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
-    repository = Repository(AvaliacaoDeProduto, connection=connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

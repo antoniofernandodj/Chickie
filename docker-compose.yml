@@ -32,6 +32,17 @@ services:
       # - mongodb
       # - database
 
+  client-angular:
+    build:
+      context: frontend-angular
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend-angular/src:/usr/app/src
+    ports:
+      - "4200:4200"
+    stdin_open: true
+    tty: true
+
   # database:
   #   image: postgres
   #   volumes:

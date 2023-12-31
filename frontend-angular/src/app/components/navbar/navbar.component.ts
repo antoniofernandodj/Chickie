@@ -14,17 +14,17 @@ import { BehaviorSubject } from 'rxjs';
 export class NavbarComponent {
   companyData: BehaviorSubject<AuthData | null>
   userData: BehaviorSubject<AuthData | null>
-  isLoggedIn: BehaviorSubject<boolean>;
+  userIsLoggedIn: BehaviorSubject<boolean>;
+  companyIsLoggedIn: BehaviorSubject<boolean>;
   isLoginPage: BehaviorSubject<boolean>;
 
   constructor(private authService: AuthService, private router: Router) {
     this.isLoginPage = this.authService.isLoginPage
     this.companyData = this.authService.companyData
     this.userData = this.authService.userData
-    this.isLoggedIn = this.authService.isLoggedIn
+    this.userIsLoggedIn = this.authService.userIsLoggedIn
+    this.companyIsLoggedIn = this.authService.companyIsLoggedIn
   }
 
 }
-
-
 

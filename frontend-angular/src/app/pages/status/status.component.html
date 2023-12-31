@@ -1,0 +1,25 @@
+<h2>Cadastro de status</h2>
+
+<div>
+
+  Nome
+  <input type="text" [(ngModel)]="nomeValue" (keyup.enter)="cadastrarStatus()">
+
+  Descrição
+  <input type="text" [(ngModel)]="descricaoValue" (keyup.enter)="cadastrarStatus()">
+
+  <button (click)="cadastrarStatus()">Cadastrar</button>
+</div>
+
+<h2>Status List</h2>
+@if (statusList.value.length) {
+  @for (status of statusList.value; track $index) {
+    <div>
+      Nome: {{ status.nome }}, Descrição: {{ status.descricao }}
+      <button (click)="deletarStatus(status)">Delete</button>
+    </div>
+
+  }
+} @else {
+  <strong>Nenhum status encontrado!</strong>
+}

@@ -1,9 +1,10 @@
 from config import settings as s
 import aiopg
-import psycopg2
-from psycopg2 import sql
+import psycopg2   # noqa
+from psycopg2 import sql   # noqa
 from typing import Optional
-from asyncio import Lock
+from asyncio import Lock   # noqa
+
 
 class DatabaseConnectionManager:
 
@@ -45,7 +46,7 @@ class DatabaseConnectionManager:
                 )
             )
         return CONNECTION_STRING_DB
-    
+
     @classmethod
     async def get_connection(cls):
         CONNECTION_STRING_DB = (
@@ -58,7 +59,7 @@ class DatabaseConnectionManager:
         )
 
         pool = await aiopg.create_pool(CONNECTION_STRING_DB)
-        
+
         connection = await pool.acquire()
         yield connection
         connection.close()

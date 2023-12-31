@@ -17,7 +17,8 @@ from src.dependencies.repository_dependecies import (  # noqa
     zona_de_entrega_repository_dependency,
     categoria_repository_dependency,
     metodo_de_pagamento_repository_dependency,
-    item_pedido_repository_dependency
+    item_pedido_repository_dependency,
+    avaliacao_repository_dependency
 )
 
 

@@ -13,7 +13,7 @@ from src.schemas import (
     ZonaDeEntrega,
     ItemPedido,
     CategoriaProdutos,
-    MetodoDePagamento
+    MetodoDePagamento,
 )
 from typing import Annotated
 from fastapi import (  # noqa
@@ -136,4 +136,9 @@ metodo_de_pagamento_repository_dependency = Annotated[
 
 item_pedido_repository_dependency = Annotated[
     Repository, Depends(get_item_pedido_repository)
+]
+
+
+avaliacao_repository_dependency = Annotated[
+    Repository, Depends(get_avaliacao_repository)
 ]

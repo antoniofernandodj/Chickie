@@ -7,7 +7,7 @@ api:
 		-t antoniofernandodj/chickie:dev \
 		-f ./backend/dockerfiles/api.dockerfile \
 		backend
-	docker compose up api-dev -d
+	docker compose up api-dev -d && docker logs api-dev -f
 
 stop:
 	docker compose down

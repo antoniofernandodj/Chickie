@@ -1,4 +1,4 @@
-<a routerLink="/empresa/categorias">Categorias</a>
+<a routerLink="/loja/categorias">Categorias</a>
 
 <p>categoria {{ categoriaUUID }} works!</p>
 
@@ -58,7 +58,7 @@ loja_uuid: {{ companyData?.uuid }}
       @for (produto of companyProducts.value; track $index) {
         <tr id="">
           <td>
-            <a [routerLink]='["/empresa/produtos", produto.uuid]'>
+            <a [routerLink]='["/loja/produtos", produto.uuid]'>
               {{ produto.nome }}
             </a>
           </td>

@@ -6,11 +6,15 @@ from src.dependencies import (
     current_company,
     oauth2_password_request_form_dependency
 )
-from src.dependencies import loja_repository_dependency
+from src.dependencies import (
+    loja_repository_dependency,
+    endereco_repository_dependency
+)
 from fastapi import HTTPException, status, Path
 from typing import Any, Optional, List
 from src.schemas import (
     LojaSignIn,
+    Endereco,
     Token,
     Loja
 )
@@ -69,7 +73,8 @@ async def requisitar_lojas(
 
 @router.post("/login", response_model=Token)
 async def login_post(
-    form_data: oauth2_password_request_form_dependency
+    form_data: oauth2_password_request_form_dependency,
+    endereco_repository: endereco_repository_dependency
 ) -> Any:
     """
     Realiza o login de uma loja.
@@ -89,15 +94,26 @@ async def login_post(
     if not loja:
         raise UnauthorizedException("Incorrect username or password")
 
+    endereco: Optional[Endereco] = await endereco_repository.find_one(
+        uuid=loja.endereco_uuid
+    )
+
+    if endereco is None:
+        raise NotFoundException("Endereço da loja não encontrado")
+
     access_token = security.create_access_token(data={"sub": loja.username})
-    return {
+    response = {
         "access_token": access_token,
         "token_type": "bearer",
         "uuid": loja.uuid,
         "nome": loja.nome,
         "username": loja.username,
         "email": loja.email,
+        "celular": loja.celular,
+        "endereco": endereco,
     }
+
+    return response
 
 
 # Adicionar verificação para unico
