@@ -1,52 +1,75 @@
 <h2>Produto</h2>
 
-<div>
-  Nome: {{ produto?.nome }}
-</div>
+@if (produto.value) {
 
-<div>
-  Preço Base: {{ produto?.preco }}
-</div>
-
-@if (this.produtoPrecos.value.length) {
-  <h2>Preços</h2>
-
-  @for (preco of this.produtoPrecos.value; track $index) {
-    <div>
-      <strong>Preço:</strong> {{ preco.valor }}, Dia da semana: {{ preco.dia_da_semana }}
-      <button (click)="removerPreco(preco)">Remover preco</button>
-    </div>
-  }
-}
-
-<h2>Cadastro de Preços Especiais</h2>
-
-<div>
   <div>
-    <label for="dia_da_semana-input">Dia da Semana</label>
-    <select
-      name="dia_da_semana"
-      id="dia_da_semana-input"
-      [(ngModel)]="diaDaSemanaValue"
-    >
+    Nome: {{ produto.value.nome }}
+  </div>
+
+  <div>
+    Preço Base: {{ produto.value.preco }}
+  </div>
+
+  @if (produto.value.precos.length) {
+    <h2>Preços</h2>
+
+    @for (preco of produto.value.precos; track $index) {
+      <div>
+        <strong>Preço:</strong> {{ preco.valor }}, Dia da semana: {{ preco.dia_da_semana }}
+        <button (click)="removerPreco($event, preco)">Remover preco</button>
+      </div>
+    }
+  }
+
+  <h2>Cadastro de Preços Especiais</h2>
+
+  <div>
+    <div>
+
+    </div>
+
     @if (diasDaSemanaDisponiveis.value.length) {
-      <option value="">Escolha um dia da semana</option>
-      @for (dia of diasDaSemanaDisponiveis.value; track $index) {
-        <option value="{{ dia.val }}">{{ dia.title }}</option>
+
+      <label for="dia_da_semana-input">Dia da Semana</label>
+      <select
+        name="dia_da_semana"
+        id="dia_da_semana-input"
+        [(ngModel)]="diaDaSemanaValue"
+      >
+
+        <option value="">Escolha um dia da semana</option>
+        @for (dia of diasDaSemanaDisponiveis.value; track $index) {
+
+          <option value="{{ dia.val }}">{{ dia.title }}</option>
+
+        }
+      </select>
+
+
+      <div>
+        <label for="valor-input">Valor</label>
+        <input
+          (keyup.enter)="cadastrarPreco()"
+          type="number"
+          id="valor-input"
+          [(ngModel)]="valorValue" />
+
+      </div>
+
+      @if (!saving) {
+        <button (click)="cadastrarPreco()">
+          Salvar
+        </button>
+      } @else {
+        Saving ...
       }
     } @else {
-      <option value="">Nenhum dia disponível!</option>
+      <strong>Nenhum preço disponível!</strong>
     }
-    </select>
+
+
   </div>
+} @else {
+  <strong>Loading ...</strong>
+}
 
-  <div>
-    <label for="valor-input">Valor</label>
-    <input (keyup.enter)="cadastrarPreco()" type="number" id="valor-input" [(ngModel)]="valorValue" />
-  </div>
-
-  <button (click)="cadastrarPreco()">
-    Salvar
-  </button>
-
-</div>

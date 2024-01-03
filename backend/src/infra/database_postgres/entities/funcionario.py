@@ -5,7 +5,7 @@ from sqlalchemy.types import Text
 
 class Funcionario(Base):
     __tablename__ = "funcionarios"
-    uuid = Col(String(36), unique=True, primary_key=True)
+    uuid = Col(String(36), unique=True, primary_key=True, nullable=False)
     nome = Col(Text, nullable=False)
     loja_uuid = Col(String(36), ForeignKey("lojas.uuid"), nullable=False)
     cargo = Col(Text)

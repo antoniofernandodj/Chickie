@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from src.schemas import Endereco
+from src.schemas import Endereco, LojaGETResponse
 
 
 class Token(BaseModel):
@@ -13,5 +13,7 @@ class Token(BaseModel):
     uuid: str | None = None
 
 
-class TokenData(BaseModel):
-    username: str | None = None
+class LojaToken(BaseModel):
+    access_token: str
+    token_type: str
+    loja: LojaGETResponse

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService, AuthData } from './auth.service';
+import { AuthService, CompanyAuthData } from './auth.service';
 import { CategoriaBodyRequest, CategoriaResponse } from '../models/categoria';
 
 
@@ -9,15 +9,15 @@ import { CategoriaBodyRequest, CategoriaResponse } from '../models/categoria';
 export class CategoriaService {
 
   baseUrl: string
-  company: AuthData | null
+  companyData: CompanyAuthData | null
   token: string
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.baseUrl = 'http://localhost:8000/categorias'
-    this.company = authService.currentCompany()
+    this.companyData = authService.currentCompany()
     this.token = ''
-    if (this.company) {
-      this.token = this.company.access_token
+    if (this.companyData) {
+      this.token = this.companyData.access_token
     }
   }
 

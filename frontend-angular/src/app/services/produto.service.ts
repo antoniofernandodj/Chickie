@@ -1,33 +1,34 @@
 import { Injectable } from '@angular/core';
-import { AuthService, AuthData } from './auth.service';
+import { AuthService, CompanyAuthData } from './auth.service';
 import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 import { ProdutoBodyRequest, ProdutoResponse } from '../models/produto';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { AuthHeaders } from '../models/authHeaders';
+
 
 
 @Injectable({ providedIn: 'root' })
 export class ProdutoService {
 
   baseUrl: string
-  companyData: AuthData | null
-  headers: HttpHeaders
+  companyData: CompanyAuthData | null
+  headers: AuthHeaders
 
   constructor(
     private http: HttpClient,
     private authService: AuthService,
     private route: ActivatedRoute
   ) {
-    this.headers = new HttpHeaders()
+    this.headers = { Authorization: ''}
     this.baseUrl = 'http://localhost:8000/produtos'
     this.companyData = null
     this.companyData = this.authService.currentCompany()
     if (this.companyData) {
-      this.headers.set(
-        'Authorization', `Bearer ${this.companyData.access_token}`
-      )
+      this.headers = {
+        'Authorization': `Bearer ${this.companyData.access_token}`}
+      }
     }
-  }
 
   getOne(uuid: string) {
     let obs = this.http.get(`${this.baseUrl}/${uuid}`)
@@ -47,11 +48,6 @@ export class ProdutoService {
   }
 
   save(body: ProdutoBodyRequest): Observable<Object> {
-    if (!this.companyData) {
-      alert('Nenhuma empresa logada!')
-      throw new Error('Nenhuma empresa logada!')
-    }
-
     return this.http.post(this.baseUrl, body, { headers: this.headers })
   }
 

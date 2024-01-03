@@ -28,7 +28,8 @@ async def requisitar_pedidos(
     endereco_repository: endereco_repository_dependency,
     status_repository: status_repository_dependency,
     current_company: current_company,
-    loja_uuid: Optional[str] = Query(None)
+    loja_uuid: Optional[str] = Query(None),
+    usuario_uuid: Optional[str] = Query(None)
 ) -> List[PedidoItens]:
     """
     Obtém uma lista de todos os pedidos cadastrados.
@@ -43,6 +44,8 @@ async def requisitar_pedidos(
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
+    if usuario_uuid is not None:
+        kwargs["usuario_uuid"] = usuario_uuid
 
     pedidos: List[PedidoItens] = await pedido_repository.find_all(**kwargs)
 
@@ -64,6 +67,7 @@ async def requisitar_pedidos(
 
         pedido_itens = PedidoItens(
             status_uuid=pedido.status_uuid,
+            comentarios=pedido.comentarios,
             status=status,
             celular=pedido.celular,
             frete=pedido.frete,
@@ -71,7 +75,8 @@ async def requisitar_pedidos(
             endereco=endereco,
             uuid=pedido.uuid,
             itens_pedido=items,
-            data_hora=pedido.data_hora
+            data_hora=pedido.data_hora,
+            email=pedido.email
         )
         pedidos_itens.append(pedido_itens)
 
@@ -94,7 +99,7 @@ async def requisitar_pedido(
     Returns:
         Pedido: Os detalhes do pedido.
     """
-    pedido: Optional[Any] = await pedido_repository.find_one(uuid=uuid)
+    pedido: Optional[Pedido] = await pedido_repository.find_one(uuid=uuid)
     if pedido is None:
         raise NotFoundException("Pedido não encontrado")
 
@@ -107,23 +112,21 @@ async def requisitar_pedido(
         uuid=pedido.endereco_uuid
     )
 
-    print({'endereco': endereco})
-
     if endereco is None:
         raise NotFoundException('Endereco de pedido não encontrado')
 
     response = PedidoItens(
         status_uuid=pedido.status_uuid,
         frete=pedido.frete,
+        comentarios=pedido.comentarios,
         celular=pedido.celular,
         loja_uuid=pedido.loja_uuid,
         uuid=pedido.uuid,
         itens_pedido=items,
         data_hora=pedido.data_hora,
-        endereco=endereco
+        endereco=endereco,
+        email=pedido.email
     )
-
-    print({'response': response})
 
     return response
 

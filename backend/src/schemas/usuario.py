@@ -4,18 +4,27 @@ import base64
 import bcrypt
 
 
+class UsuarioFollowEmpresaRequest(BaseModel):
+    usuario_uuid: str
+    loja_uuid: str
+
+
 class Usuario(BaseModel):
+
     __tablename__ = "usuarios"
     nome: str
     username: str
     email: str
     celular: str
-    endereco_uuid: str
+
+    modo_de_cadastro: str
 
     telefone: Optional[str] = None
     password: Optional[str] = None
     password_hash: Optional[str] = None
     uuid: Optional[str] = None
+    ativo: Optional[bool] = True
+    passou_pelo_primeiro_acesso: Optional[bool] = False
 
     model_config = {
         'json_schema_extra': {

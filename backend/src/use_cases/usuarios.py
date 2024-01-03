@@ -1,6 +1,6 @@
 from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
-from src.schemas import Usuario, UsuarioSignIn, Endereco
+from src.schemas import Usuario, UsuarioSignUp, EnderecoUsuario as Endereco
 from src.api.security import HashService
 from src.exceptions import InvalidPasswordException
 from typing import Optional
@@ -15,12 +15,33 @@ def validate_password(password: Optional[str]) -> bool:
     return True
 
 
-async def registrar(user_data: UsuarioSignIn) -> str:
+async def registrar(user_data: UsuarioSignUp) -> Usuario:
     async with DatabaseConnectionManager() as connection:
 
         valid = validate_password(user_data.password)
         if not valid:
             raise InvalidPasswordException
+
+        user_repo = Repository(Usuario, connection=connection)
+
+        def only_numbers(string: str | None) -> str:
+            if string is None:
+                return ''
+
+            return ''.join([n for n in string if n.isdecimal()])
+
+        user = Usuario(
+            nome=user_data.nome,
+            username=user_data.username,
+            email=user_data.email,
+            celular=only_numbers(user_data.celular),
+            telefone=only_numbers(user_data.telefone),
+            modo_de_cadastro=user_data.modo_de_cadastro,
+            password_hash=HashService.hash(password=user_data.password),
+        )
+
+        del user.password
+        user.uuid = await user_repo.save(model=user)
 
         endereco = Endereco(
             uf=user_data.uf,
@@ -29,27 +50,14 @@ async def registrar(user_data: UsuarioSignIn) -> str:
             numero=user_data.numero,
             bairro=user_data.bairro,
             cep=user_data.cep,
-            complemento=user_data.complemento
+            complemento=user_data.complemento,
+            usuario_uuid=user.uuid
         )
 
-        user_repo = Repository(Usuario, connection=connection)
-        endereco_repo = Repository(Endereco, connection=connection)
+        endereco_repository = Repository(Endereco, connection=connection)
 
-        endereco_uuid = await endereco_repo.save(endereco)
-
-        user = Usuario(
-            nome=user_data.nome,
-            username=user_data.username,
-            email=user_data.email,
-            celular=user_data.celular,
-            endereco_uuid=endereco_uuid,
-            telefone=user_data.telefone,
-            password_hash=HashService.hash(password=user_data.password)
-        )
+        await endereco_repository.save(endereco)
 
         del user_data
-        del user.password
 
-        uuid = await user_repo.save(model=user)
-
-        return uuid
+        return user

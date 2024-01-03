@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService, AuthData } from './auth.service';
+import { AuthService, CompanyAuthData } from './auth.service';
 import { PrecoBodyRequest, PrecoResponse } from '../models/preco';
 
 
@@ -9,7 +9,7 @@ import { PrecoBodyRequest, PrecoResponse } from '../models/preco';
 export class PrecoService {
 
   baseUrl: string
-  company: AuthData | null
+  companyData: CompanyAuthData | null
   token: string
   headers: HttpHeaders
 
@@ -19,10 +19,10 @@ export class PrecoService {
   ) {
     this.baseUrl = 'http://localhost:8000/precos'
     this.headers = new HttpHeaders({})
-    this.company = authService.currentCompany()
+    this.companyData = authService.currentCompany()
     this.token = ''
-    if (this.company) {
-      this.token = this.company.access_token
+    if (this.companyData) {
+      this.token = this.companyData.access_token
       this.headers = new HttpHeaders({ Authorization: `Bearer ${this.token}` })
     }
   }

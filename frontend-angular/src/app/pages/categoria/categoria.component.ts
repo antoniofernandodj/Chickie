@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProdutoService } from '../../services/produto.service';
-import { AuthService, AuthData } from '../../services/auth.service';
+import { AuthService, CompanyAuthData } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ProdutoResponse } from '../../models/produto';
 import { BehaviorSubject } from 'rxjs';
@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
 export class CategoriaComponent {
   categoriaUUID: string
   companyProducts: BehaviorSubject<Array<ProdutoResponse>>
-  companyData: AuthData | null
+  companyData: CompanyAuthData | null
 
   nomeValue: string
   descricaoValue: string
@@ -31,9 +31,8 @@ export class CategoriaComponent {
     private authService: AuthService
   ) {
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([])
-    this.companyData = this.authService.currentCompany();
     this.categoriaUUID = '';
-
+    this.companyData = null
     this.nomeValue = '';
     this.descricaoValue = '';
     this.precoValue = null
@@ -45,9 +44,15 @@ export class CategoriaComponent {
       alert(msg); throw new Error(msg)
     }
 
-    this.produtoService.getAll(this.companyData.uuid, this.categoriaUUID).subscribe({
+    this.produtoService.getAll(
+      this.companyData.loja.uuid,
+      this.categoriaUUID
+    ).subscribe({
       next: (response) => {
         if (Array.isArray(response)) {
+
+          console.log({response: response})
+
           this.companyProducts.next(response);
         }
       },
@@ -61,6 +66,7 @@ export class CategoriaComponent {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.categoriaUUID = params['id'];
+      this.companyData = this.authService.currentCompany();
       this.fetchProducts()
     });
   }
@@ -87,7 +93,7 @@ export class CategoriaComponent {
     }
 
     let body = {
-      loja_uuid: this.companyData.uuid,
+      loja_uuid: this.companyData.loja.uuid,
       categoria_uuid: this.categoriaUUID,
       nome: this.nomeValue,
       descricao: this.descricaoValue,
@@ -101,6 +107,7 @@ export class CategoriaComponent {
         alert('Item adicionado com sucesso!');
       },
       error: (response) => {
+        console.log({response: response})
         alert('Erro no cadastro do item');
       }
     })

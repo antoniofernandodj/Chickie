@@ -1,27 +1,26 @@
 import { Injectable } from '@angular/core';
-import { AuthService, AuthData } from './auth.service';
+import { AuthService, CompanyAuthData } from './auth.service';
 import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 import { StatusBodyRequest, StatusResponse } from '../models/status';
 import { Observable } from 'rxjs';
+import { AuthHeaders } from '../models/authHeaders';
 
 
 @Injectable({ providedIn: 'root' })
 export class StatusService {
 
   baseUrl: string
-  companyData: AuthData | null
-  headers: HttpHeaders
+  companyData: CompanyAuthData | null
+  headers: AuthHeaders
 
   constructor(private http: HttpClient, private authService: AuthService) {
-    this.headers = new HttpHeaders()
+    this.headers = { Authorization: '' }
     this.baseUrl = 'http://localhost:8000/status'
 
     this.companyData = this.authService.currentCompany()
 
     if (this.companyData) {
-      this.headers.set(
-        'Authorization', `Bearer ${this.companyData.access_token}`
-      )
+      this.headers = { Authorization: `Bearer ${this.companyData.access_token}` }
     }
 
   }

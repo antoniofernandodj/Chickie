@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from config import settings as s
 from src.infra.database_postgres.repository import Repository
 from src.infra.database_postgres.manager import DatabaseConnectionManager
-from src.schemas import TokenData, Loja
+from src.schemas import Loja
 from src.api.security.scheme import oauth2_scheme
 
 
@@ -22,9 +22,20 @@ async def authenticate_company(
         Optional[Loja]: O objeto da loja autenticada ou
         None se a autenticação falhar.
     """
+
+    def only_numbers(string: str | None) -> str | None:
+        if string is None:
+            return None
+
+        return ''.join([n for n in string if n.isdecimal()])
+
     async with DatabaseConnectionManager() as connection:
         loja_repo = Repository(Loja, connection=connection)
-        loja = await loja_repo.find_one(username=username)
+        l1 = await loja_repo.find_one(username=username)
+        l2 = await loja_repo.find_one(email=username)
+        l3 = await loja_repo.find_one(celular=only_numbers(username))
+
+        loja = l1 or l2 or l3
 
         if loja is None or not isinstance(loja, Loja):
             return None
@@ -50,13 +61,11 @@ async def current_company(
     Raises:
         HTTPException: Se a autenticação falhar.
     """
-    print('veio aqui')
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    print({'token': token})
     try:
         payload = jwt.decode(
             token, s.SECRET_KEY, algorithms=[s.AUTH_ALGORITHM]
@@ -64,13 +73,12 @@ async def current_company(
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
 
     async with DatabaseConnectionManager() as connection:
         loja_repo = Repository(Loja, connection=connection)
-        loja = await loja_repo.find_one(username=token_data.username)
+        loja = await loja_repo.find_one(username=username)
 
     if loja is None or not isinstance(loja, Loja):
         raise credentials_exception

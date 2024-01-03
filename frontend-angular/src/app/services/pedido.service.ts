@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService, AuthData } from './auth.service';
+import { CompanyAuthData, AuthService } from './auth.service';
 
 
 export type Endereco = {
@@ -45,22 +45,22 @@ type PedidoBodyResponse = {
 export class PedidoService {
 
   baseUrl: string
-  company: AuthData | null
+  companyData: CompanyAuthData | null
   token: string
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.baseUrl = 'http://localhost:8000/pedidos'
-    this.company = authService.currentCompany()
+    this.companyData = authService.currentCompany()
     this.token = ''
   }
 
   getOne(uuid: string) {
-    this.company = this.authService.currentCompany()
-    if (!this.company) {
+    this.companyData = this.authService.currentCompany()
+    if (!this.companyData) {
       let msg = 'Dados de empresa não encontrados'
       alert(msg); throw new Error(msg)
     }
-    let headers = { Authorization: `Bearer ${this.company.access_token}` }
+    let headers = { Authorization: `Bearer ${this.companyData.access_token}` }
     console.log({headers: headers})
 
     let observable = this.http.get(
@@ -71,13 +71,13 @@ export class PedidoService {
   }
 
   getAll(companyUUID: string):Observable<Object> {
-    this.company = this.authService.currentCompany()
-    if (!this.company) {
+    this.companyData = this.authService.currentCompany()
+    if (!this.companyData) {
       let msg = 'Dados de empresa não encontrados'
       alert(msg); throw new Error(msg)
     }
 
-    let token = this.company.access_token
+    let token = this.companyData.access_token
     let headers = { Authorization: `Bearer ${token}` }
     let params = new HttpParams().set('loja_uuid', companyUUID)
 

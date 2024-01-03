@@ -5,7 +5,7 @@ from src.infra.database_postgres.entities import Base
 
 class Fornecedor(Base):
     __tablename__ = "fornecedores"
-    uuid = Col(String(36), unique=True, primary_key=True)
+    uuid = Col(String(36), unique=True, primary_key=True, nullable=False)
     nome = Col(Text, nullable=False)
     username = Col(Text, nullable=False, unique=True)
     email = Col(Text, nullable=False, unique=True)

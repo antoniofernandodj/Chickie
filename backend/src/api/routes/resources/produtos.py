@@ -1,4 +1,5 @@
 from typing import Annotated, Optional, List, Dict
+from src.infra.database_postgres.repository import Repository
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,9 +8,10 @@ from fastapi import (  # noqa
     Path,
     Query,
 )
-from src.schemas import Produto
+from src.schemas import Produto, ProdutoGET, Preco
 from src.dependencies import (
     produto_repository_dependency,
+    connection_dependency,
     current_company
 )
 
@@ -20,9 +22,10 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 @router.get("/")
 async def requisitar_produtos(
     repository: produto_repository_dependency,
+    connection: connection_dependency,
     loja_uuid: Optional[str] = Query(None),
     categoria_uuid: Optional[str] = Query(None)
-) -> List[Produto]:
+) -> List[ProdutoGET]:
 
     """
     Requisita os produtos cadastrados na plataforma.
@@ -36,22 +39,40 @@ async def requisitar_produtos(
     Returns:
         list[Produto]
     """
+    preco_repository = Repository(Preco, connection=connection)
+
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
     if categoria_uuid is not None:
         kwargs["categoria_uuid"] = categoria_uuid
 
-    results: List[Produto] = await repository.find_all(**kwargs)
+    response = []
+    produtos: List[Produto] = await repository.find_all(**kwargs)
+    for produto in produtos:
+        precos: List[Preco] = await preco_repository.find_all(
+            produto_uuid=produto.uuid
+        )
 
-    return results
+        response.append(ProdutoGET(
+            uuid=produto.uuid,
+            nome=produto.nome,
+            descricao=produto.nome,
+            preco=produto.preco,
+            categoria_uuid=produto.categoria_uuid,
+            loja_uuid=produto.loja_uuid,
+            precos=precos
+        ))
+
+    return response
 
 
 @router.get("/{uuid}")
 async def requisitar_produto(
+    connection: connection_dependency,
     repository: produto_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
-) -> Produto:
+) -> ProdutoGET:
 
     """
     Busca um produto pelo seu uuid.
@@ -65,11 +86,24 @@ async def requisitar_produto(
     Raises:
         HTTPException: Se o produto não for encontrado.
     """
+    preco_repository = Repository(Preco, connection=connection)
+
     produto: Optional[Produto] = await repository.find_one(uuid=uuid)
     if produto is None:
         raise NotFoundException("Produto não encontrado")
 
-    return produto
+    precos: List[Preco] = await preco_repository.find_all(
+        produto_uuid=produto.uuid
+    )
+
+    return ProdutoGET(
+        nome=produto.nome,
+        descricao=produto.nome,
+        preco=produto.preco,
+        categoria_uuid=produto.categoria_uuid,
+        loja_uuid=produto.loja_uuid,
+        precos=precos
+    )
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)

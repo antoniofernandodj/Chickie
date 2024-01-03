@@ -15,9 +15,12 @@ class Pedido(BaseModel):
     endereco_uuid: str
     frete: float
     celular: str
+    email: str
 
     status_uuid: Optional[str] = None
     uuid: Optional[str] = None
+    comentarios: Optional[str] = None
+    concluído: Optional[bool] = False
 
     model_config = {
         'json_schema_extra': {
@@ -52,6 +55,9 @@ class PedidoItens(BaseModel):
     endereco_uuid: Optional[str] = None
     endereco: Optional[Endereco] = None
     itens_pedido: List[ItemPedido] = []
+    comentarios: Optional[str] = None
+    concluído: Optional[bool] = False
+    email: str
 
     class Config:
         json_schema_extra = {
@@ -61,6 +67,7 @@ class PedidoItens(BaseModel):
                 'frete': 12.75,
                 'loja_uuid': '7613fa2f-8cde-4c66-bbb3-511a63546c9b',
                 'endereco_uuid': '8077977c-c5d2-4660-af39-5a15d5f3d565',
+                'comentarios': 'Molho extra no frango',
                 'itens_pedido': [
                     {
                         'quantidade': 2,

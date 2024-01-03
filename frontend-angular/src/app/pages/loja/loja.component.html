@@ -1,8 +1,16 @@
-<p>loja works!</p>
+<a [routerLink]="['/user/home']" routerLinkActive="router-link-active" >
+  Lojas
+</a>
 
-Nome: {{ loja?.nome }} <br /><br />
+<hr />
 
-Email: {{ loja?.email }}
+<div>
+  Nome: {{ loja?.nome }}
+</div>
+
+<div>
+  Email: {{ loja?.email }}
+</div>
 
 
 <h3>Pedido</h3>

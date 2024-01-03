@@ -4,6 +4,8 @@ import psycopg2   # noqa
 from psycopg2 import sql   # noqa
 from typing import Optional
 from asyncio import Lock   # noqa
+import traceback
+import logging
 
 
 class DatabaseConnectionManager:
@@ -70,13 +72,25 @@ class DatabaseConnectionManager:
         self.connection = await self.pool.acquire()
         return self.connection
 
-    async def __aexit__(self, exception_type, exception_value, traceback):
+    async def __aexit__(
+        self,
+        exception_type,
+        exception_value,
+        traceback_object
+    ):
         self.connection.close()
         self.pool.close()
-        if exception_type and exception_value and traceback:
-            print({"exception_type": exception_type})
-            print({"exception_value": exception_value})
-            print(traceback)
+
+        if exception_type is not None:
+            print(traceback.print_tb(traceback_object))
+            logging.exception(
+                "Exception occurred",
+                exc_info=(
+                    exception_type,
+                    exception_value,
+                    traceback_object
+                )
+            )
 
     @classmethod
     async def create_database(cls, name):

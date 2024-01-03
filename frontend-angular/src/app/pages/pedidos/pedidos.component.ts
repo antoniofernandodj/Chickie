@@ -3,7 +3,7 @@ import { PedidoService } from '../../services/pedido.service';
 import { ProdutoService } from '../../services/produto.service';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { AuthData, AuthService } from '../../services/auth.service';
+import { CompanyAuthData, AuthService } from '../../services/auth.service';
 import { ProdutoResponse } from '../../models/produto';
 import { StatusService } from '../../services/status.service';
 import { StatusResponse } from '../../models/status';
@@ -54,7 +54,7 @@ export class PedidosComponent {
 
   pedidoUUID: string | null
   pedidos: BehaviorSubject<Array<Pedido>>
-  companyData: AuthData | null
+  companyData: CompanyAuthData | null
   statusList: Array<StatusResponse>
 
   constructor(
@@ -78,7 +78,7 @@ export class PedidosComponent {
         alert(msg); throw new Error(msg)
       }
 
-      this.statusService.getAll(this.companyData.uuid).subscribe({
+      this.statusService.getAll(this.companyData.loja.uuid).subscribe({
         next: (response) => {
           if (Array.isArray(response)) {
             this.statusList.push(...response)
@@ -89,7 +89,7 @@ export class PedidosComponent {
         }
       })
 
-      this.pedidoService.getAll(this.companyData.uuid).subscribe({
+      this.pedidoService.getAll(this.companyData.loja.uuid).subscribe({
         next: (response: any) => {
           this.pedidos.next(response)
           this.fetchProducts()

@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from . import (
+    avaliacoes_de_lojas,
     pedidos,
     precos,
     produtos,
@@ -7,7 +8,6 @@ from . import (
     enderecos,
     avaliacoes_de_produtos,
     entregadores,
-    feedbacks,
     funcionarios,
     metodos_de_pagamento,
     pagamentos,
@@ -22,9 +22,9 @@ router.include_router(precos.router)
 router.include_router(produtos.router)
 router.include_router(categorias.router)
 router.include_router(enderecos.router)
-router.include_router(avaliacoes_de_produtos.router)
 router.include_router(entregadores.router)
-router.include_router(feedbacks.router)
+router.include_router(avaliacoes_de_lojas.router)
+router.include_router(avaliacoes_de_produtos.router)
 router.include_router(funcionarios.router)
 router.include_router(metodos_de_pagamento.router)
 router.include_router(pagamentos.router)

@@ -1,0 +1,197 @@
+feitos -> {
+    loja: Atualizar imagem de perfil -> {
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: X
+    }
+}
+
+loja: Alteração de status de pedido -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: Ajustar pedido para concluido -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+usuario: avaliação de loja -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: avaliação de produto -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+loja: loja cadastrar usuario -> {
+    MODELS: X
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+admin: inativar loja -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: adicionar comentarios a um pedido -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: Atualizar configuracoes de conta -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+loja: Atualizar configuracoes de conta -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: pedido precisa de email -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: Cadastro de imagem para os produtos -> {
+    SERVICE: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+admin: excluir loja -> {
+    MODELS: x
+    BANCO / MIGRACAO:
+    ENDPONTS: x
+    FRONTEND:
+}
+
+loja: horarios de funcionamento -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+admin: excluir user -> {
+    MODELS: x
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: sistema para esqueci a senha -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+usuario: sistema para esqueci a senha -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+usuario: definir a senha no primeiro acesso caso tenha sido importado ou cadastrado pela empresa -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+usuario: buscar loja por localização -> {
+    criar tabela EnderecoDeLoja  X
+    criar tabela EnderecoDeUsuario X
+    criar tabela EnderecoDePedido X
+    ENDPOINTS / QUERIES:
+}
+
+usuario: buscar loja por avaliação -> {
+    ** qual a forma mais rapida de checar a avaliação media de uma empresa,
+    dado que há uma tabela Avaliações e que nela há uma coluna nota? -> {
+        SELECT AVG(nota) AS media_avaliacao
+        FROM Avaliacoes
+        WHERE id_empresa = 'ID_DA_EMPRESA';
+    },
+    ** qual a forma mais rapida de checar empresas com
+    avaliação media maior que nota 4, dado que há uma
+    tabela Avaliações e que nela há uma coluna nota? -> {
+        SELECT empresa_id, AVG(nota) AS media_avaliacao
+        FROM Avaliacoes
+        GROUP BY empresa_id
+        HAVING AVG(nota) > 4;
+    }
+} -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+usuario: listar pedidos -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+
+usuario: corrigir logica de aplicação de descontos -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+}
+
+loja: exibir historico -> {
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+loja: notificação de promoções -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: sistemas de ticket / suporte ao cliente -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}
+
+eu: pesquisar api para pagamento -> {
+    MODELS:
+    BANCO / MIGRACAO:
+    ENDPONTS:
+    FRONTEND:
+}

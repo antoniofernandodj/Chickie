@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CategoriaService } from '../../services/categoria.service';
 import { CategoriaBodyRequest, CategoriaResponse } from '../../models/categoria';
-import { AuthData, AuthService } from '../../services/auth.service';
+import { CompanyAuthData, AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class CadastroCategoriaComponent {
 
-  company: AuthData | null
+  companyData: CompanyAuthData | null
   categorias: BehaviorSubject<Array<CategoriaResponse>>
   descricaoValue: string
   nomeValue: string
@@ -26,14 +26,14 @@ export class CadastroCategoriaComponent {
   constructor (private service: CategoriaService, authService: AuthService) {
     this.descricaoValue = ''
     this.nomeValue = ''
-    this.company = authService.currentCompany()
+    this.companyData = authService.currentCompany()
     this.categorias = new BehaviorSubject<Array<CategoriaResponse>>([])
   }
 
   ngOnInit() {
-    if (this.company) {
-      console.log(this.company)
-      this.service.getAll(this.company.uuid).subscribe({
+    if (this.companyData) {
+      console.log(this.companyData)
+      this.service.getAll(this.companyData.loja.uuid).subscribe({
         next: (response: Object) => {
           if (Array.isArray(response)) {
             this.categorias.next(response)
@@ -47,14 +47,14 @@ export class CadastroCategoriaComponent {
   }
 
   registerCategoria() {
-    if (!this.company) {
+    if (!this.companyData) {
       alert('Nenhuma empresa logada!')
       throw new Error('Nenhuma empresa logada!')
     }
 
     let body = {
       descricao: this.descricaoValue,
-      loja_uuid: this.company.uuid,
+      loja_uuid: this.companyData.loja.uuid,
       nome: this.nomeValue
     }
 

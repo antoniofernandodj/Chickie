@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
 import { ProdutoBodyRequest, ProdutoResponse } from '../../models/produto';
 import { ActivatedRoute } from '@angular/router';
-import { AuthData, AuthService } from '../../services/auth.service';
+import { CompanyAuthData, AuthService } from '../../services/auth.service';
 import { ProdutoService } from '../../services/produto.service';
 import { CategoriaService } from '../../services/categoria.service';
 import { CategoriaResponse, CategoriaBodyRequest } from '../../models/categoria';
 import { BehaviorSubject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Response201Wrapper } from '../../models/wrapper';
+import { RouterModule } from '@angular/router';
+
 
 @Component({
   selector: 'app-cadastro-produto',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './cadastro-produto.component.html',
   styleUrl: './cadastro-produto.component.sass'
 })
@@ -25,7 +27,7 @@ export class CadastroProdutoComponent {
 
   companyProducts: BehaviorSubject<Array<ProdutoResponse>>
   companyCategorias: BehaviorSubject<Array<CategoriaResponse>>
-  companyData: AuthData | null
+  companyData: CompanyAuthData | null
   companyUUID: string | null
 
   constructor(
@@ -55,7 +57,7 @@ export class CadastroProdutoComponent {
       alert(msg); throw new Error(msg)
     }
 
-    this.produtoService.getAll(this.companyData.uuid).subscribe({
+    this.produtoService.getAll(this.companyData.loja.uuid).subscribe({
       next: (response) => {
         if (Array.isArray(response)) {
           this.companyProducts.next(response)
@@ -96,7 +98,7 @@ export class CadastroProdutoComponent {
       alert('Dados da empresa não encontrados!')
       throw new Error('Dados da empresa não encontrados!')
     }
-    this.categoriaService.getAll(this.companyData.uuid).subscribe({
+    this.categoriaService.getAll(this.companyData.loja.uuid).subscribe({
       next: (response) => {
         if (Array.isArray(response)) {
           this.companyCategorias.next(response)
@@ -139,7 +141,7 @@ export class CadastroProdutoComponent {
     }
 
     let body = {
-      loja_uuid: this.companyData.uuid,
+      loja_uuid: this.companyData.loja.uuid,
       categoria_uuid: this.categoriaValue,
       nome: this.nomeValue,
       descricao: this.descricaoValue,

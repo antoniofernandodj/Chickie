@@ -24,7 +24,11 @@
       para se inscrever
     </div>
   </div>
-  <button (click)="doCompanyLogin()">Login</button>
+  @if (!companyLoginStart) {
+    <button (click)="doCompanyLogin()">Login</button>
+  } @else {
+    <div>Logando...</div>
+  }
 </div>
 
 <div>
@@ -53,5 +57,9 @@
     <a routerLink="/signup/user">Clique aqui</a>
     para se inscrever
   </div>
-  <button (click)="doUserLogin()">Login</button>
+  @if (!userLoginStart) {
+    <button (click)="doUserLogin()">Login</button>
+  } @else {
+    <div>Logando...</div>
+  }
 </div>

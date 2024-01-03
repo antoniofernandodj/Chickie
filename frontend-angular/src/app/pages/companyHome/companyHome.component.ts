@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService, AuthData } from '../../services/auth.service';
+import { AuthService, CompanyAuthData } from '../../services/auth.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -10,10 +10,18 @@ import { BehaviorSubject } from 'rxjs';
   styleUrl: './companyHome.component.sass'
 })
 export class CompanyHomeComponent {
-  companyData: BehaviorSubject<AuthData | null>
+  companyData: BehaviorSubject<CompanyAuthData | null>
+  imageBase64String: string
 
   constructor (private authService: AuthService) {
+    this.imageBase64String = '';
     this.companyData = this.authService.companyData
+    if (this.companyData.value) {
+      this.imageBase64String = this.companyData.value.loja.imagem_cadastro
+      console.log({'this.companyData': this.companyData.value})
+    }
+
   }
+
 
 }

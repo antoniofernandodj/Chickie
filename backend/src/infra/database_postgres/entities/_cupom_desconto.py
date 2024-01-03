@@ -12,7 +12,7 @@ from sqlalchemy import (
 
 class CupomDesconto(Base):
     __tablename__ = "cupons_desconto"
-    uuid = Col(String(36), unique=True, primary_key=True)
+    uuid = Col(String(36), unique=True, primary_key=True, nullable=False)
     codigo = Col(String(20), unique=True, nullable=False)
     descricao = Col(Text)
     valor_desconto = Col(Float, nullable=False)

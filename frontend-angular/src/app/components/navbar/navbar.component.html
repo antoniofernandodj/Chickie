@@ -1,7 +1,5 @@
 <nav>
-  isLoginPage: {{ isLoginPage.value }}
-  User Logged in: {{ userIsLoggedIn.value }}
-  Company Logged in: {{ companyIsLoggedIn.value}}
+
   <ul>
     @if (companyIsLoggedIn.value) {
       <li><a routerLink="loja/home">Home</a></li>
@@ -9,6 +7,7 @@
       <li><a routerLink="loja/categorias">Categorias</a></li>
       <li><a routerLink="loja/pedidos">Pedidos</a></li>
       <li><a routerLink="loja/status">Status</a></li>
+      <li><a routerLink="loja/settings">Configuração de conta</a></li>
     }
 
     @if (!userIsLoggedIn.value && !companyIsLoggedIn.value) {

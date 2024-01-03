@@ -1,16 +1,29 @@
 @if (companyData.value) {
+  <h3>
+    {{ companyData.value.loja.nome }}
+  </h3>
+
   <div>
-    {{ companyData.value.nome }},
+    <strong>Email</strong>: {{ companyData.value.loja.email }}
   </div>
 
   <div>
-    email: {{ companyData.value.email }}
+    <strong>Username</strong>: {{ companyData.value.loja.username }}
   </div>
 
   <div>
-    username: {{ companyData.value.username }}
+    <strong>UUID:</strong> {{ companyData.value.loja.uuid }}
   </div>
+
+  <strong>Imagem Cadastro</strong>
+  <div>
+    <img
+      width="400px"
+      [src]="imageBase64String"
+      alt="Imagem de cadastro" />
+
+  </div>
+
 } @else {
   <strong>Loading...</strong>
 }
-

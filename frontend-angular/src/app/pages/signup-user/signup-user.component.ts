@@ -68,7 +68,9 @@ export class SignupUserComponent {
       complemento: this.complementoValue,
       logradouro: this.logradouroValue,
       numero: this.numeroValue,
-      uf: this.ufValue
+      uf: this.ufValue,
+
+      modo_de_cadastro: 'auto_cadastro'
 
     }
 

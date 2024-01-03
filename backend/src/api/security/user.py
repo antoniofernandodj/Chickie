@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from config import settings as s
 from src.infra.database_postgres.repository import Repository
 from src.infra.database_postgres.manager import DatabaseConnectionManager
-from src.schemas import TokenData, Usuario
+from src.schemas import Usuario
 from src.api.security.scheme import oauth2_scheme
 
 
@@ -22,9 +22,19 @@ async def authenticate_user(
         Optional[Usuario]: O objeto do usuário autenticado
         ou None se a autenticação falhar.
     """
+    def only_numbers(string: str | None) -> str | None:
+        if string is None:
+            return None
+
+        return ''.join([n for n in string if n.isdecimal()])
+
     async with DatabaseConnectionManager() as connection:
         user_repo = Repository(Usuario, connection=connection)
-        user = await user_repo.find_one(username=username)
+        u1 = await user_repo.find_one(username=username)
+        u2 = await user_repo.find_one(email=username)
+        u3 = await user_repo.find_one(celular=only_numbers(username))
+
+        user = u1 or u2 or u3
 
         if user is None or not isinstance(user, Usuario):
             return None
@@ -62,13 +72,12 @@ async def current_user(
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
 
     async with DatabaseConnectionManager() as connection:
         user_repo = Repository(Usuario, connection=connection)
-        user = await user_repo.find_one(username=token_data.username)
+        user = await user_repo.find_one(username=username)
 
     if user is None or not isinstance(user, Usuario):
         raise credentials_exception

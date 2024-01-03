@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
-import { AuthService, AuthData } from '../../services/auth.service';
+import { AuthService, CompanyAuthData, AuthData } from '../../services/auth.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -12,7 +12,7 @@ import { BehaviorSubject } from 'rxjs';
   styleUrl: './navbar.component.sass'
 })
 export class NavbarComponent {
-  companyData: BehaviorSubject<AuthData | null>
+  companyData: BehaviorSubject<CompanyAuthData | null>
   userData: BehaviorSubject<AuthData | null>
   userIsLoggedIn: BehaviorSubject<boolean>;
   companyIsLoggedIn: BehaviorSubject<boolean>;

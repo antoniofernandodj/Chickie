@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { PedidoService } from '../../services/pedido.service';
 import { NgxMaskDirective } from 'ngx-mask';
+import { RouterModule } from '@angular/router';
 
 
 
@@ -46,7 +47,7 @@ export type ItemPedido = {
 @Component({
   selector: 'app-loja',
   standalone: true,
-  imports: [FormsModule, NgxMaskDirective],
+  imports: [FormsModule, NgxMaskDirective, RouterModule],
   templateUrl: './loja.component.html',
   styleUrl: './loja.component.sass'
 })

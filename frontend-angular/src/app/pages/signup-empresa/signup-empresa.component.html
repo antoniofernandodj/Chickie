@@ -1,5 +1,47 @@
 <div>Sign up Empresa</div>
 <div>
+  <h3>Endereço</h3>
+  <div>
+    UF
+    <select [(ngModel)]="ufValue">
+      @for (uf of ufs; track $index) {
+        <option [value]="uf">{{ uf }}</option>
+      }
+    </select>
+  </div>
+
+    <div>
+      cep
+      <input type="text" [(ngModel)]="cepValue" mask="00000-000">
+    </div>
+
+    <div>
+      cidade
+      <input type="text" [(ngModel)]="cidadeValue">
+    </div>
+
+    <div>
+      logradouro
+      <input type="text" [(ngModel)]="logradouroValue">
+    </div>
+
+    <div>
+      bairro
+      <input type="text" [(ngModel)]="bairroValue">
+    </div>
+
+    <div>
+      numero
+      <input type="text" [(ngModel)]="numeroValue">
+    </div>
+
+    <div>
+      complemento
+      <input type="text" [(ngModel)]="complementoValue">
+    </div>
+
+    <hr />
+
     <div>
       Nome
       <input type="text" [(ngModel)]="nomeValue">
@@ -7,17 +49,17 @@
 
     <div>
       E-mail
-      <input type="text" [(ngModel)]="emailValue">
+      <input type="email" [(ngModel)]="emailValue">
     </div>
 
     <div>
       Telefone
-      <input type="text" [(ngModel)]="telefoneValue">
+      <input type="text" [(ngModel)]="telefoneValue" mask="(00) 0000-0000">
     </div>
 
     <div>
       celular
-      <input type="text" [(ngModel)]="celularValue">
+      <input type="text" [(ngModel)]="celularValue" mask="(00) 0 0000-0000">
     </div>
 
     <div>
@@ -38,5 +80,20 @@
     <div>
       <button (click)="doSignUp()">Cadastrar</button>
     </div>
+
+    <form [formGroup]="imageForm">
+      <input type="file" (change)="onFileSelected($event)" accept="image/*">
+    </form>
+
+    <div>
+      @if (selectedImage) {
+        <p>Bytes da imagem:</p>
+        <hr>
+        <p>{{ imageBytesBase64 }}</p>
+        <hr>
+        <img [src]="selectedImage" alt="Imagem selecionada">
+      }
+    </div>
+
 
 </div>

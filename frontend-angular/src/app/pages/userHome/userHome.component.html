@@ -14,3 +14,39 @@
 } @else {
   <strong>Loading...</strong>
 }
+
+<h2>Lojas</h2>
+
+@if (lojas.value.length) {
+  <div>
+    @for (loja of lojas.value; track $index) {
+      <div>
+        <div>
+          <a [routerLink]="['/l/', loja.uuid]">
+              Loja: {{ loja.nome }}
+          </a>
+        </div>
+        <div>
+          Telefone: {{ loja.telefone }}
+        </div>
+        <div>
+          email: {{ loja.email }}
+        </div>
+        <div>
+          celular: {{ loja.celular }}
+        </div>
+
+        @if (loja.imagem_cadastro) {
+          <img
+            width="400px"
+            [src]="loja.imagem_cadastro"
+            alt="Imagem loja"
+          >
+        }
+      </div>
+      <hr />
+    }
+  </div>
+} @else {
+  Carregando...
+}

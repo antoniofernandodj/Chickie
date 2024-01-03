@@ -1,13 +1,13 @@
 from src.infra.database_postgres.entities import Base
 from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from datetime import datetime
-from sqlalchemy.types import Float, String as Str, DateTime
+from sqlalchemy.types import Float, String as Str, DateTime, Text, Boolean
 
 
 class Pedido(Base):
     __tablename__ = "pedidos"
 
-    uuid = Col(Str(36), primary_key=True, unique=True)
+    uuid = Col(Str(36), primary_key=True, unique=True, nullable=False)
     data_hora = Col(DateTime, default=datetime.utcnow)
     status_uuid = Col(Str(36), FK("status.uuid"), nullable=True)
     frete = Col(Float, nullable=False)
@@ -15,6 +15,9 @@ class Pedido(Base):
     celular = Col(Str(20), nullable=False)
     endereco_uuid = Col(Str(36), FK("enderecos.uuid"), nullable=False)
     usuario_uuid = Col(Str(36), FK("usuarios.uuid"), nullable=True)
+    comentarios = Col(Text, nullable=True)
+    concluido = Col(Boolean, nullable=True, default=False)
+    email = Col(Text, nullable=False)
 
     # @property
     # def total(self):

@@ -1,0 +1,17 @@
+<p>loja-settings works!</p>
+
+
+    <form [formGroup]="imageForm">
+      <input type="file" (change)="onFileSelected($event)" accept="image/*">
+    </form>
+
+    <div>
+      @if (file.bytes_base64) {
+        <img [src]="file.bytes_base64" alt="Imagem selecionada" width="350px">
+      }
+    </div>
+    @if (!this.atualizandoImagem) {
+      <button (click)="uploadImage()">Atualizar Imagem</button>
+    } @else {
+      <strong>Atualizando a imagem de cadastro...</strong>
+    }

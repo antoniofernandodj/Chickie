@@ -3,12 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 
+export type atualizarImagemCadastroRequest = {
+  bytes_base64: string,
+  filename: string
+}
+
+
 @Injectable({ providedIn: 'root' })
 export class LojaService {
 
   baseUrl: string
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+  ) {
     this.baseUrl = 'http://localhost:8000/loja'
   }
 
@@ -19,6 +27,16 @@ export class LojaService {
 
   getAll():Observable<Object> {
     let observable = this.http.get(this.baseUrl)
+    return observable
+  }
+
+  atualizarImagemCadastro(body: atualizarImagemCadastroRequest, companyData: any) {
+    let observable = this.http.patch(
+      this.baseUrl.concat(`/atualizar_img_cadastro`), body, {
+        headers: { Authorization: `Bearer ${companyData?.access_token}`
+      }
+    })
+
     return observable
   }
 }

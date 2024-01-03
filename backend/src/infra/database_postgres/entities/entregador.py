@@ -5,7 +5,7 @@ from sqlalchemy.types import Text
 
 class Entregador(Base):
     __tablename__ = "entregadores"
-    uuid = Col(String(36), unique=True, primary_key=True)
+    uuid = Col(String(36), unique=True, primary_key=True, nullable=False)
     nome = Col(Text, unique=True, nullable=False)
     telefone = Col(Text)
     email = Col(Text)

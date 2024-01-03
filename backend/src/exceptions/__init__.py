@@ -6,6 +6,10 @@ class InvalidPasswordException(Exception):
     ...
 
 
+class LojaJaCadastradaException(Exception):
+    ...
+
+
 class NotFoundException(HTTPException):
     def __init__(
         self,

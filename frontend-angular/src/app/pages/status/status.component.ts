@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { StatusService } from '../../services/status.service';
 import { StatusBodyRequest, StatusResponse } from '../../models/status';
 import { BehaviorSubject } from 'rxjs';
-import { AuthService, AuthData } from '../../services/auth.service';
+import { AuthService, CompanyAuthData } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Response201Wrapper } from '../../models/wrapper';
 
@@ -16,38 +16,52 @@ import { Response201Wrapper } from '../../models/wrapper';
 })
 export class StatusComponent {
 
-  companyData: AuthData | null
+  companyData: CompanyAuthData | null
   statusList: BehaviorSubject<Array<StatusResponse>>
   descricaoValue: string
   nomeValue: string
+  saving: boolean
+  fetching: boolean
 
   constructor(private statusService: StatusService, private authService: AuthService) {
+    this.saving = false
+    this.fetching = false
     this.descricaoValue = ''
     this.nomeValue = ''
     this.companyData = authService.currentCompany();
     this.statusList = new BehaviorSubject<Array<StatusResponse>>([])
+  }
+
+  ngOnInit(): void {
+    this.fetching = true
     if (this.companyData === null) {
-      throw new Error('Dados da empresa não encontrados!')
+      let msg = 'Dados da empresa não encontrados!'
+      alert(msg); throw new Error(msg)
     }
-    statusService.getAll(this.companyData.uuid).subscribe({
+    this.statusService.getAll(this.companyData.loja.uuid).subscribe({
       next: (response) => {
         if (Array.isArray(response)) {
           this.statusList.value.push(...response)
         }
+        this.fetching = false
       },
       error: (response) => {
         throw new Error('Erro na requisição dos dados')
       }
     })
+
   }
 
-  cadastrarStatus() {
-    if (this.companyData === null) {
-      throw new Error('Dados da empresa não encontrados!')
+  public cadastrarStatus(): void {
+    this.saving = true
+    if (!this.companyData) {
+      this.saving = false
+      let msg = 'Dados da empresa não encontrados!'
+      alert(msg); throw new Error(msg)
     }
 
     let body = {
-      loja_uuid: this.companyData.uuid,
+      loja_uuid: this.companyData.loja.uuid,
       descricao: this.descricaoValue,
       nome: this.nomeValue
     }
@@ -55,15 +69,28 @@ export class StatusComponent {
     this.statusService.save(body).subscribe({
       next: (response) => {
         let r = new Response201Wrapper(response)
-        let newItem = {...body, uuid: r.uuid}
-        this.statusList.value.push(newItem)
+        let newStatusItem = {...body, uuid: r.uuid}
+        this.statusList.value.push(newStatusItem)
         alert('Item cadastrado com sucesso!')
+        this.saving = false
       },
-      error: (response) => {}
+      error: (response) => {
+        this.saving = false
+        let msg = 'Erro no cadastro do item';
+        alert(msg); throw new Error(msg)
+      }
     })
   }
 
-  deletarStatus(status: StatusResponse) {
+  public deletarStatus(event: Event, status: StatusResponse): void {
+
+    let button = event.target as HTMLButtonElement
+
+    let initialHTML = button.innerHTML
+
+    button.disabled = true
+    button.innerHTML = 'Removendo...'
+
     this.statusService.delete(status).subscribe({
       next: (response) => {
         let newList = this.statusList.value
@@ -74,6 +101,10 @@ export class StatusComponent {
       },
       error: (response) => {
         let msg = 'Erro na remoção do item';
+
+        button.disabled = false
+        button.innerHTML = initialHTML
+
         alert(msg); throw new Error(msg)
       }
     })

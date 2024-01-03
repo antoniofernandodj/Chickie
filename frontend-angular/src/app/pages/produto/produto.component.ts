@@ -1,17 +1,73 @@
 import { Component } from '@angular/core';
 import { PrecoService } from '../../services/preco.service';
 import { ActivatedRoute } from '@angular/router';
-import { AuthService, AuthData } from '../../services/auth.service';
+import { AuthService, CompanyAuthData } from '../../services/auth.service';
 import { BehaviorSubject } from 'rxjs';
-import { Response201Wrapper } from '../../models/wrapper';
 import { FormsModule } from '@angular/forms';
 import { ProdutoService } from '../../services/produto.service';
 import { ProdutoResponse } from '../../models/produto';
+import { PrecoResponse } from '../../models/preco';
+
+
+
+
+class Produto {
+
+  produto_uuid: string
+  categoria_uuid: string
+  descricao: string
+  loja_uuid: string
+  nome: string
+  preco: string
+  precos: Array<PrecoResponse>
+
+  constructor(response: any) {
+    this.produto_uuid = response.produto_uuid;
+    this.categoria_uuid = response.categoria_uuid;
+    this.descricao = response.descricao;
+    this.loja_uuid = response.loja_uuid;
+    this.nome = response.nome;
+    this.preco = response.preco;
+    this.precos = response.precos;
+  }
+}
+
 
 type DiaSemana = {
   title: string;
   val: string;
 }
+
+let diasArray = [
+  { title: 'Domingo', val: 'dom' },
+  { title: 'Segunda', val: 'seg' },
+  { title: 'Terça', val: 'ter' },
+  { title: 'Quarta', val: 'qua' },
+  { title: 'Quinta', val: 'qui' },
+  { title: 'Sexta', val: 'sex' },
+  { title: 'Sábado', val: 'sab' }
+]
+
+const getTitle = (dia: string) => {
+  switch (dia) {
+    case 'dom':
+      return 'Domingo';
+    case 'seg':
+      return 'Segunda-feira';
+    case 'ter':
+      return 'Terça-feira';
+    case 'qua':
+      return 'Quarta-feira';
+    case 'qui':
+      return 'Quinta-feira';
+    case 'sex':
+      return 'Sexta-feira';
+    case 'sab':
+      return 'Sábado';
+    default:
+      return 'Dia inválido';
+  }
+};
 
 @Component({
   selector: 'app-produto',
@@ -23,13 +79,14 @@ type DiaSemana = {
 export class ProdutoComponent {
 
   produtoUUID: string
-  produto: ProdutoResponse | any
-  companyData: AuthData | null
-  produtoPrecos: BehaviorSubject<Array<any>>
+  produto: BehaviorSubject<Produto | null>
+  companyData: CompanyAuthData | null
+
   valorValue: number | null
   diaDaSemanaValue: string
-  diasDaSemanaCadastrados: BehaviorSubject<Array<string>>
+  diasDaSemanaCadastrados: BehaviorSubject<Array<DiaSemana>>
   diasDaSemanaDisponiveis: BehaviorSubject<Array<DiaSemana>>
+  saving: boolean
 
   constructor(
     private precoService: PrecoService,
@@ -37,107 +94,95 @@ export class ProdutoComponent {
     private route: ActivatedRoute,
     private authService: AuthService
   ) {
-    this.produto = null
+    this.saving = false
+    this.produto = new BehaviorSubject<Produto | null>(null)
     this.produtoUUID = ''
     this.diaDaSemanaValue = ''
     this.valorValue = null
     this.companyData = this.authService.currentCompany()
-    this.produtoPrecos = new BehaviorSubject<Array<any>>([])
-    this.diasDaSemanaCadastrados = new BehaviorSubject<Array<string>>([])
-    this.diasDaSemanaDisponiveis = new BehaviorSubject<Array<DiaSemana>>([
-      { title: 'Domingo', val: 'dom' },
-      { title: 'Segunda', val: 'seg' },
-      { title: 'Terça', val: 'ter' },
-      { title: 'Quarta', val: 'qua' },
-      { title: 'Quinta', val: 'qui' },
-      { title: 'Sexta', val: 'sex' },
-      { title: 'Sábado', val: 'sab' }
-    ])
+
+    this.diasDaSemanaCadastrados = new BehaviorSubject<Array<DiaSemana>>([])
+    this.diasDaSemanaDisponiveis = new BehaviorSubject<Array<DiaSemana>>([])
   }
+
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.produtoUUID = params['id'];
     });
+    this.updateProdutoPrecos()
+  }
+
+
+  updateProdutoPrecos() {
 
     if (this.companyData) {
-
-      this.precoService.getAll(this.produtoUUID).subscribe({
-        next: (response) => {
-          if (Array.isArray(response)) {
-            let diasDaSemana = response.map(i => i.dia_da_semana)
-            this.diasDaSemanaCadastrados.next(diasDaSemana)
-            let diasDaSemanaDisponiveis = this.diasDaSemanaDisponiveis.getValue()
-            diasDaSemanaDisponiveis = diasDaSemanaDisponiveis.filter(
-              d => !this.diasDaSemanaCadastrados.value.includes(d.val)
-            )
-            this.produtoPrecos.next(response)
-            this.diasDaSemanaDisponiveis.next(diasDaSemanaDisponiveis)
-          }
-        },
-        error: (response) => {
-          alert('Erro na busca pelos preços')
-        }
-      })
-
       this.produtoService.getOne(this.produtoUUID).subscribe({
         next: (response) => {
-          this.produto = response
+          let produto = new Produto(response)
+          this.produto.next(produto)
+
+          let diasDaSemanaCadastrados = produto.precos.map(preco => ({
+              val: preco.dia_da_semana,
+              title: getTitle(preco.dia_da_semana)
+          }))
+
+          this.diasDaSemanaCadastrados.next(diasDaSemanaCadastrados)
+          const arrayDiasCadastrados = diasDaSemanaCadastrados.map(i => i.val)
+
+          this.diasDaSemanaDisponiveis.next([])
+          let newArr = []
+          for (let dia of diasArray) {
+            if (!arrayDiasCadastrados.includes(dia.val)) {
+              newArr.push(dia)
+            }
+          }
+          this.diasDaSemanaDisponiveis.next(newArr)
         },
         error: (response) => {
           alert('Erro na busca pelo produto')
         }
       })
     }
+
+
   }
 
-  removerPreco(preco: any) {
+
+  removerPreco(event: Event, preco: any) {
+    let button  = event.target as HTMLButtonElement
+
+    let initialHTML = button.innerHTML
+
+    button.innerHTML = 'Removendo...'
+    button.disabled = true
+
     this.precoService.delete(preco).subscribe({
       next: (response) => {
         alert('Preço removido com sucesso!');
-        let newArr = this.produtoPrecos.getValue()
-          .filter(i => i.uuid != preco.uuid)
-
-        this.produtoPrecos.next(newArr)
-
-        this.updateDiasDaSemanaCadastradosRemove(preco.dia_da_semana)
-        this.updateDiasDaSemanaDisponiveis()
+        this.updateProdutoPrecos()
       },
       error: (response) => {
+        button.innerHTML = initialHTML
+        button.disabled = false
         alert('Erro ao remover preço de produto')
       }
     })
   }
 
-  updateDiasDaSemanaDisponiveis() {
-    let diasDaSemanaDisponiveis = this.diasDaSemanaDisponiveis.getValue()
-    diasDaSemanaDisponiveis = diasDaSemanaDisponiveis.filter(
-      dia => !this.diasDaSemanaCadastrados.value.includes(dia.val)
-    )
-    this.diasDaSemanaDisponiveis.next(diasDaSemanaDisponiveis)
-  }
-
-  updateDiasDaSemanaCadastradosAdd(dia: string) {
-    let diasDaSemanaCadastrados = this.diasDaSemanaCadastrados.getValue()
-    this.diasDaSemanaCadastrados.next(
-      [...diasDaSemanaCadastrados, dia]
-    )
-  }
-
-  updateDiasDaSemanaCadastradosRemove(dia: string) {
-    let newDiasDaSemanaCadastrados = this.diasDaSemanaCadastrados.getValue()
-    newDiasDaSemanaCadastrados = newDiasDaSemanaCadastrados
-      .filter(item => item != dia)
-
-    this.diasDaSemanaCadastrados.next(newDiasDaSemanaCadastrados)
+  clearInputs() {
+    this.valorValue = null
+    this.diaDaSemanaValue = ''
+    this.saving = false
   }
 
   cadastrarPreco() {
-    let inputs = [this.valorValue, this.diaDaSemanaValue]
-    for (let input of inputs) {
+    this.saving = true
+    for (let input of [this.valorValue, this.diaDaSemanaValue]) {
       if (!input) {
-        alert('É necessário preencher todos os campos!')
-        throw new Error('É necessário preencher todos os campos!')
+        let msg = 'É necessário preencher todos os campos!'
+        this.saving = false
+        alert(msg); throw new Error(msg)
       }
     }
 
@@ -147,19 +192,14 @@ export class ProdutoComponent {
       'produto_uuid': this.produtoUUID
     }
 
-
     this.precoService.save(body).subscribe({
       next: (response) => {
-        let r = new Response201Wrapper(response)
-        this.produtoPrecos.value.push({...body, uuid: r.uuid})
         alert('Preço cadastrado com sucesso!')
-        this.updateDiasDaSemanaCadastradosAdd(this.diaDaSemanaValue)
-        this.updateDiasDaSemanaDisponiveis()
-
-        this.valorValue = null
-        this.diaDaSemanaValue = ''
+        this.updateProdutoPrecos()
+        this.clearInputs()
       },
       error: (response) => {
+        this.saving = false
         alert('Erro no cadasto do preço')
       }
     })

@@ -9,7 +9,9 @@ export type EmpresaSignUpRequest = {
   telefone: string,
   celular: string,
   password: string
-  
+  image_bytes: string | ArrayBuffer
+  image_filename: string
+
 }
 
 export type UserSignUpRequest = {
@@ -27,7 +29,9 @@ export type UserSignUpRequest = {
   complemento: string,
   logradouro: string,
   numero: string,
-  uf: string
+  uf: string,
+
+  modo_de_cadastro: string
 
 }
 
@@ -39,11 +43,11 @@ export class SignupService {
   private userSignupUrl: string
 
   constructor(private http: HttpClient) {
-    this.companySignupUrl = 'http://localhost:8000/loja/signin'
-    this.userSignupUrl = 'http://localhost:8000/user/signin'
+    this.companySignupUrl = 'http://localhost:8000/loja/signup'
+    this.userSignupUrl = 'http://localhost:8000/user/signup'
   }
 
-  doCompanySignUp(body: any) {
+  doCompanySignUp(body: EmpresaSignUpRequest) {
     let obs = this.http.post(this.companySignupUrl, body)
     return obs
   }
