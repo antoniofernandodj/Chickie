@@ -14,7 +14,6 @@ from src.dependencies import (
 )
 from src.dependencies import (  # noqa
     loja_repository_dependency,
-    endereco_repository_dependency,
     connection_dependency
 )
 from fastapi import HTTPException, status, Path, Response
@@ -27,11 +26,16 @@ from src.schemas import (
     EnderecoLoja as Endereco,  # noqa
     LojaToken,
     Loja,
+    Produto,
     LojaGETResponse,
+    ProdutoGET,
     LojaUpdateImageCadastro,
     UsuarioFollowEmpresaRequest
 )
-from src.services import ImageUploadService
+from src.services import (
+    ImageUploadService,
+    ProdutoService
+)
 
 
 from typing import Annotated
@@ -337,6 +341,58 @@ async def signup(
     return {"uuid": loja_cadastrada.uuid}
 
 
+@router.get("/{loja_uuid}/produtos")
+async def requisitar_produtos_de_loja(
+    connection: connection_dependency,
+    loja_uuid: str,
+    categoria_uuid: str
+) -> List[ProdutoGET]:
+
+    """
+    Requisita os produtos de uma loja específica
+    cadastrados na plataforma.
+    Aceita um uuid como query para buscar os
+    produtos de uma empresa específica
+
+    Args:
+        loja_uuid (Optional[str]): O uuid da empresa,
+        caso necessário
+
+    Returns:
+        list[Produto]
+    """
+    loja_repository = Repository(Loja, connection=connection)
+    produto_repository = Repository(Produto, connection=connection)
+    loja: Optional[Loja] = await loja_repository.find_one(
+        uuid=loja_uuid
+    )
+    if loja is None:
+        raise NotFoundException('Loja de produto não encontrada!')
+    produto_service = ProdutoService(connection=connection, loja=loja)
+
+    kwargs = {}
+    if categoria_uuid is not None:
+        kwargs["categoria_uuid"] = categoria_uuid
+
+    response = []
+    produtos: List[Produto] = await produto_repository.find_all(**kwargs)
+    for produto in produtos:
+        precos = await produto_service.get_precos(produto)
+        image_url = await produto_service.get_public_url_image(produto)
+        response_item = ProdutoGET(
+            uuid=produto.uuid,
+            nome=produto.nome,
+            descricao=produto.nome,
+            preco=produto.preco,
+            categoria_uuid=produto.categoria_uuid,
+            loja_uuid=produto.loja_uuid,
+            precos=precos,
+            image_url=image_url
+        )
+        response.append(response_item)
+    return response
+
+
 @router.patch(
     '/atualizar_img_cadastro',
     summary="Atualizar imagem de cadastro da loja",
@@ -365,9 +421,7 @@ async def atualizar_img_cadastro(
 
     try:
         image_service = ImageUploadService(loja=loja)
-        image_bytes_base64 = image.bytes_base64.replace(
-            'data:image/jpeg;base64,', ''
-        )
+        image_bytes_base64 = image.bytes_base64.split(',')[1]
         result = image_service.upload_image_cadastro(
             base64_string=image_bytes_base64
         )

@@ -3,7 +3,8 @@ export type ProdutoBodyRequest = {
   categoria_uuid: string,
   nome: string,
   preco: number,
-  descricao: string
+  descricao: string,
+  image_bytes: string
 }
 
 export type ProdutoResponse = {
@@ -13,5 +14,6 @@ export type ProdutoResponse = {
   nome: string,
   preco: number,
   descricao: string,
-  categoria?: any
+  categoria?: any,
+  image_url: string
 }

@@ -5,6 +5,11 @@ feitos -> {
         ENDPONTS: X
         FRONTEND: X
     }
+    loja: Cadastro de imagem para os produtos -> {
+        SERVICE: X
+        ENDPONTS: x
+        FRONTEND: x
+    }
 }
 
 loja: Alteração de status de pedido -> {
@@ -12,6 +17,12 @@ loja: Alteração de status de pedido -> {
     BANCO / MIGRACAO: X
     ENDPONTS:
     FRONTEND:
+}
+
+loja: Atualizacao de imagem para os produtos -> {
+    SERVICE: X
+    ENDPONTS: 
+    FRONTEND: 
 }
 
 loja: Ajustar pedido para concluido -> {
@@ -77,11 +88,7 @@ usuario: pedido precisa de email -> {
     FRONTEND:
 }
 
-loja: Cadastro de imagem para os produtos -> {
-    SERVICE: X
-    ENDPONTS:
-    FRONTEND:
-}
+
 
 admin: excluir loja -> {
     MODELS: x

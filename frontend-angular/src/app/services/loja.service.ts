@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { FileDataRequest } from '../models/file';
 
 
-export type atualizarImagemCadastroRequest = {
-  bytes_base64: string,
-  filename: string
-}
 
 
 @Injectable({ providedIn: 'root' })
@@ -30,7 +27,19 @@ export class LojaService {
     return observable
   }
 
-  atualizarImagemCadastro(body: atualizarImagemCadastroRequest, companyData: any) {
+  getAllProducts(
+    companyUUID: string,
+    categoryUUID?: string
+  ):Observable<Object> {
+    let url = this.baseUrl.concat(`/${companyUUID}/produtos`)
+    if (categoryUUID) {
+      url = url.concat(`?categoria_uuid=${categoryUUID}`)
+    }
+    let observable = this.http.get(url)
+    return observable
+  }
+
+  atualizarImagemCadastro(body: FileDataRequest, companyData: any) {
     let observable = this.http.patch(
       this.baseUrl.concat(`/atualizar_img_cadastro`), body, {
         headers: { Authorization: `Bearer ${companyData?.access_token}`

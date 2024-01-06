@@ -137,7 +137,8 @@ export class PedidosComponent {
               nome: response.nome,
               preco: response.preco,
               descricao: response.descricao,
-              categoria: response.categoria
+              categoria: response.categoria,
+              image_url: response.image_url
             }
             item.subtotal = Number(response.preco * item.quantidade)
             pedido.total += item.subtotal

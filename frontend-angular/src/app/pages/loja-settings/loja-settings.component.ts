@@ -7,7 +7,7 @@ import { LojaService } from '../../services/loja.service';
 import { AuthService, CompanyAuthData } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UploadImageDataResponse } from '../../models/image';
-import { atualizarImagemCadastroRequest } from '../../services/loja.service';
+import { FileDataRequest } from '../../models/file';
 
 
 @Component({
@@ -20,7 +20,7 @@ import { atualizarImagemCadastroRequest } from '../../services/loja.service';
 export class LojaSettingsComponent {
 
   imageForm: FormGroup
-  file: atualizarImagemCadastroRequest
+  file: FileDataRequest
   companyData: CompanyAuthData | null
   atualizandoImagem: boolean
 
@@ -33,11 +33,7 @@ export class LojaSettingsComponent {
     this.imageForm = this.formBuilder.group({ imageFile: [''] });
     this.companyData = authService.currentCompany()
     this.atualizandoImagem = false
-
-    this.file = {
-      bytes_base64: '',
-      filename: ''
-    }
+    this.file = { bytes_base64: '', filename: '' }
   }
 
   async onFileSelected(event: any) {

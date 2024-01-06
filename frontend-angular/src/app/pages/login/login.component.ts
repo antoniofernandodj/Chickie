@@ -119,8 +119,8 @@ export class LoginComponent {
 
         if (Array.isArray(detail)) {
           let errArr = detail.map(item => new ErrorDetail(item))
-          for (let error of errArr) {
-            error.showError()
+          for (let errorItem of errArr) {
+            errorItem.showError()
           }
         }
 

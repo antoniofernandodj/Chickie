@@ -4,3 +4,4 @@ from .image_upload_service import (  # noqa
     ImageUploadProdutoService,  # noqa
     ImageUploadServiceResponse  # noqa
 )
+from .produto_service import ProdutoService  # noqa

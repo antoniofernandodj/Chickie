@@ -7,7 +7,7 @@ import { CategoriaService } from '../../services/categoria.service';
 import { CategoriaResponse, CategoriaBodyRequest } from '../../models/categoria';
 import { BehaviorSubject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { Response201Wrapper } from '../../models/wrapper';
+import { Response201Wrapper, Response201ImageCreatedWrapper } from '../../models/wrapper';
 import { RouterModule } from '@angular/router';
 
 
@@ -145,16 +145,22 @@ export class CadastroProdutoComponent {
       categoria_uuid: this.categoriaValue,
       nome: this.nomeValue,
       descricao: this.descricaoValue,
-      preco: Number(this.precoValue || 0)
+      preco: Number(this.precoValue || 0),
+      image_bytes: ''
     }
 
     this.produtoService.save(body).subscribe({
       next: (response) => {
-        let r = new Response201Wrapper(response)
+        let r = new Response201ImageCreatedWrapper(response)
         alert('Item adicionado com sucesso!')
         this.categoriaService.getOne(this.categoriaValue).subscribe({
           next: (response) => {
-            let newProduct = {...body, uuid: r.uuid, categoria: response}
+            let newProduct = {
+              ...body,
+              uuid: r.uuid,
+              categoria: response,
+              image_url: r.image_url
+            }
             this.companyProducts.value.push(newProduct)
           }
         })

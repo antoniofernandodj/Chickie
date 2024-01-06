@@ -10,6 +10,22 @@
     Preço Base: {{ produto.value.preco }}
   </div>
 
+  <div>
+    Descricao: {{ produto.value.descricao }}
+  </div>
+
+  @if(produto.value.image_url) {
+    <strong>Imagem Produto</strong>
+    <br />
+    <div>
+      <img
+        width="350px"
+        [src]="produto.value.image_url"
+        alt="Imagem do produto">
+    </div>
+  }
+  <br />
+
   @if (produto.value.precos.length) {
     <h2>Preços</h2>
 

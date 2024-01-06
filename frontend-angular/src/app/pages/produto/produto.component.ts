@@ -18,6 +18,7 @@ class Produto {
   descricao: string
   loja_uuid: string
   nome: string
+  image_url?: string
   preco: string
   precos: Array<PrecoResponse>
 
@@ -29,6 +30,7 @@ class Produto {
     this.nome = response.nome;
     this.preco = response.preco;
     this.precos = response.precos;
+    this.image_url = response.image_url;
   }
 }
 

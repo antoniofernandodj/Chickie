@@ -5,8 +5,11 @@ import { AuthService, CompanyAuthData } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ProdutoResponse } from '../../models/produto';
 import { BehaviorSubject } from 'rxjs';
-import { Response201Wrapper } from '../../models/wrapper';
-import { FormsModule } from '@angular/forms';
+import { Response201Wrapper, Response201ImageCreatedWrapper } from '../../models/wrapper';
+import { FormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { ImageService } from '../../services/image.service';
+import { FileDataRequest } from '../../models/file';
+import { LojaService } from '../../services/loja.service';
 
 
 @Component({
@@ -24,35 +27,44 @@ export class CategoriaComponent {
   nomeValue: string
   descricaoValue: string
   precoValue: number | null
+  imageForm: FormGroup
+  file: FileDataRequest | null
+  selectedImage = ''
+  loading: boolean
 
   constructor(
     private route: ActivatedRoute,
     private produtoService: ProdutoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private formBuilder: FormBuilder,
+    private imageService: ImageService,
+    private lojaService: LojaService
   ) {
+    this.loading = false
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([])
     this.categoriaUUID = '';
     this.companyData = null
     this.nomeValue = '';
     this.descricaoValue = '';
-    this.precoValue = null
+    this.precoValue = null;
+    this.file = null;
+    this.imageForm = this.formBuilder.group({ imageFile: [''] });
+    this.selectedImage = ''
   }
 
   fetchProducts() {
     if (!this.companyData) {
-      let msg = "Erro ao buscar dados da loja!"
-      alert(msg); throw new Error(msg)
+      let msg = "Erro ao buscar dados da loja!";
+      alert(msg); throw new Error(msg);
     }
-
-    this.produtoService.getAll(
+    this.loading = true
+    this.lojaService.getAllProducts(
       this.companyData.loja.uuid,
       this.categoriaUUID
     ).subscribe({
       next: (response) => {
+        this.loading = false
         if (Array.isArray(response)) {
-
-          console.log({response: response})
-
           this.companyProducts.next(response);
         }
       },
@@ -88,8 +100,17 @@ export class CategoriaComponent {
 
   cadastrarProduto() {
     if (!this.companyData) {
-      alert('Nenhuma empresa logada!');
-      throw new Error(JSON.stringify('Nenhuma empresa logada!'))
+      let msg = 'Nenhuma empresa logada!'
+      alert(msg); throw new Error(msg)
+    }
+
+    if (
+      this.file == null ||
+      this.file.bytes_base64 === "" ||
+      this.file.bytes_base64 === null
+    ) {
+      let msg = 'Nenhuma imagem selecionada!'
+      alert(msg); throw new Error(msg)
     }
 
     let body = {
@@ -97,14 +118,28 @@ export class CategoriaComponent {
       categoria_uuid: this.categoriaUUID,
       nome: this.nomeValue,
       descricao: this.descricaoValue,
-      preco: this.precoValue || 0
+      preco: Number(this.precoValue || 0),
+      image_bytes: this.file.bytes_base64.split(',')[1]
     }
+
 
     this.produtoService.save(body).subscribe({
       next: (response) => {
-        let r = new Response201Wrapper(response)
-        this.companyProducts.value.push({...body, uuid: r.uuid});
+        let r = new Response201ImageCreatedWrapper(response)
+
+        let newItem = {
+          uuid: r.uuid,
+          image_url: r.image_url,
+          loja_uuid: body.loja_uuid,
+          categoria_uuid: body.categoria_uuid,
+          nome: body.nome,
+          descricao: body.descricao,
+          preco: body.preco,
+        }
+
+        this.companyProducts.value.push(newItem);
         alert('Item adicionado com sucesso!');
+        this.clearInputs()
       },
       error: (response) => {
         console.log({response: response})
@@ -112,5 +147,30 @@ export class CategoriaComponent {
       }
     })
 
+  }
+
+  clearInputs() {
+    this.nomeValue = '';
+    this.descricaoValue = '';
+    this.precoValue = null;
+    this.file = null;
+    this.selectedImage = ''
+    let fileInput = document.querySelector('file-input') as HTMLInputElement
+    if (fileInput){
+      fileInput.value = ''
+    }
+  }
+
+  async onFileSelected(event: any) {
+    const eventFile: File = event.target.files[0];
+    if (eventFile) {
+      this.selectedImage = URL.createObjectURL(eventFile)
+      this.file = {
+        filename: eventFile.name,
+        bytes_base64: await this.imageService.getImageBytes(eventFile)
+
+      }
+      console.log(this.file)
+    }
   }
 }

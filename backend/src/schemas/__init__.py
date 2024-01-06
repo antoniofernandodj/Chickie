@@ -6,7 +6,7 @@ from .login import Login  # noqa
 from .loja import Loja, LojaGETResponse  # noqa
 from .pedido import Pedido, PedidoItens  # noqa
 from .preco import Preco  # noqa
-from .produto import Produto, ProdutoGET  # noqa
+from .produto import Produto, ProdutoGET, ProdutoPOST  # noqa
 from .signup import UsuarioSignUp, LojaSignUp  # noqa
 from .token import Token, LojaToken, LojaGETResponse  # noqa
 from .usuario import Usuario, UsuarioFollowEmpresaRequest  # noqa

@@ -87,10 +87,8 @@
 
     <div>
       @if (selectedImage) {
-        <p>Bytes da imagem:</p>
         <hr>
-        <p>{{ imageBytesBase64 }}</p>
-        <hr>
+        <p>Imagem Selecionada</p>
         <img [src]="selectedImage" alt="Imagem selecionada">
       }
     </div>

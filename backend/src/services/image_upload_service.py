@@ -73,7 +73,6 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
         base64_string: str
     ) -> ImageUploadServiceResponse:
         """Upload an image to Cloudinary."""
-
         public_id = self.__get_public_id_image_produto(produto)
         if public_id:
             self.delete_image_by_public_id(public_id)
