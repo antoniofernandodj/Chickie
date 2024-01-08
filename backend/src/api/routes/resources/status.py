@@ -7,7 +7,7 @@ from fastapi import (  # noqa
     Path,
     Query
 )
-from src.schemas import Status
+from src.models import Status
 from src.dependencies import (
     status_repository_dependency,
     current_company

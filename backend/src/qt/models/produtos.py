@@ -1,6 +1,6 @@
 import httpx
 import json
-from src.schemas import Produto
+from src.models import Produto
 from contextlib import suppress
 
 

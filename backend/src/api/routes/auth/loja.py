@@ -3,7 +3,9 @@ from src.infra.database_postgres.repository import Repository
 from src.exceptions import (
     UnauthorizedException,
     NotFoundException,
-    ConflictException
+    ConflictException,
+    LojaJaCadastradaException,
+    InvalidPasswordException
 )
 
 from fastapi.routing import APIRouter
@@ -14,20 +16,22 @@ from src.dependencies import (
 )
 from src.dependencies import (  # noqa
     loja_repository_dependency,
-    connection_dependency
+    loja_service_dependency
 )
-from fastapi import HTTPException, status, Path, Response
+
+from src.dependencies.connection_dependency import connection_dependency
+from fastapi import HTTPException, status, Path, Response, Query
 from typing import Any, Optional, List
-from src.schemas import (
+from src.models import (
     Cliente,
     UsuarioSignUp,
     LojaSignUp,
+    LojaPUT,
     # Endereco,
-    EnderecoLoja as Endereco,  # noqa
     LojaToken,
     Loja,
     Produto,
-    LojaGETResponse,
+    LojaGET,
     ProdutoGET,
     LojaUpdateImageCadastro,
     UsuarioFollowEmpresaRequest
@@ -49,11 +53,10 @@ router = APIRouter(prefix="/loja", tags=["Loja", "Auth"])
     "/{uuid}"
 )
 async def requisitar_loja(
-    repository: loja_repository_dependency,
+    loja_service: loja_service_dependency,
     connection: connection_dependency,
-    # endereco_repository: endereco_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
-) -> LojaGETResponse:
+) -> LojaGET:
     """
     Busca uma loja pelo seu uuid.
 
@@ -66,36 +69,14 @@ async def requisitar_loja(
     Raises:
         HTTPException: Se a loja não for encontrada.
     """
+
+    repository = Repository(Loja, connection=connection)
+
     loja: Optional[Loja] = await repository.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
 
-    endereco_repository = Repository(Endereco, connection=connection)
-    print(endereco_repository)
-
-    # endereco: Optional[Endereco] = await endereco_repository.find_one(
-    #     uuid=loja.endereco_uuid
-    # )
-
-    # if endereco is None:
-    #     raise NotFoundException('Endereco de loja não encontrado')
-
-    if loja.uuid is None:
-        raise NotFoundException('Loja com erros no cadastro')
-
-    response = LojaGETResponse(
-        nome=loja.nome,
-        username=loja.username,
-        email=loja.email,
-        celular=loja.celular,
-        uuid=loja.uuid,
-        # endereco=endereco,
-        telefone=loja.telefone
-    )
-
-    image_service = ImageUploadService(loja=loja)
-    public_url = image_service.get_public_url_image_cadastro()
-    response.imagem_cadastro = public_url
+    response = await loja_service.get_data(loja)
 
     return response
 
@@ -104,10 +85,9 @@ async def requisitar_loja(
     "/"
 )
 async def requisitar_lojas(
-    repository: loja_repository_dependency,
-    # endereco_repository: endereco_repository_dependency,
     connection: connection_dependency,
-) -> List[LojaGETResponse]:
+    loja_service: loja_service_dependency,
+) -> List[LojaGET]:
     """
     Busca uma loja pelo seu uuid.
 
@@ -121,37 +101,12 @@ async def requisitar_lojas(
         HTTPException: Se a loja não for encontrada.
     """
 
-    endereco_repository = Repository(Endereco, connection=connection)
-    print(endereco_repository)
-
-    response: List[LojaGETResponse] = []
+    repository = Repository(Loja, connection=connection)
+    response: List[LojaGET] = []
     lojas: List[Loja] = await repository.find_all()
     for loja in lojas:
-
-        # endereco: Optional[Endereco] = await endereco_repository.find_one(
-        #     uuid=loja.endereco_uuid
-        # )
-
-        # if endereco is None:
-        #     raise NotFoundException('Endereco de loja não encontrado')
-
-        if loja.uuid is None:
-            raise NotFoundException('Loja com erros no cadastro')
-
-        response_item = LojaGETResponse(
-            nome=loja.nome,
-            username=loja.username,
-            email=loja.email,
-            celular=loja.celular,
-            uuid=loja.uuid,
-            # endereco=endereco,
-            telefone=loja.telefone
-        )
-
-        image_service = ImageUploadService(loja=loja)
-        public_url = image_service.get_public_url_image_cadastro()
-        response_item.imagem_cadastro = public_url
-        response.append(response_item)
+        loja_data = await loja_service.get_data(loja)
+        response.append(loja_data)
 
     return response
 
@@ -160,9 +115,9 @@ async def requisitar_lojas(
     "/login",
     response_model=LojaToken
 )
-async def login_post(
+async def login(
     form_data: oauth2_password_request_form_dependency,
-    # endereco_repository: endereco_repository_dependency,
+    loja_service: loja_service_dependency,
     connection: connection_dependency
 ) -> Any:
     """
@@ -178,39 +133,17 @@ async def login_post(
         HTTPException: Se as credenciais forem inválidas.
     """
 
-    endereco_repository = Repository(Endereco, connection=connection)
-    print(endereco_repository)
-
     loja = await security.authenticate_company(
         form_data.username, form_data.password
     )
     if not loja:
         raise UnauthorizedException("Credenciais inválidas!")
 
-    access_token = security.create_access_token(data={"sub": loja.username})
-
-    # endereco: Optional[Endereco] = await endereco_repository.find_one(
-    #     uuid=loja.endereco_uuid
-    # )
-
-    # if endereco is None:
-    #     raise NotFoundException("Endereço da loja não encontrado")
-    if loja.uuid is None:
-        raise NotFoundException('Loja com erros no cadastro')
-
-    loja_data = LojaGETResponse(
-        nome=loja.nome,
-        username=loja.username,
-        email=loja.email,
-        celular=loja.celular,
-        uuid=loja.uuid,
-        # endereco=endereco,
-        telefone=loja.telefone
+    access_token = security.create_access_token(
+        data={"sub": loja.username}
     )
 
-    image_service = ImageUploadService(loja=loja)
-    public_url = image_service.get_public_url_image_cadastro()
-    loja_data.imagem_cadastro = public_url
+    loja_data = await loja_service.get_data(loja)
 
     return LojaToken(
         access_token=access_token,
@@ -221,18 +154,17 @@ async def login_post(
 
 @router.put("/{uuid}", summary='Atualizar dados de cadastro da Loja')
 async def update_loja(
-    loja_repository: loja_repository_dependency,
-    # endereco_loja_repository: endereco_loja_repository_dependency,
+    service: loja_service_dependency,
     connection: connection_dependency,
-    updated_data: LojaSignUp,
-    uuid: Annotated[str, Path(title="O uuid da loja a ser atualizada")],
+    updated_data: LojaPUT,
+    uuid: Annotated[str, Path(title="O uuid da loja a ser atualizada")]
 ):
     """
     Atualiza os detalhes de uma loja existente.
 
     Args:
         `uuid` (str): O uuid da loja a ser atualizada.
-        `updated_data` (LojaSignUp): Os novos detalhes da loja.
+        `updated_data` (LojaPUT): Os novos detalhes da loja.
 
     Returns:
         `dict`: Um dicionário confirmando a atualização.
@@ -241,55 +173,15 @@ async def update_loja(
         `HTTPException`: Se a loja não for encontrada ou ocorrer um erro na atualização.  # noqa
     """
 
-    endereco_repository = Repository(Endereco, connection=connection)
-    print(endereco_repository)
-
-    loja: Optional[Loja] = await loja_repository.find_one(uuid=uuid)
-    if loja is None:
-        raise NotFoundException('Loja não encontrada')
-
-    def only_numbers(string: str | None) -> str | None:
-        if string is None:
-            return None
-
-        return ''.join([n for n in string if n.isdecimal()])
-
     try:
-        loja_data_updated = dict(
-            nome=updated_data.nome,
-            username=updated_data.username,
-            email=updated_data.email,
-            celular=only_numbers(updated_data.celular),
-            telefone=only_numbers(updated_data.telefone),
-            horarios_de_funcionamento=updated_data.horarios_de_funcionamento
-        )
-
-        updated_loja = await loja_repository.update(
-            loja,
-            loja_data_updated
-        )
-
-        # endereco = await endereco_repository.find_one(
-        #     loja_uuid=loja.uuid
-        # )
-
-        # await endereco_repository.update(
-        #     endereco, {
-        #         ...
-        #     }
-        # )
-
-        return {
-            "message": "Loja atualizada com sucesso!",
-            "uuid": loja.uuid,
-            "success": updated_loja
-        }
-
+        await service.update_loja_data(uuid, updated_data)
     except Exception as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erro ao atualizar a loja! Detalhes: {error}"
         )
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post(
@@ -298,7 +190,7 @@ async def update_loja(
 )
 async def signup(
     loja: LojaSignUp,
-    loja_repository: loja_repository_dependency
+    loja_service: loja_service_dependency
 ) -> Any:
     """
     Realiza o cadastro de uma nova loja.
@@ -310,33 +202,22 @@ async def signup(
         dict: Um dicionário contendo o uuid da loja cadastrada.
     """
     try:
-        loja_cadastrada = await use_cases.lojas.registrar(loja_data=loja)
+        loja_cadastrada = await loja_service.registrar(loja_data=loja)
 
-    except use_cases.lojas.InvalidPasswordException:
+    except InvalidPasswordException:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Senha inválida! A senha deve ser maior que 5"
         )
 
-    except use_cases.lojas.LojaJaCadastradaException:
+    except LojaJaCadastradaException:
         raise ConflictException(detail="Credenciais inválidas!")
 
-    if loja.image_bytes and loja.image_filename:
-        try:
-            image_service = ImageUploadService(loja=loja_cadastrada)
-            image_bytes_base64 = loja.image_bytes.replace(
-                'data:image/jpeg;base64,', ''
-            )
-            image_service.upload_image_cadastro(
-                base64_string=image_bytes_base64
-            )
-
-        except Exception:
-            del_result = await loja_repository.delete(loja_cadastrada)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Erro no upload da imagem! res: {del_result}"
-            )
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro no cadastro da loja! detail: {error}"
+        )
 
     return {"uuid": loja_cadastrada.uuid}
 
@@ -368,7 +249,7 @@ async def requisitar_produtos_de_loja(
     )
     if loja is None:
         raise NotFoundException('Loja de produto não encontrada!')
-    produto_service = ProdutoService(connection=connection, loja=loja)
+    produto_service = ProdutoService(connection=connection)
 
     kwargs = {}
     if categoria_uuid is not None:
@@ -400,7 +281,7 @@ async def requisitar_produtos_de_loja(
         404: {"description": "Loja não encontrada"}
     }
 )
-async def atualizar_img_cadastro(
+async def atualizar_imagem_de_cadastro(
     loja: current_company,
     image: LojaUpdateImageCadastro,
     response: Response
@@ -421,7 +302,11 @@ async def atualizar_img_cadastro(
 
     try:
         image_service = ImageUploadService(loja=loja)
-        image_bytes_base64 = image.bytes_base64.split(',')[1]
+        try:
+            image_bytes_base64 = image.bytes_base64.split(',')[1]
+        except IndexError:
+            image_bytes_base64 = image.bytes_base64
+
         result = image_service.upload_image_cadastro(
             base64_string=image_bytes_base64
         )
@@ -451,7 +336,7 @@ async def home(current_company: current_company):
 
 
 @router.patch(
-    "/{uuid}/ativar_inativar"
+    "/ativar_inativar/{uuid}"
 )
 async def ativar_inativar_loja(
     loja_repository: loja_repository_dependency,
@@ -477,7 +362,7 @@ async def ativar_inativar_loja(
 
     await loja_repository.update(loja, {'ativo': ativar})
 
-    status_msg = "ativada" if ativar else "inativada"
+    status_msg = "ativada" if ativar is True else "inativada"
     return {"message": f"Loja {status_msg} com sucesso!"}
 
 
@@ -485,7 +370,6 @@ async def ativar_inativar_loja(
     "/{uuid}"
 )
 async def deletar_loja(
-    loja_repository: loja_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ser deletada")]
 ) -> Any:
     """
@@ -500,11 +384,6 @@ async def deletar_loja(
     Raises:
         HTTPException: Se a loja não for encontrada.
     """
-    loja: Optional[Loja] = await loja_repository.find_one(uuid=uuid)
-    if loja is None:
-        raise NotFoundException('Loja não encontrada')
-
-    await loja_repository.delete(loja)
 
     return {"message": "Loja deletada com sucesso!"}
 
@@ -594,3 +473,25 @@ async def cadastrar_cliente_v2(
         "usuario_uuid": usuario_cadastrado.uuid,
         "cliente_uuid": cliente_uuid
     }
+
+
+@router.post('/refresh')
+async def refresh(
+    loja: current_company,
+    service: loja_service_dependency,
+    complete: str = Query('0')
+):
+    access_token = security.create_access_token(
+        data={"sub": loja.username}
+    )
+
+    loja_data = None
+
+    if complete == '1':
+        loja_data = await service.get_data(loja)
+
+    return LojaToken(
+        access_token=access_token,
+        token_type='bearer',
+        loja=loja_data
+    )

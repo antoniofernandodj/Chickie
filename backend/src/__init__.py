@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from contextlib import suppress
-import asyncio
 import warnings
 
 warnings.filterwarnings(

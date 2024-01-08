@@ -1,6 +1,6 @@
 from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
-from src.schemas import Usuario, UsuarioSignUp, EnderecoUsuario as Endereco
+from src.models import Usuario, UsuarioSignUp, EnderecoUsuario as Endereco
 from src.api.security import HashService
 from src.exceptions import InvalidPasswordException
 from typing import Optional

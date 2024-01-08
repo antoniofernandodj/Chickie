@@ -7,7 +7,7 @@ from fastapi.requests import Request
 from src.exceptions import NotFoundException
 from src.infra.database_postgres.repository import Repository
 from src.api import security
-from src.schemas import (
+from src.models import (
     UsuarioFollowEmpresaRequest,
     UsuarioSignUp,
     EnderecoUsuario as Endereco,
@@ -17,11 +17,10 @@ from src.schemas import (
 )
 from src import use_cases
 from src.dependencies import (
-    current_user,
-    endereco_repository_dependency,
-    usuario_repository_dependency,
-    connection_dependency
+    current_user    
 )
+
+from src.dependencies.connection_dependency import connection_dependency
 
 
 router = APIRouter(prefix="/user", tags=["Usuario", "Auth"])
@@ -118,8 +117,7 @@ async def update_user(
     uuid: str,
     user_data: UsuarioSignUp,
     current_user: current_user,
-    user_repository: usuario_repository_dependency,
-    endereco_repository: endereco_repository_dependency
+    connection: connection_dependency,
 ) -> Any:
     """
     Atualiza os detalhes de um usuário existente.
@@ -132,6 +130,8 @@ async def update_user(
     Returns:
         dict: Um dicionário vazio.
     """
+    endereco_repository = Repository(Endereco, connection)
+    user_repository = Repository(Endereco, connection)
 
     usuario: Optional[Usuario] = await user_repository.find_one(uuid=uuid)
     if usuario is None or usuario.uuid is None:

@@ -1,16 +1,10 @@
+import { LojaService } from './loja.service';
+
 import { Injectable } from '@angular/core';
-import { AuthHeaders } from '../models/authHeaders';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LojaService } from './loja.service';
-import {
-  HttpClient,
-  HttpParams,
-  HttpHeaders,
-  HttpErrorResponse,
-  HttpResponse
-} from '@angular/common/http';
-
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 
 
@@ -35,6 +29,7 @@ type Loja = {
   telefone: string;
   username: string;
   uuid: string;
+  horarios_de_funcionamento: string | null
 }
 
 
@@ -90,6 +85,7 @@ export class AuthService {
   companyData: BehaviorSubject<CompanyAuthData | null>;
   loja_uuid: string | null
 
+
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
@@ -122,7 +118,7 @@ export class AuthService {
   }
 
   doCompanyLogin(loginValue: string, passwordValue: string): Observable<Object> {
-    const urlLogin = 'http://localhost:8000/loja/login';
+    const urlLogin = `${environment.host}/loja/login`;
 
     const body = new HttpParams()
       .set('username', loginValue)
@@ -138,7 +134,7 @@ export class AuthService {
   }
 
   doUserLogin(loginValue: string, passwordValue: string): Observable<Object> {
-    const urlLogin = 'http://localhost:8000/user/login';
+    const urlLogin = `${environment.host}/user/login`;
 
     const body = new HttpParams()
       .set('username', loginValue)
@@ -186,6 +182,46 @@ export class AuthService {
       });
     });
   }
+
+  refreshLojaData() {
+    let companyData = this.companyData.getValue()
+    const urlRefresh = `${environment.host}/loja/refresh?complete=1`;
+    let observable = this.http.post(urlRefresh, {}, {
+      headers: { Authorization: `Bearer ${companyData?.access_token}` }
+    });
+
+    observable.subscribe({
+      next: (response) => {
+        let authData = new CompanyAuthData({ response });
+        this.setCompanyData(authData)
+        console.log('Dados completos atualizados com sucesso!')
+      },
+      error: (response) => {
+        console.log(response)
+        throw new Error('Erro ao atualizar os dados!')
+      }
+    })
+  }
+
+
+  refreshTokenData() {
+    let companyData = this.companyData.getValue()
+    const urlRefresh = `${environment.host}/loja/refresh?complete=0`;
+    let observable = this.http.post(urlRefresh, {}, {
+      headers: { Authorization: `Bearer ${companyData?.access_token}` }
+    });
+
+    observable.subscribe({
+      next: (response: any) => {
+        sessionStorage.setItem('access_token', response.access_token)
+      },
+      error: (response) => {
+        console.log(response)
+        throw new Error('Erro ao atualizar os dados!')
+      }
+    })
+  }
+
 
   currentUser() {
     let userData = sessionStorage.getItem('current_user');

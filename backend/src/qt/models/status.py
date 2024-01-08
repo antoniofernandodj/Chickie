@@ -1,6 +1,6 @@
 import httpx
 import json
-from src.schemas import Status
+from src.models import Status
 from contextlib import suppress
 
 

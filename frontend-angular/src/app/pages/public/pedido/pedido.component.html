@@ -1,0 +1,27 @@
+@if( thisURL.includes('loja') ) {
+  <a [routerLink]="['/loja/pedidos']">Pedidos</a>
+}
+
+
+@if (pedido) {
+  <h2>Detalhes do Pedido</h2>
+  <p><strong>Celular:</strong> {{ pedido.celular }}</p>
+  <p><strong>Data e Hora:</strong> {{ pedido.data_hora }}</p>
+
+  <h3>Endereço</h3>
+  <p><strong>UF:</strong> {{ pedido.endereco.uf }}</p>
+  <p><strong>Cidade:</strong> {{ pedido.endereco.cidade }}</p>
+  <p><strong>Logradouro:</strong> {{ pedido.endereco.logradouro }}</p>
+
+  <h3>Itens do Pedido</h3>
+  <ul>
+    @for (item of pedido.itens; track $index) {
+      <li>
+        <p><strong>Quantidade:</strong> {{ item.quantidade }}</p>
+        <p><strong>Subtotal:</strong> {{ item.valor | currency:"BRL"  }}</p>
+      </li>
+    }
+  </ul>
+  <h3>Total: {{ pedido.total }}</h3>
+}
+

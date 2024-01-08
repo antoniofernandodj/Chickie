@@ -6,9 +6,9 @@ from fastapi import (  # noqa
     status,
     Path
 )
-from src.schemas import AvaliacaoDeLoja
+from src.models import AvaliacaoDeLoja
 from src.infra.database_postgres.repository import Repository
-from src.dependencies import (
+from src.dependencies.connection_dependency import (
     connection_dependency
 )
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { FileDataRequest } from '../models/file';
-
+import { FileDataRequest } from '../models/models';
+import { environment } from '../../environments/environment';
 
 
 
@@ -14,7 +14,7 @@ export class LojaService {
   constructor(
     private http: HttpClient,
   ) {
-    this.baseUrl = 'http://localhost:8000/loja'
+    this.baseUrl = `${environment.host}/loja`
   }
 
   getOne(uuid: string): Observable<Object> {
@@ -44,6 +44,22 @@ export class LojaService {
       this.baseUrl.concat(`/atualizar_img_cadastro`), body, {
         headers: { Authorization: `Bearer ${companyData?.access_token}`
       }
+    })
+
+    return observable
+  }
+
+  atualizarCadastro(body: any, companyData: any) {
+
+    if (!companyData) {
+      let msg = 'Dados da empresa não encontrados!'
+      alert(msg); throw new Error(msg)
+    }
+
+    console.log({H: { Authorization: `Bearer ${companyData?.access_token}` }})
+    let observable = this.http.put(
+      this.baseUrl.concat(`/${companyData.loja.uuid }`), body, {
+        headers: { Authorization: `Bearer ${companyData?.access_token}` }
     })
 
     return observable

@@ -1,6 +1,6 @@
 from config import settings as s
 from fastapi.testclient import TestClient  # noqa
-from src.schemas import Loja  # noqa
+from src.models import Loja  # noqa
 import json  # noqa
 import pytest  # noqa
 import sys  # noqa

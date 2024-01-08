@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from config import settings as s
-from src.schemas import Loja
+from src.models import Loja
 from faker import Faker
 
 f = Faker()

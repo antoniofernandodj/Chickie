@@ -1,0 +1,110 @@
+<nav>
+  <ul style="display: flex; list-style: none; padding: 0;">
+    <li style="margin-right: 5px; margin-left: 5px;">
+      <a [routerLink]="['/loja/categorias']">
+        Categoria
+      </a>
+    </li>
+    /
+    <li style="margin-right: 5px; margin-left: 5px;">
+      <a [routerLink]="['/loja/categorias', produto.value?.categoria_uuid]">
+        Produtos
+      </a>
+    </li>
+
+  </ul>
+
+</nav>
+
+<h2>Produto</h2>
+
+
+@if (produto.value) {
+
+  <div>
+    Nome: {{ produto.value.nome }}
+  </div>
+
+  <div>
+    Preço Base: {{ produto.value.preco | currency:"BRL" }}
+  </div>
+
+  <div>
+    Descricao: {{ produto.value.descricao }}
+  </div>
+
+  @if(produto.value.image_url) {
+    <strong>Imagem Produto</strong>
+    <br />
+    <div>
+      <img
+        width="350px"
+        [src]="produto.value.image_url"
+        alt="Imagem do produto">
+    </div>
+  }
+  <br />
+
+  @if (produto.value.precos.length) {
+    <h2>Preços</h2>
+
+    @for (preco of produto.value.precos; track $index) {
+      <div>
+        <strong>Preço:</strong> {{ preco.valor | currency:"BRL" }}, Dia da semana: {{ preco.dia_da_semana }}
+        <button (click)="removerPreco($event, preco)">Remover preco</button>
+      </div>
+    }
+  }
+
+  <h2>Cadastro de Preços Especiais</h2>
+
+  <div>
+    <div>
+
+    </div>
+
+    @if (diasDaSemanaDisponiveis.value.length) {
+
+      <label for="dia_da_semana-input">Dia da Semana</label>
+      <select
+        name="dia_da_semana"
+        id="dia_da_semana-input"
+        [(ngModel)]="diaDaSemanaValue"
+      >
+
+        <option value="">Escolha um dia da semana</option>
+        @for (dia of diasDaSemanaDisponiveis.value; track $index) {
+
+          <option value="{{ dia.val }}">{{ dia.title }}</option>
+
+        }
+      </select>
+
+
+      <div>
+        <label for="valor-input">Valor</label>
+        <input
+          (keyup.enter)="cadastrarPreco()"
+          type="number"
+          id="valor-input"
+          [(ngModel)]="valorValue" />
+
+      </div>
+
+      @if (!saving) {
+        <button (click)="cadastrarPreco()">
+          Salvar
+        </button>
+      } @else {
+        Saving ...
+      }
+    } @else {
+      <strong>Nenhum preço disponível!</strong>
+    }
+
+
+  </div>
+} @else {
+  <strong>Loading ...</strong>
+}
+

@@ -8,12 +8,12 @@ from fastapi import (  # noqa
     Query
 )
 from typing import Optional
-from src.schemas import Funcionario
+from src.models import Funcionario
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
-    connection_dependency,
     current_company
 )
+from src.dependencies.connection_dependency import connection_dependency
 
 
 router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
@@ -35,11 +35,12 @@ async def requisitar_funcionarios(
         List[Funcionario]: Uma lista
         contendo todos os funcionários cadastrados.
     """
+    repository = Repository(Funcionario, connection=connection)
+
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    repository = Repository(Funcionario, connection=connection)
     results = await repository.find_all(**kwargs)
 
     return results
@@ -59,8 +60,8 @@ async def requisitar_funcionario(
     Returns:
         Funcionario: O funcionário correspondente ao UUID.
     """
-
     repository = Repository(Funcionario, connection=connection)
+
     result = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -85,6 +86,7 @@ async def cadastrar_funcionarios(
         dict: Um dicionário contendo o UUID do funcionário cadastrado.
     """
     repository = Repository(Funcionario, connection=connection)
+
     try:
         uuid = await repository.save(funcionario)
     except Exception as error:
@@ -113,6 +115,7 @@ async def atualizar_funcionario_put(
         afetadas na atualização.
     """
     repository = Repository(Funcionario, connection=connection)
+
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -132,6 +135,7 @@ async def atualizar_funcionario_patch(
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")],
 ):
     repository = Repository(Funcionario, connection=connection)
+
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -160,6 +164,7 @@ async def remover_funcionario(
         dict: Um dicionário contendo o número de itens removidos.
     """
     repository = Repository(Funcionario, connection=connection)
+
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

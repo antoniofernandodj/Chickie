@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
 import { AuthService, CompanyAuthData } from './auth.service';
-import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
-import { ProdutoBodyRequest, ProdutoResponse } from '../models/produto';
+
+import { Injectable } from '@angular/core';
+import { HttpParams, HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { AuthHeaders } from '../models/authHeaders';
-
+import { ProdutoBodyRequest, ProdutoResponse, AuthHeaders } from '../models/models';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({ providedIn: 'root' })
@@ -21,13 +21,14 @@ export class ProdutoService {
     private route: ActivatedRoute
   ) {
     this.headers = { Authorization: ''}
-    this.baseUrl = 'http://localhost:8000/produtos'
+    this.baseUrl = `${environment.host}/produtos`
     this.companyData = null
     this.companyData = this.authService.currentCompany()
     if (this.companyData) {
       this.headers = {
         'Authorization': `Bearer ${this.companyData.access_token}`}
       }
+      console.log({headers: this.headers})
     }
 
   getOne(uuid: string) {

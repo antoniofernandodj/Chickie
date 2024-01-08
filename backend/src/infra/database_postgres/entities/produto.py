@@ -3,7 +3,7 @@ from sqlalchemy.schema import Column as Col, ForeignKey as FK
 from sqlalchemy.types import String as Str, Text, Float
 
 
-class Produto(Base):
+class Produto(Base):   # database
     __tablename__ = "produtos"
 
     uuid = Col(Str(36), primary_key=True, unique=True, nullable=False)
@@ -14,4 +14,3 @@ class Produto(Base):
         Str(36), FK("categorias_de_produtos.uuid"), nullable=False
     )
     loja_uuid = Col(Str(36), FK("lojas.uuid"), nullable=False)
-

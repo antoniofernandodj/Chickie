@@ -15,5 +15,6 @@ export type ProdutoResponse = {
   preco: number,
   descricao: string,
   categoria?: any,
-  image_url: string
+  image_url: string,
+  preco_hoje?: number
 }

@@ -1,4 +1,5 @@
 from typing import Annotated, List, Dict, Optional
+from src.infra.database_postgres.repository import Repository
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,11 +8,8 @@ from fastapi import (  # noqa
     Path,
     Query
 )
-from src.schemas import Pagamento
-from src.infra.database_postgres.repository import Repository
-from src.dependencies import (
-    connection_dependency
-)
+from src.models import Pagamento
+from src.dependencies.connection_dependency import connection_dependency
 
 router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
@@ -30,11 +28,12 @@ async def requisitar_pagamentos(
     Returns:
         list[Pagamento]: Lista de pagamentos encontrados.
     """
+    repository = Repository(Pagamento, connection=connection)
+
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    repository = Repository(Pagamento, connection=connection)
     results: List[Pagamento] = await repository.find_all(**kwargs)
 
     return results
@@ -58,6 +57,7 @@ async def requisitar_pagamento(
         HTTPException: Se o pagamento não for encontrado.
     """
     repository = Repository(Pagamento, connection=connection)
+
     result: Optional[Pagamento] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -83,6 +83,7 @@ async def cadastrar_pagamentos(
         HTTPException: Se ocorrer um erro durante o cadastro.
     """
     repository = Repository(Pagamento, connection=connection)
+
     try:
         uuid = await repository.save(pagamento)
     except Exception as error:
@@ -112,6 +113,7 @@ async def atualizar_pagamento_put(
         HTTPException: Se o pagamento não for encontrado.
     """
     repository = Repository(Pagamento, connection=connection)
+
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -130,6 +132,7 @@ async def atualizar_pagamento_patch(
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ) -> Dict[str, int]:
     repository = Repository(Pagamento, connection=connection)
+
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -159,6 +162,7 @@ async def remover_pagamento(
         HTTPException: Se ocorrer um erro durante a remoção.
     """
     repository = Repository(Pagamento, connection=connection)
+
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

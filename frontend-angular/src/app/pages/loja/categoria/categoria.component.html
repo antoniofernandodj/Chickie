@@ -1,0 +1,107 @@
+<a routerLink="/loja/categorias">Categorias</a>
+
+
+<h2>Cadastrar Produto</h2>
+
+<div>
+
+  Descricao
+  <input
+    type="text"
+    name="descricao"
+    id="descricao-input"
+    [(ngModel)]="descricaoValue"
+  />
+
+  <br />
+
+  Nome
+  <input
+    type="text"
+    name="nome"
+    id="nome-input"
+    (keyup.enter)="cadastrarProduto()"
+    [(ngModel)]="nomeValue"
+  >
+
+  <br />
+
+  preco
+  <input
+    type="number"
+    name="preco"
+    id="preco-input"
+    (keyup.enter)="cadastrarProduto()"
+    [(ngModel)]="precoValue"
+  />
+
+  <br />
+
+  imagem
+  <input
+    type="file"
+    name="image"
+    id="file-input"
+    (change)="onFileSelected($event)"
+    accept="image/*" />
+
+  @if (selectedImage) {
+    <br />
+
+    <label>Imagem Selecionada</label>
+    <br />
+    <img
+      width="350px"
+      alt="Imagem do produto"
+      [src]="selectedImage"
+    />
+  }
+
+  <br />
+  <button
+    (click)="cadastrarProduto()">
+      Cadastrar
+    </button>
+    <br />
+</div>
+
+@if (!loading) {
+  <h1>Produtos</h1>
+
+  @if (this.companyProducts.value.length) {
+    <table>
+      <thead>
+        <tr>
+          <th>Nome do Produto</th>
+          <th>Descrição</th>
+          <th>Preço</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (produto of companyProducts.value; track $index) {
+          <tr id="">
+            <td>
+              <a [routerLink]='["/loja/produtos", produto.uuid]'>
+                {{ produto.nome }}
+              </a>
+            </td>
+            <td>{{ produto.descricao }}</td>
+            <td>{{ produto.preco }}</td>
+            <td>
+              <img src="" alt="">
+            </td>
+            <td (click)="removerProduto(produto)">
+              <button>Remover</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <strong>Nenhum produto encontrado!</strong>
+  }
+
+} @else {
+  <strong>Loading...</strong>
+}

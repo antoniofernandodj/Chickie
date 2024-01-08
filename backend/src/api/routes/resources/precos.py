@@ -1,4 +1,5 @@
 from typing import Annotated, Optional, List, Dict
+from src.infra.database_postgres.repository import Repository
 from src.exceptions import NotFoundException, ConflictException
 from starlette import status
 from fastapi import (  # noqa
@@ -8,8 +9,11 @@ from fastapi import (  # noqa
     Path,
     Query
 )
-from src.schemas import Preco
-from src.dependencies import preco_repository_dependency, current_company
+from src.models import Preco
+from src.dependencies import (
+    current_company
+)
+from src.dependencies.connection_dependency import connection_dependency
 
 
 router = APIRouter(prefix="/precos", tags=["Preços"])
@@ -17,7 +21,7 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 
 @router.get("/")
 async def requisitar_precos(
-    repository: preco_repository_dependency,
+    connection: connection_dependency,
     produto_uuid: Optional[str] = Query(None)
 ) -> List[Preco]:
     """
@@ -29,6 +33,8 @@ async def requisitar_precos(
     Returns:
         list: Uma lista contendo os preços encontrados.
     """
+    repository = Repository(Preco, connection)
+
     kwargs = {}
     if produto_uuid is not None:
         kwargs["produto_uuid"] = produto_uuid
@@ -40,7 +46,7 @@ async def requisitar_precos(
 
 @router.get("/{uuid}")
 async def requisitar_preco(
-    repository: preco_repository_dependency,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ) -> Preco:
     """
@@ -52,6 +58,8 @@ async def requisitar_preco(
     Returns:
         Preco: Os detalhes do preço.
     """
+    repository = Repository(Preco, connection)
+
     result: Optional[Preco] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Preço não encontrado")
@@ -63,7 +71,7 @@ async def requisitar_preco(
 async def cadastrar_precos(
     preco: Preco,
     current_company: current_company,
-    repository: preco_repository_dependency
+    connection: connection_dependency,
 ) -> Dict[str, str]:
     """
     Cadastra um novo preço especial para um dado produto.
@@ -75,6 +83,8 @@ async def cadastrar_precos(
     Returns:
         dict: Um dicionário contendo o UUID do preço cadastrado.
     """
+    repository = Repository(Preco, connection)
+
     query = await repository.find_one(
         dia_da_semana=preco.dia_da_semana,
         produto_uuid=preco.produto_uuid
@@ -103,7 +113,7 @@ async def atualizar_preco_patch(
 async def atualizar_preco_put(
     itemData: Preco,
     current_company: current_company,
-    repository: preco_repository_dependency,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")]
 ) -> Dict[str, int]:
     """
@@ -118,6 +128,8 @@ async def atualizar_preco_put(
         dict: Um dicionário contendo o número de linhas afetadas na
         atualização.
     """
+    repository = Repository(Preco, connection)
+
     preco = await repository.find_one(uuid=uuid)
     if preco is None:
         raise NotFoundException("Preço não encontrado")
@@ -132,7 +144,7 @@ async def atualizar_preco_put(
 @router.delete("/{uuid}")
 async def remover_preco(
     current_company: current_company,
-    repository: preco_repository_dependency,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
 ) -> Dict[str, int]:
     """
@@ -145,6 +157,8 @@ async def remover_preco(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
+    repository = Repository(Preco, connection)
+
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

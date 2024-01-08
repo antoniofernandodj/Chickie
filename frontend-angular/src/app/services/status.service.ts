@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
 import { AuthService, CompanyAuthData } from './auth.service';
-import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
-import { StatusBodyRequest, StatusResponse } from '../models/status';
+
+import { Injectable } from '@angular/core';
+import { HttpParams, HttpClient } from '@angular/common/http';
+import { StatusBodyRequest, StatusResponse, AuthHeaders } from '../models/models';
 import { Observable } from 'rxjs';
-import { AuthHeaders } from '../models/authHeaders';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class StatusService {
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.headers = { Authorization: '' }
-    this.baseUrl = 'http://localhost:8000/status'
+    this.baseUrl = `${environment.host}/status`
 
     this.companyData = this.authService.currentCompany()
 

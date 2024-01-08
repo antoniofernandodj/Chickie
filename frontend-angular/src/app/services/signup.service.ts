@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+
 
 export type EmpresaSignUpRequest = {
 
@@ -43,8 +45,8 @@ export class SignupService {
   private userSignupUrl: string
 
   constructor(private http: HttpClient) {
-    this.companySignupUrl = 'http://localhost:8000/loja/signup'
-    this.userSignupUrl = 'http://localhost:8000/user/signup'
+    this.companySignupUrl = `${environment.host}/loja/signup`
+    this.userSignupUrl = `${environment.host}/user/signup`
   }
 
   doCompanySignUp(body: EmpresaSignUpRequest) {

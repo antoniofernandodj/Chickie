@@ -1,6 +1,4 @@
 from typing import Annotated, Optional, List, Dict
-from src.infra.database_postgres.repository import Repository
-from src.services import ImageUploadProdutoService, ProdutoService
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -8,12 +6,12 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
+    Response
 )
-from src.schemas import Produto, ProdutoGET, ProdutoPOST, Loja
+from src.models import ProdutoGET, ProdutoPOST
 from src.dependencies import (
-    produto_repository_dependency,
-    connection_dependency,
-    current_company
+    produto_service_dependency,
+    current_company,
 )
 
 
@@ -22,7 +20,7 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 
 @router.get("/")
 async def requisitar_produtos(
-    connection: connection_dependency,
+    produto_service: produto_service_dependency,
     loja_uuid: Optional[str] = Query(None),
     categoria_uuid: Optional[str] = Query(None)
 ) -> List[ProdutoGET]:
@@ -39,8 +37,6 @@ async def requisitar_produtos(
     Returns:
         list[Produto]
     """
-    loja_repository = Repository(Loja, connection=connection)
-    produto_repository = Repository(Produto, connection=connection)
 
     kwargs = {}
     if loja_uuid is not None:
@@ -48,35 +44,13 @@ async def requisitar_produtos(
     if categoria_uuid is not None:
         kwargs["categoria_uuid"] = categoria_uuid
 
-    response = []
-    produtos: List[Produto] = await produto_repository.find_all(**kwargs)
-    for produto in produtos:
-        loja: Optional[Loja] = await loja_repository.find_one(
-            uuid=produto.loja_uuid
-        )
-        if loja is None:
-            raise NotFoundException('Loja de produto não encontrada!')
-        produto_service = ProdutoService(connection=connection, loja=loja)
-        image_url = await produto_service.get_public_url_image(produto)
-        precos = await produto_service.get_precos(produto)
-
-        response.append(ProdutoGET(
-            uuid=produto.uuid,
-            nome=produto.nome,
-            descricao=produto.nome,
-            preco=produto.preco,
-            categoria_uuid=produto.categoria_uuid,
-            loja_uuid=produto.loja_uuid,
-            precos=precos,
-            image_url=image_url
-        ))
-
-    return response
+    produtos = await produto_service.get_all_produtos(**kwargs)
+    return produtos
 
 
 @router.get("/{uuid}")
 async def requisitar_produto(
-    connection: connection_dependency,
+    produto_service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ) -> ProdutoGET:
 
@@ -92,42 +66,19 @@ async def requisitar_produto(
     Raises:
         HTTPException: Se o produto não for encontrado.
     """
-    loja_repository = Repository(Loja, connection=connection)
-    produto_repository = Repository(Produto, connection=connection)
-
-    produto: Optional[Produto] = await produto_repository.find_one(
-        uuid=uuid
-    )
+    produto = await produto_service.get_produto(uuid)
     if produto is None:
         raise NotFoundException("Produto não encontrado")
 
-    loja: Optional[Loja] = await loja_repository.find_one(
-        uuid=produto.loja_uuid
-    )
-    if loja is None:
-        raise NotFoundException('Loja de produto não encontrada!')
-
-    produto_service = ProdutoService(connection=connection, loja=loja)
-    precos = await produto_service.get_precos(produto)
-    image_url = await produto_service.get_public_url_image(produto)
-
-    return ProdutoGET(
-        nome=produto.nome,
-        descricao=produto.nome,
-        preco=produto.preco,
-        categoria_uuid=produto.categoria_uuid,
-        loja_uuid=produto.loja_uuid,
-        precos=precos,
-        image_url=image_url
-    )
+    return produto
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_produto(
     produto_data: ProdutoPOST,
     current_company: current_company,
-    connection: connection_dependency,
-) -> Dict[str, str | dict]:
+    produto_service: produto_service_dependency
+) -> Dict[str, str]:
 
     """
     Cadastra um novo produto na plataforma.
@@ -142,24 +93,10 @@ async def cadastrar_produto(
     Raises:
         HTTPException: Se ocorrer um erro durante o cadastro.
     """
-    loja_repository = Repository(Loja, connection=connection)
-    produto_repository = Repository(Produto, connection=connection)
-
-    produto = Produto(
-        nome=produto_data.nome,
-        descricao=produto_data.descricao,
-        preco=produto_data.preco,
-        categoria_uuid=produto_data.categoria_uuid,
-        loja_uuid=produto_data.loja_uuid
-    )
-    loja: Optional[Loja] = await loja_repository.find_one(
-        uuid=produto.loja_uuid
-    )
-    if loja is None:
-        raise NotFoundException('Loja de produto não encontrada!')
 
     try:
-        produto.uuid = await produto_repository.save(produto)
+        response = await produto_service.save_produto(produto_data)
+        return response
     except Exception as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -167,38 +104,17 @@ async def cadastrar_produto(
                     f"upload da imagem! detail: {error}")
         )
 
-    try:
-        image_service = ImageUploadProdutoService(loja=loja)
-        image_service.upload_image_produto(
-            base64_string=produto_data.image_bytes, produto=produto
-        )
-
-    except Exception:
-        del_result = await produto_repository.delete(produto)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=("Erro no cadastro do produto ou"
-                    f"upload da imagem! res: {del_result}")
-        )
-
-    image_url = image_service.get_public_url_image_produto(produto)
-
-    return {
-        "uuid": produto.uuid,
-        'image_url': image_url or ''
-    }
-
 
 @router.put(
     "/{uuid}",
     summary='Atualizar dados de cadastro de produto'
 )
 async def atualizar_produto_put(
-    produtoData: Produto,
+    produto_data: ProdutoPOST,
     current_company: current_company,
-    repository: produto_repository_dependency,
+    produto_service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
-) -> Dict[str, int]:
+):
 
     """
     Atualiza um produto utilizando o método HTTP PUT.
@@ -215,42 +131,44 @@ async def atualizar_produto_put(
     Raises:
         HTTPException: Se o produto não for encontrado.
     """
-    produto = await repository.find_one(uuid=uuid)
-    if produto is None:
-        raise NotFoundException("Produto não encontrado")
 
-    num_rows_affected = await repository.update(
-        produto, produtoData.model_dump()  # type: ignore
-    )
-
-    return {"num_rows_affected": num_rows_affected}
+    try:
+        await produto_service.atualizar_produto(
+            uuid=uuid, produto_data=produto_data
+        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=("Erro no cadastro do produto ou"
+                    f"upload da imagem! detail: {error}")
+        )
 
 
 @router.patch("/{uuid}")
-async def atualizar_produto_patch(
-    produtoData: Produto,
+async def atualizar_imagem_de_produto(
     current_company: current_company,
-    repository: produto_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")]
-) -> Dict[str, int]:
+):
 
-    produto: Optional[Produto] = await repository.find_one(uuid=uuid)
-    if produto is None:
-        raise NotFoundException("Produto não encontrado")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-    num_rows_affected = await repository.update(
-        produto, produtoData.model_dump()  # type: ignore
-    )
 
-    return {"num_rows_affected": num_rows_affected}
+@router.delete("/{uuid}/imagem/")
+async def remover_imagem_de_produto(
+    current_company: current_company,
+    uuid: Annotated[str, Path(title="O uuid do produto a remover a imagem")]
+):
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
 async def remover_produto(
     current_company: current_company,
-    repository: produto_repository_dependency,
+    service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
-) -> Dict[str, int]:
+):
     """
     Remove um produto pelo seu uuid.
 
@@ -265,8 +183,7 @@ async def remover_produto(
         HTTPException: Se ocorrer um erro durante a remoção.
     """
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        await service.remove_produto(uuid=uuid)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
-
-    return {"itens_removed": itens_removed}

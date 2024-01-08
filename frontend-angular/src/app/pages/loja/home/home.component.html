@@ -1,0 +1,64 @@
+@if (companyData.value) {
+  <h3>
+    {{ companyData.value.loja.nome }}
+  </h3>
+
+  <div>
+    <strong>Email</strong>: {{ companyData.value.loja.email }}
+  </div>
+
+  <div>
+    <strong>Username:</strong> {{ companyData.value.loja.username }}
+  </div>
+
+  <div>
+    <strong>UUID:</strong> {{ companyData.value.loja.uuid }}
+  </div>
+
+  <br />
+
+  <div>
+    Horarios:
+    {{ companyData.value.loja.horarios_de_funcionamento }}
+  </div>
+
+  <br />
+
+  <div>
+    <strong>Endereço:</strong>
+    <div>
+      UF: {{ companyData.value.loja.endereco.uf }}
+    </div>
+    <div>
+      Cidade: {{ companyData.value.loja.endereco.cidade }}
+    </div>
+    <div>
+      Bairro: {{ companyData.value.loja.endereco.bairro }}
+    </div>
+    <div>
+      Rua: {{ companyData.value.loja.endereco.logradouro }}
+    </div>
+    <div>
+      Numero: {{ companyData.value.loja.endereco.numero }}
+    </div>
+    @if (companyData.value.loja.endereco.complemento) {
+      <div>
+        Complemento: {{ companyData.value.loja.endereco.complemento }}
+      </div>
+    }
+  </div>
+
+  <br />
+
+  <strong>Imagem Cadastro</strong>
+  <div>
+    <img
+      width="400px"
+      [src]="imageBase64String"
+      alt="Imagem de cadastro" />
+
+  </div>
+
+} @else {
+  <strong>Loading...</strong>
+}

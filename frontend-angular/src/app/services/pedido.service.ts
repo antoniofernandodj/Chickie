@@ -1,7 +1,9 @@
+import { AuthService, CompanyAuthData } from './auth.service';
+
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CompanyAuthData, AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 
 export type Endereco = {
@@ -19,7 +21,7 @@ export type PedidoBodyRequest = {
   data_hora: string,
   endereco: Endereco,
   frete: number,
-  itens_pedido: Array<{
+  itens: Array<{
     produto_uuid: string,
     quantidade: number
   }>,
@@ -49,7 +51,7 @@ export class PedidoService {
   token: string
 
   constructor(private http: HttpClient, private authService: AuthService) {
-    this.baseUrl = 'http://localhost:8000/pedidos'
+    this.baseUrl = `${environment.host}/pedidos`;
     this.companyData = authService.currentCompany()
     this.token = ''
   }
@@ -61,7 +63,6 @@ export class PedidoService {
       alert(msg); throw new Error(msg)
     }
     let headers = { Authorization: `Bearer ${this.companyData.access_token}` }
-    console.log({headers: headers})
 
     let observable = this.http.get(
       `${this.baseUrl}/${uuid}`,
@@ -80,11 +81,9 @@ export class PedidoService {
     let token = this.companyData.access_token
     let headers = { Authorization: `Bearer ${token}` }
     let params = new HttpParams().set('loja_uuid', companyUUID)
-
-    let observable = this.http.get(
-      `${this.baseUrl}/`,
-      { params: params, headers: headers }
-    )
+    let observable = this.http.get(`${this.baseUrl}/`, {
+      params: params, headers: headers
+    })
     return observable
   }
 

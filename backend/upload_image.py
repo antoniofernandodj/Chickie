@@ -1,7 +1,7 @@
 import asyncio
 from src.infra.database_postgres.repository import Repository
 from src.infra.database_postgres.config import DatabaseConnectionManager
-from src.schemas import Loja, Produto
+from src.models import Loja, Produto
 import aiofiles  # type: ignore
 from src.services import ImageUploadService 
 import base64

@@ -1,0 +1,65 @@
+<h1>Login</h1>
+<div>
+  <h2>Login Empresa</h2>
+  <div>
+    <div>
+      <label for="">Login</label>
+      <input
+        type="text"
+        (keyup.enter)="doCompanyLogin()"
+        [(ngModel)]="loginCompanyValue"
+      />
+    </div>
+    <div>
+      <label for="">Senha</label>
+      <input
+        type="password"
+        (keyup.enter)="doCompanyLogin()"
+        [(ngModel)]="passwordCompanyValue"
+      />
+    </div>
+    <div>
+      Não é cadastrado?
+      <a routerLink="/signup/loja">Clique aqui</a>
+      para se inscrever
+    </div>
+  </div>
+  @if (!companyLoginStart) {
+    <button (click)="doCompanyLogin()">Login</button>
+  } @else {
+    <div>Logando...</div>
+  }
+</div>
+
+<div>
+  <h2>Login Usuario</h2>
+  <div>
+    <div>
+      <label for="">Login</label>
+      <input
+        type="text"
+        (keyup.enter)="doUserLogin()"
+        [(ngModel)]="loginUserValue"
+      />
+    </div>
+    <div>
+
+    </div>
+    <label for="">Senha</label>
+    <input
+      type="password"
+      (keyup.enter)="doUserLogin()"
+      [(ngModel)]="passwordUserValue"
+    />
+  </div>
+  <div>
+    Não é cadastrado?
+    <a routerLink="/signup/user">Clique aqui</a>
+    para se inscrever
+  </div>
+  @if (!userLoginStart) {
+    <button (click)="doUserLogin()">Login</button>
+  } @else {
+    <div>Logando...</div>
+  }
+</div>

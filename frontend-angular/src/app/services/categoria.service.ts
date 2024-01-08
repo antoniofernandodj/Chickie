@@ -1,9 +1,12 @@
+import { AuthService, CompanyAuthData } from './auth.service';
+
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService, CompanyAuthData } from './auth.service';
-import { CategoriaBodyRequest, CategoriaResponse } from '../models/categoria';
+import { environment } from '../../environments/environment';
 
+
+import { CategoriaBodyRequest, CategoriaResponse } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriaService {
@@ -13,7 +16,7 @@ export class CategoriaService {
   token: string
 
   constructor(private http: HttpClient, private authService: AuthService) {
-    this.baseUrl = 'http://localhost:8000/categorias'
+    this.baseUrl = `${environment.host}/categorias`
     this.companyData = authService.currentCompany()
     this.token = ''
     if (this.companyData) {

@@ -1,4 +1,5 @@
 from typing import Annotated, Optional, Dict, List
+from src.infra.database_postgres.repository import Repository
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,11 +8,11 @@ from fastapi import (  # noqa
     Path,
     Query,
 )
-from src.schemas import CategoriaProdutos
+from src.models import CategoriaProdutos
 from src.dependencies import (
     current_company,
-    categoria_repository_dependency
 )
+from src.dependencies.connection_dependency import connection_dependency
 
 
 router = APIRouter(
@@ -26,7 +27,7 @@ router = APIRouter(
 
 @router.get("/")
 async def requisitar_categorias(
-    repository: categoria_repository_dependency,
+    connection: connection_dependency,
     nome: Optional[str] = Query(None),
     loja_uuid: Optional[str] = Query(None)
 ) -> List[CategoriaProdutos]:
@@ -43,6 +44,8 @@ async def requisitar_categorias(
         List[CategoriaProdutos]: Uma lista contendo todas as
         categorias de produtos correspondentes aos filtros.
     """
+    repository = Repository(CategoriaProdutos, connection)
+
     kwargs = {}
     if nome is not None:
         kwargs["nome"] = nome
@@ -56,7 +59,7 @@ async def requisitar_categorias(
 
 @router.get("/{uuid}")
 async def requisitar_categoria(
-    repository: categoria_repository_dependency,
+    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
     nome: Optional[str] = Query(None)
 ) -> CategoriaProdutos:
@@ -70,6 +73,8 @@ async def requisitar_categoria(
     Returns:
         CategoriaProdutos: A categoria de produto correspondente ao UUID.
     """
+    repository = Repository(CategoriaProdutos, connection)
+
     kwargs = {}
     if nome is not None:
         kwargs["nome"] = nome
@@ -84,7 +89,7 @@ async def requisitar_categoria(
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_categorias(
     categoria: CategoriaProdutos,
-    repository: categoria_repository_dependency,
+    connection: connection_dependency,
     current_company: current_company,
 ) -> Dict[str, str]:
 
@@ -98,6 +103,8 @@ async def cadastrar_categorias(
     Returns:
         dict: Um dicionário contendo o UUID da categoria cadastrada.
     """
+    repository = Repository(CategoriaProdutos, connection)
+
     try:
         uuid = await repository.save(categoria)
     except Exception as error:
@@ -116,7 +123,7 @@ async def atualizar_categoria_patch(
 
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
-    repository: categoria_repository_dependency,
+    connection: connection_dependency,
     current_company: current_company,
     itemData: CategoriaProdutos,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
@@ -134,6 +141,8 @@ async def atualizar_categoria_put(
         dict: Um dicionário contendo o número de linhas
         afetadas pela atualização.
     """
+    repository = Repository(CategoriaProdutos, connection)
+
     try:
         categoria = await repository.find_one(uuid=uuid)
     except Exception as error:
@@ -150,7 +159,7 @@ async def atualizar_categoria_put(
 
 @router.delete("/{uuid}")
 async def remover_categoria(
-    repository: categoria_repository_dependency,
+    connection: connection_dependency,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
 ) -> Dict[str, int]:
@@ -164,6 +173,8 @@ async def remover_categoria(
     Returns:
         dict: Um dicionário contendo o número de itens removidos.
     """
+    repository = Repository(CategoriaProdutos, connection)
+
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

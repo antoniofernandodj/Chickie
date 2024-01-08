@@ -1,1 +1,2 @@
-from . import lojas, usuarios  # noqa
+from . import usuarios  # noqa
+

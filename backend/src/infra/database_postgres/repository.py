@@ -97,13 +97,12 @@ class Repository:
         async with self.lock:
             cursor = await self.connection.cursor()
             await cursor.execute(query, values)
-
-            column_names = []
-            if cursor.description is not None:
-                for item in cursor.description:
-                    column_names.append(item[0])
-
             results = await cursor.fetchall()
+
+        column_names = []
+        if cursor.description is not None:
+            for item in cursor.description:
+                column_names.append(item[0])
 
         response_dicts = [
             {key: value for key, value in zip(column_names, list(result))}
@@ -255,3 +254,54 @@ class Repository:
 
         cursor.close()
         return num_rows_affected
+
+    async def execute_and_fetch_one(self, query: str, params: tuple):
+        """ """
+        logging.info(f"Query: {query}")
+
+        async with self.lock:
+            cursor = await self.connection.cursor()
+            await cursor.execute(query, params)
+
+        column_names = []
+        if cursor.description is not None:
+            for item in cursor.description:
+                column_names.append(item[0])
+
+        result = await cursor.fetchone()
+
+        if result:
+            column_names = []
+            if cursor.description is not None:
+                for item in cursor.description:
+                    column_names.append(item[0])
+
+            dict_result = dict(list(zip(column_names, result)))
+            cursor.close()
+            return dict_result
+
+        cursor.close()
+        return None
+
+    async def execute_and_fetch_all(self, query: str, params: tuple):
+        """ """
+        logging.info(f"Query: {query}")
+
+        async with self.lock:
+            cursor = await self.connection.cursor()
+            await cursor.execute(query, params)
+
+        column_names = []
+        if cursor.description is not None:
+            for item in cursor.description:
+                column_names.append(item[0])
+
+        results = await cursor.fetchall()
+
+        response_dicts = [
+            {key: value for key, value in zip(column_names, list(result))}
+            for result in results
+        ]
+
+        cursor.close()
+        return response_dicts

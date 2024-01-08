@@ -1,0 +1,153 @@
+<strong>Imagem Cadastro</strong>
+
+    <form [formGroup]="imageForm">
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="image/*">
+
+    </form>
+
+    <div>
+      @if (file.bytes_base64 || imageBase64String) {
+        <img
+          [src]="file.bytes_base64 || imageBase64String"
+          alt="Imagem selecionada" width="350px">
+      }
+    </div>
+    @if (!this.atualizandoImagem) {
+      @if (file.bytes_base64) {
+        <button (click)="uploadImage()">Atualizar Imagem</button>
+      }
+    } @else {
+      <strong>Atualizando a imagem de cadastro...</strong>
+    }
+
+
+    @if (companyData.value) {
+      <div>
+        <strong>Nome</strong>
+        <input type="text" [(ngModel)]="nomeValue" name="nome">
+      </div>
+
+      <div>
+        <strong>Email:</strong>
+        <input
+          id=""
+          type="text"
+          name="email"
+          [(ngModel)]="emailValue">
+      </div>
+
+      <div>
+        <strong>Username:</strong>
+        <input
+          type="text"
+          [(ngModel)]="usernameValue"
+          name="username">
+      </div>
+
+
+      <div>
+        <strong>Telefone:</strong>
+        <input
+          type="text"
+          [(ngModel)]="telefoneValue"
+          name="telefone"
+          mask="(00) 0000-0000">
+      </div>
+
+
+
+      <div>
+        <strong>Celular:</strong>
+        <input
+          type="text"
+          [(ngModel)]="celularValue"
+          name="celular"
+          mask="(00) 0 0000-0000">
+
+      </div>
+
+
+      <div>
+        <strong>Horários de funcionamento:</strong>
+        <br />
+        <textarea
+          type="text"
+          [(ngModel)]="horariosValue"
+          name="horarios"></textarea>
+
+        <br />
+      </div>
+
+      <br />
+
+      <div>
+        <strong>Endereço:</strong>
+        <div>
+          UF
+          <select name="uf" [(ngModel)]="uf">
+
+            <option value="">Escolha um estado...</option>
+
+            @for (item of ufs; track $index) {
+              <option value="{{ item }}">
+              {{ item }}
+              </option>
+            }
+
+          </select>
+        </div>
+        <div>
+          Cidade:
+          <input
+            type="text"
+            [(ngModel)]="cidadeValue"
+            name="cidade">
+
+        </div>
+        <div>
+          Bairro:
+          <input
+            type="text"
+            [(ngModel)]="bairroValue"
+            name="bairro">
+
+        </div>
+        <div>
+          Rua:
+          <input
+            type="text"
+            [(ngModel)]="logradouroValue"
+            name="logradouro">
+
+        </div>
+        <div>
+          Numero:
+          <input
+            type="text"
+            [(ngModel)]="numeroValue"
+            name="numero">
+
+        </div>
+        @if (companyData.value.loja.endereco.complemento) {
+          <div>
+            Complemento:
+            <input
+              type="text"
+              [(ngModel)]="complementoValue"
+              name="complamento">
+
+          </div>
+        }
+      </div>
+
+      <br />
+
+      <button (click)="atualizarCadastro()">Atualizar cadastro</button>
+
+
+    } @else {
+      <strong>Loading...</strong>
+    }

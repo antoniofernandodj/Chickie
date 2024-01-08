@@ -7,13 +7,14 @@ from fastapi import (  # noqa
     Query
 )
 from typing import Optional
-from src.schemas import Entregador
+from src.models import Entregador
 from src.exceptions import NotFoundException
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import (
-    connection_dependency,
     current_company
 )
+
+from src.dependencies.connection_dependency import connection_dependency
 
 
 router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
@@ -34,11 +35,12 @@ async def requisitar_entregadores(
     Returns:
         List[Entregador]: Uma lista contendo todos os entregadores cadastrados.
     """
+    repository = Repository(Entregador, connection=connection)
+
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    repository = Repository(Entregador, connection=connection)
     results = await repository.find_all(**kwargs)
 
     return results
@@ -59,6 +61,7 @@ async def requisitar_entregador(
         Entregador: O entregador correspondente ao UUID.
     """
     repository = Repository(Entregador, connection=connection)
+
     result = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Entregador não encontrado")
@@ -84,6 +87,7 @@ async def cadastrar_entregadores(
         dict: Um dicionário contendo o UUID do entregador cadastrado.
     """
     repository = Repository(Entregador, connection=connection)
+
     try:
         uuid = await repository.save(entregador)
     except Exception as error:
@@ -113,6 +117,7 @@ async def atualizar_entregador_put(
         pela atualização.
     """
     repository = Repository(Entregador, connection=connection)
+
     entregador = await repository.find_one(uuid=uuid)
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
@@ -132,6 +137,7 @@ async def atualizar_entregador_patch(
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")],
 ):
     repository = Repository(Entregador, connection=connection)
+
     entregador = await repository.find_one(uuid=uuid)
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
@@ -161,6 +167,7 @@ async def remover_entregador(
         dict: Um dicionário contendo o número de itens removidos.
     """
     repository = Repository(Entregador, connection=connection)
+
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

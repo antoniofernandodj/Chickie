@@ -1,18 +1,55 @@
 feitos -> {
+
+    usuario: corrigir logica de aplicação de descontos -> {
+        MODELS: x
+        BANCO / MIGRACAO: x
+        ENDPONTS: x
+    }
+
+    usuario: adicionar comentarios a um item de pedido -> {
+
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: x
+    }
+
+    loja: horarios de funcionamento -> {
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: x
+    }
+
     loja: Atualizar imagem de perfil -> {
         MODELS: X
         BANCO / MIGRACAO: X
         ENDPONTS: X
         FRONTEND: X
     }
+
     loja: Cadastro de imagem para os produtos -> {
         SERVICE: X
         ENDPONTS: x
         FRONTEND: x
     }
+
+    loja: Atualizar configuracoes de conta -> {
+
+        // LojaService
+
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: x
+    }
+
 }
 
 loja: Alteração de status de pedido -> {
+    
+    // PedidoService
+
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS:
@@ -20,12 +57,18 @@ loja: Alteração de status de pedido -> {
 }
 
 loja: Atualizacao de imagem para os produtos -> {
+
+    // ProdutoService
+
     SERVICE: X
     ENDPONTS: 
     FRONTEND: 
 }
 
 loja: Ajustar pedido para concluido -> {
+
+    // PedidoService
+
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS:
@@ -33,6 +76,9 @@ loja: Ajustar pedido para concluido -> {
 }
 
 usuario: avaliação de loja -> {
+
+    // LojaService
+
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
@@ -40,6 +86,9 @@ usuario: avaliação de loja -> {
 }
 
 usuario: avaliação de produto -> {
+
+    // ProdutoService
+
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
@@ -47,20 +96,17 @@ usuario: avaliação de produto -> {
 }
 
 loja: loja cadastrar usuario -> {
+
+    // LojaService
+
     MODELS: X
     BANCO / MIGRACAO:
     ENDPONTS:
     FRONTEND:
 }
 
-admin: inativar loja -> {
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
-
 usuario: adicionar comentarios a um pedido -> {
+
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
@@ -68,46 +114,12 @@ usuario: adicionar comentarios a um pedido -> {
 }
 
 usuario: Atualizar configuracoes de conta -> {
+
+    // UserService
+
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
-    FRONTEND:
-}
-
-loja: Atualizar configuracoes de conta -> {
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
-
-usuario: pedido precisa de email -> {
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS:
-    FRONTEND:
-}
-
-
-
-admin: excluir loja -> {
-    MODELS: x
-    BANCO / MIGRACAO:
-    ENDPONTS: x
-    FRONTEND:
-}
-
-loja: horarios de funcionamento -> {
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
-
-admin: excluir user -> {
-    MODELS: x
-    BANCO / MIGRACAO:
-    ENDPONTS:
     FRONTEND:
 }
 
@@ -133,18 +145,24 @@ usuario: definir a senha no primeiro acesso caso tenha sido importado ou cadastr
 }
 
 usuario: buscar loja por localização -> {
+
+    // LojaService
+
     criar tabela EnderecoDeLoja  X
     criar tabela EnderecoDeUsuario X
     criar tabela EnderecoDePedido X
     ENDPOINTS / QUERIES:
 }
 
-usuario: buscar loja por avaliação -> {
+usuario: buscar loja por avaliação -> [{
+
+    // AvaliacaoService
+
     ** qual a forma mais rapida de checar a avaliação media de uma empresa,
     dado que há uma tabela Avaliações e que nela há uma coluna nota? -> {
         SELECT AVG(nota) AS media_avaliacao
         FROM Avaliacoes
-        WHERE id_empresa = 'ID_DA_EMPRESA';
+        WHERE empresa__uuid = 'ID_DA_EMPRESA';
     },
     ** qual a forma mais rapida de checar empresas com
     avaliação media maior que nota 4, dado que há uma
@@ -154,25 +172,19 @@ usuario: buscar loja por avaliação -> {
         GROUP BY empresa_id
         HAVING AVG(nota) > 4;
     }
-} -> {
+},
+{
     MODELS:
     BANCO / MIGRACAO:
     ENDPONTS:
     FRONTEND:
-}
+}]
 
 usuario: listar pedidos -> {
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
     FRONTEND:
-}
-
-
-usuario: corrigir logica de aplicação de descontos -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
 }
 
 loja: exibir historico -> {
@@ -189,6 +201,10 @@ loja: notificação de promoções -> {
     FRONTEND:
 }
 
+admin: requisitar pedido so pode ser acessivel à loja ou ao user {
+    ...
+}
+
 loja: sistemas de ticket / suporte ao cliente -> {
     MODELS:
     BANCO / MIGRACAO:
@@ -196,9 +212,33 @@ loja: sistemas de ticket / suporte ao cliente -> {
     FRONTEND:
 }
 
-eu: pesquisar api para pagamento -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
+admin {
+    admin: pesquisar api para pagamento -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+
+    admin: excluir loja -> {
+        MODELS: x
+        BANCO / MIGRACAO:
+        ENDPONTS: x
+        FRONTEND:
+    }
+
+    admin: excluir user -> {
+        MODELS: x
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    admin: inativar loja -> {
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND:
+    }
 }

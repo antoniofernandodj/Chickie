@@ -1,6 +1,6 @@
 from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
-from src.schemas import Loja, LojaSignUp
+from src.models import Loja, LojaSignUp
 from src import use_cases
 from config import settings as s
 

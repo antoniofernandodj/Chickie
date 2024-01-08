@@ -12,7 +12,7 @@ from src.infra.database_postgres.commands import (
 )
 from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
-from src.schemas import Usuario
+from src.models import Usuario
 
 f = Faker()
 

@@ -1,8 +1,10 @@
+import { AuthService, CompanyAuthData } from './auth.service';
+
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService, CompanyAuthData } from './auth.service';
-import { PrecoBodyRequest, PrecoResponse } from '../models/preco';
+import { PrecoBodyRequest, PrecoResponse } from '../models/models';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({ providedIn: 'root' })
@@ -17,7 +19,7 @@ export class PrecoService {
     private http: HttpClient,
     private authService: AuthService,
   ) {
-    this.baseUrl = 'http://localhost:8000/precos'
+    this.baseUrl = `${environment.host}/precos`
     this.headers = new HttpHeaders({})
     this.companyData = authService.currentCompany()
     this.token = ''
