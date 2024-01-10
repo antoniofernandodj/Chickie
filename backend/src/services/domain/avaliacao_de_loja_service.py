@@ -32,7 +32,7 @@ class AvaliacaoDeLojaService(BaseService):
         )
         self.loja = loja
 
-    async def avaliacao_de_loja(self, loja: Loja):
+    async def avaliacao_de_loja(self, loja: Loja) -> Optional[dict]:
         sql = """
         SELECT AVG(nota) AS media_avaliacao
         FROM Avaliacoes
@@ -67,6 +67,8 @@ class AvaliacaoDeLojaService(BaseService):
         avaliacoes = [
             AvaliacaoDeLoja(**result) for result in results
         ]
+
+        [print(avaliacao) for avaliacao in avaliacoes]
 
         return avaliacoes
 

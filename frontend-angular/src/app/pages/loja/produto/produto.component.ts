@@ -108,14 +108,12 @@ export class ProdutoComponent {
     this.diasDaSemanaDisponiveis = new BehaviorSubject<Array<DiaSemana>>([])
   }
 
-
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.produtoUUID = params['id'];
     });
     this.updateProdutoPrecos()
   }
-
 
   updateProdutoPrecos() {
 
@@ -151,7 +149,6 @@ export class ProdutoComponent {
 
 
   }
-
 
   removerPreco(event: Event, preco: any) {
     let button  = event.target as HTMLButtonElement
@@ -191,9 +188,9 @@ export class ProdutoComponent {
     }
 
     let body = {
-      'valor': this.valorValue || 0,
-      'dia_da_semana': this.diaDaSemanaValue,
-      'produto_uuid': this.produtoUUID
+      valor: this.valorValue || 0,
+      dia_da_semana: this.diaDaSemanaValue,
+      produto_uuid: this.produtoUUID
     }
 
     this.precoService.save(body).subscribe({

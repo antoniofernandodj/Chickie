@@ -29,7 +29,6 @@ class ErrorDetail {
 }
 
 
-
 @Component({
   selector: 'app-login',
   standalone: true,

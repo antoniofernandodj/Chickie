@@ -20,9 +20,6 @@ class LojaService(BaseService):
             model=self.model, connection=self.connection
         )
 
-        self.repo = Repository(
-            model=Loja, connection=self.connection
-        )
         self.endereco_repo = Repository(
             model=EnderecoLoja, connection=connection
         )
@@ -93,9 +90,12 @@ class LojaService(BaseService):
             telefone=loja.telefone,
             horarios_de_funcionamento=loja.horarios_de_funcionamento
         )
-
         image_service = ImageUploadService(loja=loja)
-        public_url = image_service.get_public_url_image_cadastro()
+        try:
+            public_url = image_service.get_public_url_image_cadastro()
+        except ValueError:
+            public_url = None
+
         loja_data.imagem_cadastro = public_url
         return loja_data
 
@@ -148,7 +148,8 @@ class LojaService(BaseService):
                 except IndexError:
                     image_bytes_base64 = loja_data.image_bytes
                 image_service.upload_image_cadastro(
-                    base64_string=image_bytes_base64
+                    base64_string=image_bytes_base64,
+                    filename=loja_data.image_filename
                 )
         except Exception:
             pass

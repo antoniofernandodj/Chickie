@@ -42,11 +42,13 @@ class Loja(BaseModel):
 
 
 class LojaPUT(BaseModel):
-    nome: str
-    username: str
+
     email: str
     telefone: str
     celular: str
+
+    nome: str
+    username: str
 
     uf: str
     cep: str

@@ -81,7 +81,7 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
         base64_string: str,
         filename: Optional[str] = None
     ) -> ImageUploadServiceResponse:
-        bytes_data: bytes = base64.b64decode(base64_string)
+        bytes_data = base64.b64decode(base64_string)
 
         if filename:
             new_name = self.__get_cloud_filename(produto, filename)
@@ -118,7 +118,7 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
 
     def __get_cloud_filename(self, produto: Produto, filename: str) -> str:
         name, ext = os.path.splitext(filename)  # type: ignore
-        new_filename = f"{name}_{produto.nome}_{produto.uuid}{ext}"
+        new_filename = f"{name}_{produto.nome}_{produto.uuid}"
 
         web_safe_name = re.sub(
             pattern=r'[^\w\s-]',
@@ -229,7 +229,7 @@ class ImageUploadCadastroService(ImageUploadServiceBase):
     def __get_cloud_filename(self, filename: str) -> str:
         name, ext = os.path.splitext(filename)  # type: ignore
         uuid_part = str(uuid.uuid4())
-        new_filename = f"{name}_{self.loja.uuid or uuid_part}{ext}"
+        new_filename = f"{name}_{self.loja.uuid or uuid_part}"
 
         web_safe_name = re.sub(
             pattern=r'[^\w\s-]',
@@ -241,7 +241,7 @@ class ImageUploadCadastroService(ImageUploadServiceBase):
 
     @property
     def image_cadastro_folder_path(self) -> str:
-        dirname = self.safe_name(f'{self.loja.uuid}_{self.loja.username}')
+        dirname = self.safe_name(f'{self.loja.username}_{self.loja.uuid}')
         return (f'lojas/{dirname}/imagem_cadastro')
 
     @property
@@ -274,7 +274,7 @@ class ImageUploadCadastroService(ImageUploadServiceBase):
             if self.loja.uuid in image['public_id']:
                 return image
 
-        raise ValueError('Nenhum produto encontrado!')
+        raise ValueError('Nenhuma imagem de cadastro encontrada!')
 
 
 class ImageUploadService(

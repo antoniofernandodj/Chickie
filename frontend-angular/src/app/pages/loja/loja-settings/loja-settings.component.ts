@@ -163,11 +163,12 @@ export class LojaSettingsComponent {
 
     let body = {
 
-      nome: this.nomeValue,
-      username: this.usernameValue,
       email: this.emailValue,
       telefone: this.telefoneValue,
       celular: this.celularValue,
+
+      nome: this.nomeValue,
+      username: this.usernameValue,
 
       uf: this.uf,
       cep: this.cep,

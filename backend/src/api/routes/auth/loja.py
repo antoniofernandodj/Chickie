@@ -21,7 +21,7 @@ from src.dependencies import (  # noqa
 
 from src.dependencies.connection_dependency import connection_dependency
 from fastapi import HTTPException, status, Path, Response, Query
-from typing import Any, Optional, List
+from typing import Any, Optional, List, Dict
 from src.models import (
     Cliente,
     UsuarioSignUp,
@@ -38,6 +38,7 @@ from src.models import (
 )
 from src.services import (
     ImageUploadService,
+    ImageUploadServiceResponse,
     ProdutoService
 )
 
@@ -175,13 +176,12 @@ async def update_loja(
 
     try:
         await service.update_loja_data(uuid, updated_data)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erro ao atualizar a loja! Detalhes: {error}"
         )
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post(
@@ -259,7 +259,10 @@ async def requisitar_produtos_de_loja(
     produtos: List[Produto] = await produto_repository.find_all(**kwargs)
     for produto in produtos:
         precos = await produto_service.get_precos(produto)
-        image_url = await produto_service.get_public_url_image(produto)
+        try:
+            image_url = await produto_service.get_public_url_image(produto)
+        except ValueError:
+            image_url = None
         response_item = ProdutoGET(
             uuid=produto.uuid,
             nome=produto.nome,
@@ -275,7 +278,7 @@ async def requisitar_produtos_de_loja(
 
 
 @router.patch(
-    '/atualizar_img_cadastro',
+    '/atualizar_imagem_cadastro',
     summary="Atualizar imagem de cadastro da loja",
     responses={
         404: {"description": "Loja não encontrada"}
@@ -283,9 +286,8 @@ async def requisitar_produtos_de_loja(
 )
 async def atualizar_imagem_de_cadastro(
     loja: current_company,
-    image: LojaUpdateImageCadastro,
-    response: Response
-) -> Any:
+    image: LojaUpdateImageCadastro
+) -> Dict[str, ImageUploadServiceResponse]:
     """
     Atualiza a imagem de cadastro de uma loja.
 
@@ -308,7 +310,8 @@ async def atualizar_imagem_de_cadastro(
             image_bytes_base64 = image.bytes_base64
 
         result = image_service.upload_image_cadastro(
-            base64_string=image_bytes_base64
+            base64_string=image_bytes_base64,
+            filename=image.filename
         )
         return {'result': result}
 

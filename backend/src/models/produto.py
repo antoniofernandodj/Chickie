@@ -22,6 +22,7 @@ class ProdutoPOST(BaseModel):
     categoria_uuid: str
     loja_uuid: str
     image_bytes: str
+    filename: str
 
     uuid: Optional[str] = None
 

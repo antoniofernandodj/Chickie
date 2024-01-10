@@ -37,7 +37,6 @@ class ProdutoService(BaseService):
         self,
         produto_data: ProdutoPOST
     ) -> Dict[str, str]:
-
         from src.services import ImageUploadProdutoService
 
         produto = Produto(
@@ -57,6 +56,7 @@ class ProdutoService(BaseService):
             image_service = ImageUploadProdutoService(loja=loja)
             image_service.upload_image_produto(
                 base64_string=produto_data.image_bytes,
+                filename=produto_data.filename,
                 produto=produto
             )
             image_url = image_service.get_public_url_image_produto(produto)
@@ -148,7 +148,11 @@ class ProdutoService(BaseService):
         response: List[ProdutoGET] = []
         produtos = await self.get_all(**kwargs)
         for produto in produtos:
-            image_url = await self.get_public_url_image(produto)
+            try:
+                image_url = await self.get_public_url_image(produto)
+            except ValueError:
+                image_url = None
+
             precos = await self.get_precos(produto)
             preco_hoje = await self.pedido_service.get_produto_preco(produto)
 
@@ -176,7 +180,11 @@ class ProdutoService(BaseService):
         preco_hoje = await self.pedido_service.get_produto_preco(produto)
 
         precos = await self.get_precos(produto)
-        image_url = await self.get_public_url_image(produto)
+        try:
+            image_url = await self.get_public_url_image(produto)
+        except ValueError:
+            image_url = None
+
         return ProdutoGET(
             nome=produto.nome,
             descricao=produto.nome,

@@ -2038,6 +2038,20 @@ files = [
 ]
 
 [[package]]
+name = "reactivex"
+version = "4.0.4"
+description = "ReactiveX (Rx) for Python"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "reactivex-4.0.4-py3-none-any.whl", hash = "sha256:0004796c420bd9e68aad8e65627d85a8e13f293de76656165dffbcb3a0e3fb6a"},
+    {file = "reactivex-4.0.4.tar.gz", hash = "sha256:e912e6591022ab9176df8348a653fe8c8fa7a301f26f9931c9d8c78a650e04e8"},
+]
+
+[package.dependencies]
+typing-extensions = ">=4.1.1,<5.0.0"
+
+[[package]]
 name = "redis"
 version = "4.6.0"
 description = "Python client for Redis database and key-value store"
@@ -2567,4 +2581,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.12"
-content-hash = "c5fa4520e636d4813aaf77654743675438e54f3322bd6edabec41e50987a7e84"
+content-hash = "cf831e2dca4c03da4e0df0759e66826df517a529185c48395acbbca1106a3134"

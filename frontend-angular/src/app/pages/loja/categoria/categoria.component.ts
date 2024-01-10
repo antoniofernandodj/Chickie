@@ -118,7 +118,8 @@ export class CategoriaComponent {
       nome: this.nomeValue,
       descricao: this.descricaoValue,
       preco: Number(this.precoValue || 0),
-      image_bytes: this.file.bytes_base64.split(',')[1]
+      image_bytes: this.file.bytes_base64.split(',')[1],
+      filename: this.file.filename
     }
 
 
