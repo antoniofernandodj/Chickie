@@ -93,6 +93,7 @@ class PedidoService(BaseService):
                     itens=items,
                     total=total,
                     data_hora=pedido.data_hora,
+                    concluido=pedido.concluido
                 )
             )
 
@@ -181,6 +182,7 @@ class PedidoService(BaseService):
             total=total,
             itens=items,
             data_hora=pedido.data_hora,
+            concluido=pedido.concluido
         )
 
     async def save_pedido(
@@ -193,6 +195,7 @@ class PedidoService(BaseService):
             loja_uuid=pedido_data.loja_uuid,
             frete=pedido_data.frete,
             celular=pedido_data.celular,
+            concluido=False
         )
 
         pedido.uuid = await self.repo.save(pedido)
@@ -271,9 +274,6 @@ class PedidoService(BaseService):
         Pedido, status: str
     ) -> None:
 
-        return None
-
-    async def marcar_como_concluido(self, pedido: Pedido) -> None:
         return None
 
     async def remover_pedido(self, uuid: str) -> Dict[str, int]:

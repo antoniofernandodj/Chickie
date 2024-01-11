@@ -29,5 +29,6 @@ export type Pedido = {
   status_uuid: string | null;
   total: number
   uuid: string;
+  concluido: boolean
 };
 

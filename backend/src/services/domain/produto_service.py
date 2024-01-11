@@ -4,6 +4,7 @@ from src.models import (
     Preco,
     Loja,
     ProdutoPOST,
+    ProdutoPUT,
     ProdutoGET,
     AvaliacaoDeProduto
 )
@@ -196,7 +197,7 @@ class ProdutoService(BaseService):
             image_url=image_url
         )
 
-    async def atualizar_produto(self, uuid: str, produto_data: ProdutoPOST):
+    async def atualizar_produto(self, uuid: str, produto_data: ProdutoPUT):
         produto = await self.repo.find_one(uuid=uuid)
         if produto is None:
             raise ValueError("Produto não encontrado")

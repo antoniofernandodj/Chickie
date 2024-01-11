@@ -13,10 +13,10 @@ import {  CompanyAuthData, AuthService, PedidoService,
   selector: 'app-pedido',
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
-  templateUrl: './pedidos.component.html',
-  styleUrl: './pedidos.component.sass'
+  templateUrl: './historico.component.html',
+  styleUrl: './historico.component.sass'
 })
-export class PedidosComponent {
+export class HistoricoComponent {
 
   pedidoUUID: string
   pedidos: BehaviorSubject<Array<Pedido>>
@@ -60,39 +60,16 @@ export class PedidosComponent {
       this.pedidoService.getAll(this.companyData.loja.uuid).subscribe({
         next: (response: any) => {
           this.pedidos.next(response)
-          console.log({response: response})
-          this.pedidos.next(response)
           this.nenhumEmAndamento.next(
-            this.pedidos.value.filter(item => !item.concluido).length == 0
+            this.pedidos.value.filter(item => item.concluido).length == 0
           )
+          console.log({response: response})
         },
         error: (response) => {
           let msg = 'Erro na busca do pedido'
           alert(msg); console.log(response); throw new Error(msg)
         }
       })
-    })
-  }
-
-  concluir(event: Event, pedido: Pedido) {
-    let button = event.target as HTMLButtonElement
-
-    button.innerHTML = 'Concluindo...'
-    button.disabled = true
-
-    this.pedidoService.concluir(pedido.uuid).subscribe({
-      next: (result) => {
-        alert('Pedido concluído com sucesso!')
-        button.innerHTML = 'Marcar como concluido'
-        button.disabled = false
-
-        this.ngOnInit()
-      },
-      error: (result) => {
-        alert('Erro na conclusão do pedido')
-        button.innerHTML = 'Marcar como concluido'
-        button.disabled = false
-      }
     })
   }
 
@@ -108,16 +85,6 @@ export class PedidosComponent {
     const segundos = String(data.getSeconds()).padStart(2, '0');
 
     return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
-  }
-
-  atualizarStatusDePedido(pedido: any) {
-    console.log(pedido)
-    alert('Status Atualizado com sucesso!')
-  }
-
-  atualizarFreteDePedido(pedido: any) {
-    console.log(pedido)
-    alert('Frete atualizado com sucesso!')
   }
 
 }

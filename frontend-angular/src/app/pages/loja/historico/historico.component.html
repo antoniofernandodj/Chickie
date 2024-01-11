@@ -1,9 +1,9 @@
 <div>
-<h2>Pedidos</h2>
+<h2>Histórico</h2>
 <hr>
 @for (pedido of pedidos.value; track $index) {
 
-  @if (!pedido.concluido) {
+  @if (pedido.concluido) {
 
       <p>
         <a [routerLink]="['/loja/pedidos', pedido.uuid]" >
@@ -12,29 +12,6 @@
       </p>
       <div>Total: {{ pedido.total | currency:'BRL' }}</div>
 
-      @if (statusList.length) {
-
-        <select id="" [(ngModel)]="pedido.status_uuid">
-          <option value="">Pedido Realizado</option>
-        @for (s of statusList; track $index) {
-          <option value="{{ s.uuid }}">{{s.nome}}</option>
-        }
-        </select>
-        <button (click)="atualizarStatusDePedido(pedido)">Atualizar Status</button>
-      }
-
-
-      @if (pedido.status) {
-        <p>Status: {{pedido.status.nome}}</p>
-      } @else {
-        <p>Status: Pedido Realizado</p>
-      }
-
-      Concluído: {{ pedido.concluido }}
-
-      <div>
-        <button (click)="concluir($event, pedido)">Marcar como concluído</button>
-      </div>
 
       <p>Celular:
         <a href="http://wa.me/55{{pedido.celular}}">{{pedido.celular}}</a>
@@ -52,15 +29,9 @@
       </ul>
 
       <p>
-        Frete: R$
-        <input
-        type="number"
-        min="0"
-        [(ngModel)]="pedido.frete"
-        (keyup.enter)="atualizarFreteDePedido(pedido)">
+        Frete: R$ {{ pedido.frete }}
       </p>
 
-      <button (click)="atualizarFreteDePedido(pedido)">Atualizar Frete</button>
       <h3>Itens do Pedido:</h3>
       <div style="border: 1px solid black;">
         <ul>
@@ -74,9 +45,11 @@
       </div>
 
   }
+
+<hr [ngStyle]="{'margin-top.px': 50}">
+<hr>
+<hr [ngStyle]="{'margin-bottom.px': 50}">
+
 }
 
-@if (nenhumEmAndamento.value) {
-  Vazio!
-}
 </div>

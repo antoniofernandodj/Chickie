@@ -24,36 +24,39 @@
 
 <h1>Categorias:</h1>
 
-<div id="table-container">
-  @if (categorias.value.length) {
-    <table id="categoria_table">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Descricao</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (categoria of categorias.value; track $index) {
+@if (!loading) {
+  <div id="table-container">
+    @if (categorias.value.length) {
+      <table id="categoria_table">
+        <thead>
           <tr>
-            <td>
-              <a [routerLink]="['/loja/categorias', categoria.uuid]">
-                {{categoria.nome}}
-              </a>
-            </td>
-            <td>{{ categoria.descricao }}</td>
-            <td>
-              <button (click)="deleteCategoria(categoria)">
-                Delete
-              </button>
-            </td>
+            <th>Nome</th>
+            <th>Descricao</th>
+            <th></th>
           </tr>
-        }
-      </tbody>
-  </table>
-  } @else {
-    <strong>Nenhuma categoria encontrada!</strong>
-  }
-</div>
-
+        </thead>
+        <tbody>
+          @for (categoria of categorias.value; track $index) {
+            <tr>
+              <td>
+                <a [routerLink]="['/loja/categorias', categoria.uuid]">
+                  {{  categoria.nome  }}
+                </a>
+              </td>
+              <td>{{ categoria.descricao }}</td>
+              <td>
+                <button (click)="deleteCategoria(categoria)">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+    </table>
+    } @else {
+      <strong>Nenhuma categoria encontrada!</strong>
+    }
+  </div>
+} @else {
+  <strong>loading...</strong>
+}

@@ -8,10 +8,21 @@ from fastapi import (  # noqa
     Query,
     Response
 )
-from src.models import ProdutoGET, ProdutoPOST
 from src.dependencies import (
     produto_service_dependency,
     current_company,
+)
+
+from src.services import (
+    ImageUploadService,
+    ImageUploadServiceResponse,
+)
+
+from src.models import (
+    ProdutoGET,
+    ProdutoPOST,
+    ProdutoPUT,
+    LojaUpdateImageCadastro,
 )
 
 
@@ -110,7 +121,7 @@ async def cadastrar_produto(
     summary='Atualizar dados de cadastro de produto'
 )
 async def atualizar_produto_put(
-    produto_data: ProdutoPOST,
+    produto_data: ProdutoPUT,
     current_company: current_company,
     produto_service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
@@ -121,7 +132,7 @@ async def atualizar_produto_put(
 
     Args:
         uuid (str): O uuid do produto a ser atualizado.
-        produtoData (Produto): Os novos dados do produto.
+        produto_data (Produto): Os novos dados do produto.
         current_company: A empresa atual autenticada.
 
     Returns:
@@ -145,22 +156,91 @@ async def atualizar_produto_put(
         )
 
 
-@router.patch("/{uuid}")
+@router.post(
+    '/{uuid}/imagem',
+    summary="Atualizar imagem de produto da loja",
+    responses={
+        404: {"description": "Loja não encontrada"}
+    }
+)
 async def atualizar_imagem_de_produto(
-    current_company: current_company,
-    uuid: Annotated[str, Path(title="O uuid do produto a fazer patch")]
-):
+    uuid: str,
+    loja: current_company,
+    image: LojaUpdateImageCadastro,
+    service: produto_service_dependency
+) -> Dict[str, ImageUploadServiceResponse]:
+    """
+    Atualiza a imagem de um produto de uma loja.
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    Returns:
+    - `JSONResponse`: Retorna um JSON vazio com um status code de 204 se a atualização for bem-sucedida.  # noqa
+
+    Raises:
+    - `HTTPException`: Se ocorrer um erro durante o upload da imagem.
+    """
+    produto = await service.get(uuid)
+    if produto is None:
+        raise NotFoundException('O produto não foi encontrado!')
+
+    try:
+        image_service = ImageUploadService(loja=loja)
+        try:
+            image_bytes_base64 = image.bytes_base64.split(',')[1]
+        except IndexError:
+            image_bytes_base64 = image.bytes_base64
+
+        result = image_service.upload_image_produto(
+            base64_string=image_bytes_base64,
+            filename=image.filename,
+            produto=produto
+        )
+        return {'result': result}
+
+    except Exception as error:
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro no upload da imagem! Detalhes: {error}"
+        )
 
 
-@router.delete("/{uuid}/imagem/")
+@router.delete(
+    '/{uuid}/imagem',
+    summary="Remover imagem de produto da loja",
+    responses={
+        404: {"description": "Loja não encontrada"}
+    }
+)
 async def remover_imagem_de_produto(
-    current_company: current_company,
-    uuid: Annotated[str, Path(title="O uuid do produto a remover a imagem")]
+    uuid: str,
+    loja: current_company,
+    service: produto_service_dependency
 ):
+    """
+    Remover a imagem de um produto de uma loja.
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    Returns:
+    - `JSONResponse`: Retorna um JSON vazio com um status code de 204 se a atualização for bem-sucedida.  # noqa
+
+    Raises:
+    - `HTTPException`: Se ocorrer um erro durante a remoção da imagem.
+    """
+    produto = await service.get(uuid)
+    if produto is None:
+        raise NotFoundException('O produto não foi encontrado!')
+
+    try:
+        image_service = ImageUploadService(loja=loja)
+        image_service.delete_image_produto(produto)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro no upload da imagem! Detalhes: {error}"
+        )
 
 
 @router.delete("/{uuid}")

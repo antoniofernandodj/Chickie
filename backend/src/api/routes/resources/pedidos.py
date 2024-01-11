@@ -129,6 +129,8 @@ async def concluir_pedido(
         await service.concluir_pedido(pedido_uuid=uuid)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'Erro no cadastro do pedido! detail: {error}'

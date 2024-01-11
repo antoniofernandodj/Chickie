@@ -7,6 +7,12 @@ export type ProdutoBodyRequest = {
   image_bytes: string
 }
 
+export type ProdutoPUTRequest = {
+    nome: string,
+    descricao: string,
+    preco: number,
+}
+
 export type ProdutoResponse = {
   uuid: string
   loja_uuid: string,

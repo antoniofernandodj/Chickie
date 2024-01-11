@@ -92,9 +92,17 @@ export class PedidoService {
     return observable
   }
 
+  concluir(uuid: string) {
+    let headers = { Authorization: `Bearer ${this.companyData?.access_token}` }
+    console.log(headers)
+    let urlRequest = `${this.baseUrl}/concluir_pedido/${uuid}`
+    let observable = this.http.patch(urlRequest, {}, { headers: headers })
+    return observable
+  }
+
   delete(item: PedidoBodyResponse) {
 
-    let headers = new HttpHeaders({ Authorization: `Bearer ${this.token}` })
+    let headers = { Authorization: `Bearer ${this.token}` }
 
     let observable = this.http.delete(
       `${this.baseUrl}/${item.uuid}`, { headers: headers }

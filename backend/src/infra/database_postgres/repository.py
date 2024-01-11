@@ -197,11 +197,12 @@ class Repository:
             int: The number of rows affected by the update operation.
         """
         values = list(data.values())
+        print({'data': data})
         set_clause = ", ".join([f"{column} = %s" for column in data.keys()])
         query = "UPDATE {} SET {} WHERE uuid = '{}';".format(
             self.tablename, set_clause, item.uuid
         )
-        logging.info(f"\nCommand: {query} Values: {values}")
+        logging.info(f"\n\n\nCommand: {query} Values: {values}\n\n")
         async with self.lock:
             cursor = await self.connection.cursor()
             await cursor.execute(query, values)

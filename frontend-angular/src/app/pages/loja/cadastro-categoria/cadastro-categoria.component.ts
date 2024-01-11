@@ -21,8 +21,10 @@ export class CadastroCategoriaComponent {
   categorias: BehaviorSubject<Array<CategoriaResponse>>
   descricaoValue: string
   nomeValue: string
+  loading: boolean
 
   constructor (private service: CategoriaService, authService: AuthService) {
+    this.loading = false
     this.descricaoValue = ''
     this.nomeValue = ''
     this.companyData = authService.currentCompany()
@@ -30,10 +32,11 @@ export class CadastroCategoriaComponent {
   }
 
   ngOnInit() {
+    this.loading = true
     if (this.companyData) {
-      console.log(this.companyData)
       this.service.getAll(this.companyData.loja.uuid).subscribe({
         next: (response: Object) => {
+          this.loading = false
           if (Array.isArray(response)) {
             this.categorias.next(response)
           }

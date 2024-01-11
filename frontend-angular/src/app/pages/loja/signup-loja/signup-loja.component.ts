@@ -78,9 +78,7 @@ export class SignupLojaComponent {
       'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
     ];
 
-    this.imageForm = this.formBuilder.group({
-      imageFile: ['']
-    });
+    this.imageForm = this.formBuilder.group({ imageFile: [''] });
 
   }
 

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LojaHomeComponent } from '../pages/loja/home/home.component';
 import { CadastroCategoriaComponent } from '../pages/loja/cadastro-categoria/cadastro-categoria.component';
-import { CadastroProdutoComponent } from '../pages/loja/cadastro-produto/cadastro-produto.component';
+import { ProdutosComponent } from '../pages/loja/produtos/produtos.component';
 import { CategoriaComponent } from '../pages/loja/categoria/categoria.component';
 import { ProdutoComponent } from '../pages/loja/produto/produto.component';
 import { PedidosComponent } from '../pages/loja/pedidos/pedidos.component';
@@ -10,6 +10,7 @@ import { companyAuthGuard } from '../guards/company-auth.guard';
 import { LojaSettingsComponent } from '../pages/loja/loja-settings/loja-settings.component';
 import { SignupLojaComponent } from '../pages/loja/signup-loja/signup-loja.component';
 import { PedidoComponent } from '../pages/public/pedido/pedido.component';
+import { HistoricoComponent } from '../pages/loja/historico/historico.component';
 
 
 export const lojaRoutes: Routes = [
@@ -42,11 +43,15 @@ export const lojaRoutes: Routes = [
     canActivate: [companyAuthGuard] },
 
   { path: 'loja/produtos',
-    component: CadastroProdutoComponent,
+    component: ProdutosComponent,
     canActivate: [companyAuthGuard] },
 
   { path: 'loja/pedidos',
     component: PedidosComponent,
+    canActivate: [companyAuthGuard] },
+
+    { path: 'loja/historico',
+    component: HistoricoComponent,
     canActivate: [companyAuthGuard] },
 
   { path: 'loja/status',

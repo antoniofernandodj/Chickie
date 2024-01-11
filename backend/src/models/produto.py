@@ -27,6 +27,13 @@ class ProdutoPOST(BaseModel):
     uuid: Optional[str] = None
 
 
+class ProdutoPUT(BaseModel):
+    __tablename__ = "produtos"
+    nome: str
+    descricao: str
+    preco: float
+
+
 class ProdutoGET(BaseModel):
     __tablename__ = "produtos"
     nome: str

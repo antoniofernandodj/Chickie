@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { PrecoResponse } from '../../../models/models';
-import { RouterModule } from '@angular/router';
+import { PrecoResponse, FileDataRequest } from '../../../models/models';
 import { CurrencyPipe } from '@angular/common';
 
-import {  AuthService, CompanyAuthData,
+import {  AuthService, CompanyAuthData, ImageService,
           PrecoService, ProdutoService } from '../../../services/services';
 
 
@@ -75,7 +74,7 @@ const getTitle = (dia: string) => {
 @Component({
   selector: 'app-produto',
   standalone: true,
-  imports: [FormsModule, RouterModule, CurrencyPipe],
+  imports: [FormsModule, RouterModule, CurrencyPipe, ReactiveFormsModule],
   templateUrl: './produto.component.html',
   styleUrl: './produto.component.sass'
 })
@@ -84,25 +83,44 @@ export class ProdutoComponent {
   produtoUUID: string
   produto: BehaviorSubject<Produto | null>
   companyData: CompanyAuthData | null
+  imageForm: FormGroup
 
   valorValue: number | null
   diaDaSemanaValue: string
   diasDaSemanaCadastrados: BehaviorSubject<Array<DiaSemana>>
   diasDaSemanaDisponiveis: BehaviorSubject<Array<DiaSemana>>
+
+  selectedImage: string
   saving: boolean
+  fileData: FileDataRequest
+  atualizandoImagem: boolean
+
+  nomeValue: string
+  descricaoValue: string
+  precoValue: number
 
   constructor(
+    private formBuilder: FormBuilder,
     private precoService: PrecoService,
     private produtoService: ProdutoService,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private imageService: ImageService
   ) {
+    this.atualizandoImagem = false
+    this.fileData = { bytes_base64: '', filename: '' }
+    this.selectedImage = ''
     this.saving = false
     this.produto = new BehaviorSubject<Produto | null>(null)
     this.produtoUUID = ''
     this.diaDaSemanaValue = ''
     this.valorValue = null
     this.companyData = this.authService.currentCompany()
+    this.imageForm = this.formBuilder.group({ imageFile: [''] })
+
+    this.nomeValue = ''
+    this.descricaoValue = ''
+    this.precoValue = 0
 
     this.diasDaSemanaCadastrados = new BehaviorSubject<Array<DiaSemana>>([])
     this.diasDaSemanaDisponiveis = new BehaviorSubject<Array<DiaSemana>>([])
@@ -112,10 +130,84 @@ export class ProdutoComponent {
     this.route.params.subscribe(params => {
       this.produtoUUID = params['id'];
     });
-    this.updateProdutoPrecos()
+    this.refreshProdutoPrecos()
   }
 
-  updateProdutoPrecos() {
+  async onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.fileData.filename = file.name
+      this.selectedImage = URL.createObjectURL(file)
+      this.fileData.bytes_base64 = await this.imageService.getImageBytes(file)
+    }
+  }
+
+
+  removeImage() {
+    this.produtoService.removeImage(this.produtoUUID).subscribe({
+      next: (result) => {
+        alert('Imagem removida com sucesso!')
+        this.fileData.filename = ''
+        this.fileData.bytes_base64 = ''
+        this.imageForm = this.formBuilder.group({ imageFile: [''] })
+        this.refreshProdutoPrecos()
+      },
+      error: (result) => {
+        alert('Erro na remoção da imagem!')
+      }
+    })
+  }
+
+  uploadImage() {
+    if (!this.fileData.bytes_base64) {
+      let msg = 'Selecione uma imagem!'
+      alert(msg); throw new Error(msg)
+    }
+    this.produtoService.uploadImage(this.produtoUUID, this.fileData).subscribe({
+      next: (result) => {
+        alert('Imagem atualizada com sucesso!')
+      },
+      error: (result) => {
+        alert('Erro na atualização da imagem!')
+      }
+    })
+  }
+
+  updateProdutoData(event: Event) {
+    let button = event.target as HTMLButtonElement
+
+    button.disabled = true
+    button.innerHTML = 'Atualizando os dados...'
+
+    if (!this.companyData) {
+      let msg = 'Não deu';
+      alert(msg); throw new Error()
+    }
+
+    let body = {
+      nome: this.nomeValue,
+      descricao: this.descricaoValue,
+      preco: this.precoValue,
+    }
+    this.produtoService.update(this.produtoUUID, body).subscribe({
+      next: (result) => {
+        alert('Dados atualizados com sucesso!')
+
+        button.disabled = false
+        button.innerHTML = 'Atualizar dados'
+
+      },
+      error: (result) => {
+        alert('Erro na atualização dos dados do produto!')
+
+        button.disabled = false
+        button.innerHTML = 'Atualizar dados'
+
+      }
+    })
+  }
+
+  refreshProdutoPrecos() {
 
     if (this.companyData) {
       this.produtoService.getOne(this.produtoUUID).subscribe({
@@ -123,6 +215,10 @@ export class ProdutoComponent {
           console.log({response: response})
           let produto = new Produto(response)
           this.produto.next(produto)
+
+          this.nomeValue = produto.nome
+          this.precoValue = produto.preco
+          this.descricaoValue = produto.descricao
 
           let diasDaSemanaCadastrados = produto.precos.map(preco => ({
               val: preco.dia_da_semana,
@@ -161,7 +257,7 @@ export class ProdutoComponent {
     this.precoService.delete(preco).subscribe({
       next: (response) => {
         alert('Preço removido com sucesso!');
-        this.updateProdutoPrecos()
+        this.refreshProdutoPrecos()
       },
       error: (response) => {
         button.innerHTML = initialHTML
@@ -177,7 +273,13 @@ export class ProdutoComponent {
     this.saving = false
   }
 
-  cadastrarPreco() {
+  cadastrarPreco(event: Event) {
+
+    let button = event.target as HTMLButtonElement
+
+    button.disabled = true
+    button.innerHTML = 'Salvando...'
+
     this.saving = true
     for (let input of [this.valorValue, this.diaDaSemanaValue]) {
       if (!input) {
@@ -196,12 +298,20 @@ export class ProdutoComponent {
     this.precoService.save(body).subscribe({
       next: (response) => {
         alert('Preço cadastrado com sucesso!')
-        this.updateProdutoPrecos()
+        this.refreshProdutoPrecos()
         this.clearInputs()
+
+        button.disabled = true
+        button.innerHTML = 'Salvar'
+
       },
       error: (response) => {
         this.saving = false
         alert('Erro no cadasto do preço')
+
+        button.disabled = true
+        button.innerHTML = 'Salvar'
+
       }
     })
 

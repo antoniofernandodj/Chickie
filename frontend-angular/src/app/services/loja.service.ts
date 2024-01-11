@@ -40,8 +40,8 @@ export class LojaService {
   }
 
   atualizarImagemCadastro(body: FileDataRequest, companyData: any) {
-    let observable = this.http.patch(
-      this.baseUrl.concat(`/atualizar_imagem_cadastro`), body, {
+    let observable = this.http.post(
+      this.baseUrl.concat(`/imagem_cadastro`), body, {
         headers: { Authorization: `Bearer ${companyData?.access_token}`
       }
     })

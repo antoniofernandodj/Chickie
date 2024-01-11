@@ -4,6 +4,7 @@ import base64
 from typing import Any, Optional, Dict
 from pydantic import BaseModel
 from src.models import Loja, Produto
+from contextlib import suppress
 
 import cloudinary.uploader  # type: ignore
 import cloudinary.api  # type: ignore
@@ -82,6 +83,10 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
         filename: Optional[str] = None
     ) -> ImageUploadServiceResponse:
         bytes_data = base64.b64decode(base64_string)
+
+        with suppress(ValueError):
+            public_id = self.__get_public_id_image_produto(produto)
+            self.delete_image_by_public_id(public_id)
 
         if filename:
             new_name = self.__get_cloud_filename(produto, filename)

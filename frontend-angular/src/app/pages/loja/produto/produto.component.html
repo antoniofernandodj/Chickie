@@ -19,34 +19,64 @@
 <h2>Produto</h2>
 
 
+<strong>Imagem Produto</strong>
+
+<div>
+
+    @if (fileData.bytes_base64 || produto.value?.image_url) {
+      imagem
+      <img
+      [src]="fileData.bytes_base64 || produto.value?.image_url"
+      alt="Imagem selecionada" width="350px">
+    } @else {
+      <strong>Nenhuma imagem disponível!</strong>
+    }
+
+    <form [formGroup]="imageForm">
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="image/*">
+
+    </form>
+
+    @if (!atualizandoImagem) {
+
+      @if (fileData.bytes_base64) {
+        <button (click)="uploadImage()">Atualizar Imagem</button>
+      }
+    } @else {
+      <strong>Atualizando a imagem de cadastro...</strong>
+    }
+</div>
+<div>
+  @if (produto.value?.image_url) {
+    <button (click)="removeImage()">Remover imagem X</button>
+  }
+</div>
+
 @if (produto.value) {
 
   <div>
-    Nome: {{ produto.value.nome }}
+    Nome  <input type="text" [(ngModel)]="nomeValue">
   </div>
 
   <div>
-    Preço Base: {{ produto.value.preco | currency:"BRL" }}
+    Preço Base (R$) <input type="number" [(ngModel)]="precoValue">
   </div>
+
 
   <div>
-    Descricao: {{ produto.value.descricao }}
+    Descricao <input type="text" [(ngModel)]="descricaoValue">
   </div>
 
-  @if(produto.value.image_url) {
-    <strong>Imagem Produto</strong>
-    <br />
-    <div>
-      <img
-        width="350px"
-        [src]="produto.value.image_url"
-        alt="Imagem do produto">
-    </div>
-  }
+  <button
+    (click)="updateProdutoData($event)"
+    >Atualizar dados</button>
   <br />
 
   @if (produto.value.precos.length) {
-    <h2>Preços</h2> 
+    <h2>Preços</h2>
 
     @for (preco of produto.value.precos; track $index) {
       <div>
@@ -84,7 +114,7 @@
       <div>
         <label for="valor-input">Valor</label>
         <input
-          (keyup.enter)="cadastrarPreco()"
+          (keyup.enter)="cadastrarPreco($event)"
           type="number"
           id="valor-input"
           [(ngModel)]="valorValue" />
@@ -92,7 +122,7 @@
       </div>
 
       @if (!saving) {
-        <button (click)="cadastrarPreco()">
+        <button (click)="cadastrarPreco($event)">
           Salvar
         </button>
       } @else {

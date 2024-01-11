@@ -15,10 +15,10 @@ import {  CompanyAuthData, AuthService,
   selector: 'app-cadastro-produto',
   standalone: true,
   imports: [FormsModule, RouterModule],
-  templateUrl: './cadastro-produto.component.html',
-  styleUrl: './cadastro-produto.component.sass'
+  templateUrl: './produtos.component.html',
+  styleUrl: './produtos.component.sass'
 })
-export class CadastroProdutoComponent {
+export class ProdutosComponent {
 
   nomeValue: string
   descricaoValue: string

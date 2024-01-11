@@ -12,13 +12,13 @@ class Pedido(BaseModel):
     __tablename__ = "pedidos"
 
     celular: str
-    data_hora: isodatetime | datetime    
+    data_hora: isodatetime | datetime
     loja_uuid: str
     frete: float
+    concluido: bool
 
     status_uuid: Optional[str] = None
     uuid: Optional[str] = None
-    concluido: Optional[bool] = False
 
 
 class PedidoGET(BaseModel):
@@ -33,7 +33,7 @@ class PedidoGET(BaseModel):
     status: Optional[Status] = None
     endereco: Optional[EnderecoEntrega] = None
     itens: List[ItemPedido] = []
-    concluido: Optional[bool] = False
+    concluido: Optional[bool] = None
 
 
 class PedidoPOST(BaseModel):

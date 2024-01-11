@@ -4,8 +4,11 @@ import { Injectable } from '@angular/core';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { ProdutoBodyRequest, ProdutoResponse, AuthHeaders } from '../models/models';
 import { environment } from '../../environments/environment';
+
+import {  ProdutoBodyRequest, ProdutoPUTRequest,
+          ProdutoResponse, AuthHeaders, FileDataRequest } from '../models/models';
+
 
 
 @Injectable({ providedIn: 'root' })
@@ -50,6 +53,21 @@ export class ProdutoService {
 
   save(body: ProdutoBodyRequest): Observable<Object> {
     return this.http.post(this.baseUrl, body, { headers: this.headers })
+  }
+
+  removeImage(uuid: string) {
+    let urlRequest = this.baseUrl.concat(`/${uuid}/imagem`)
+    return this.http.delete(urlRequest, { headers: this.headers })
+  }
+
+  update(uuid: string, body: ProdutoPUTRequest) {
+    let urlRequest = this.baseUrl.concat(`/${uuid}`)
+    return this.http.put(urlRequest, body, { headers: this.headers })
+  }
+
+  uploadImage(uuid: string, body: FileDataRequest) {
+    let urlRequest = this.baseUrl.concat(`/${uuid}/imagem`)
+    return this.http.post(urlRequest, body, { headers: this.headers })
   }
 
   delete(item: ProdutoResponse) {
