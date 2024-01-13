@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import {  CompanyAuthData, AuthData,
           AuthService } from '../../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ButtonHandler } from '../../../handlers/button';
 
 
 class ErrorDetail {
@@ -44,53 +45,52 @@ export class LoginComponent {
   loginUserValue: string;
   passwordUserValue: string;
 
-  companyLoginStart: boolean
-  userLoginStart: boolean
-
   constructor(private authService: AuthService, private router: Router) {
     this.loginCompanyValue = "";
     this.passwordCompanyValue = "";
 
     this.loginUserValue= "";
     this.passwordUserValue = "";
-
-    this.companyLoginStart = false;
-    this.userLoginStart = false;
   }
 
   ngOnInit(): void { }
 
-  doCompanyLogin(): void {
-    this.companyLoginStart = true;
+  doCompanyLogin(event: Event): void {
+
+    let button = new ButtonHandler(undefined, 'btn_loja')
+    button.disable('Autenticando...')
+
     this.authService.doCompanyLogin(
       this.loginCompanyValue,
       this.passwordCompanyValue
     ).subscribe({
 
       next: (response: Object) => {
+        button.enable()
         let authData = new CompanyAuthData({ response });
         this.authService.setCompanyData(authData)
         this.authService.refreshLoggedIn();
 
         this.authService.isLoginPage.next(false);
-        this.companyLoginStart = false;
 
         this.router.navigate(['/loja/home']);
       },
 
       error: (response: HttpErrorResponse) => {
-
-        this.companyLoginStart = false;
+        button.enable()
         alert(`${response.statusText}: ${response.error.detail}`)
       },
     });
 
   }
 
-  doUserLogin(): void {
-    this.userLoginStart = true;
+  doUserLogin(event: Event): void {
+    let button = new ButtonHandler(undefined, 'btn_user')
+    button.disable('Autenticando...')
+
     this.authService.doUserLogin(this.loginUserValue, this.passwordUserValue).subscribe({
       next: (response: Object) => {
+        button.enable()
         let authData = new AuthData({ response });
         sessionStorage.setItem('access_token', authData.access_token);
         sessionStorage.setItem('current_user', authData.toString());
@@ -100,7 +100,7 @@ export class LoginComponent {
         this.router.navigate(['/user/home']);
       },
       error: (response: HttpErrorResponse) => {
-
+        button.enable()
         let message = response.message
 
         // if (message) {
@@ -122,8 +122,6 @@ export class LoginComponent {
           }
         }
 
-
-        this.userLoginStart = false;
       },
     });
   }

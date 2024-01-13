@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { FormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { ButtonHandler } from '../../../handlers/button';
 
 import {  ProdutoResponse, Response201ImageCreatedWrapper,
           FileDataRequest } from '../../../models/models';
@@ -82,23 +83,40 @@ export class CategoriaComponent {
     });
   }
 
-  removerProduto(produto: ProdutoResponse) {
+  removerProduto(event: Event, produto: ProdutoResponse) {
+    let button = new ButtonHandler(event)
+
+    button.disable('Removendo...')
+
     this.produtoService.delete(produto).subscribe({
       next: (response) => {
+        button.enable()
+
         alert('Produto removido com sucesso!');
         let newArr = this.companyProducts.getValue();
         newArr = newArr.filter((p: ProdutoResponse) => p.uuid != produto.uuid);
         this.companyProducts.next(newArr)
+
+
       },
       error: (response) => {
+        button.enable()
+
         alert("Erro na remoção do produto");
         throw new Error(JSON.stringify(response))
       }
     })
   }
 
-  cadastrarProduto() {
+  cadastrarProduto(event: Event) {
+
+    let button = new ButtonHandler(event)
+    button.disable('Cadastrando...')
+
+
     if (!this.companyData) {
+      button.enable()
+
       let msg = 'Nenhuma empresa logada!'
       alert(msg); throw new Error(msg)
     }
@@ -108,6 +126,8 @@ export class CategoriaComponent {
       this.file.bytes_base64 === "" ||
       this.file.bytes_base64 === null
     ) {
+      button.enable()
+
       let msg = 'Nenhuma imagem selecionada!'
       alert(msg); throw new Error(msg)
     }
@@ -140,9 +160,13 @@ export class CategoriaComponent {
         this.companyProducts.value.push(newItem);
         alert('Item adicionado com sucesso!');
         this.clearInputs()
+
+        button.enable()
+
       },
       error: (response) => {
         console.log({response: response})
+        button.enable()
         alert('Erro no cadastro do item');
       }
     })

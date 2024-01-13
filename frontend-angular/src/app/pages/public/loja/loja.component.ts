@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 
 import {  ProdutoResponse, CategoriaResponse, LojaResponse,
           ItemPedido, Endereco } from '../../../models/models';
+import { ButtonHandler } from '../../../handlers/button';
 
 
 @Component({
@@ -193,7 +194,11 @@ export class LojaComponent {
     return 0
   }
 
-  cadastrarProduto() {
+  cadastrarPedido(event: Event) {
+
+    let button = new ButtonHandler(event)
+    button.disable('Enviando o pedido...')
+
     let numeroCelular = this.celular.replace(/\D/g, '');
     if (numeroCelular.length != 11) {
       alert('O numero de celular precisa ter 11 digitos contando com o DDD!')
@@ -236,10 +241,12 @@ export class LojaComponent {
 
     this.pedidoService.save(body).subscribe({
       next: (response) => {
+        button.enable()
         console.log({response: response})
         alert('Pedido Cadastrado com sucesso!')
       },
       error: (response) => {
+        button.enable()
         console.log({response: response})
         alert('Erro no cadastro dos produtos')
       }

@@ -1,122 +1,107 @@
-import abc
-import redis
-import pickle
-from contextlib import suppress
-from typing import TypeVar, Any
+import aioredis
+from typing import TypeVar, Any, Optional
+from config import settings as s
+import json
 
-with suppress(ModuleNotFoundError):
-    from config import settings as s
 
 T = TypeVar("T")
 
 
-class Cache(abc.ABC):
-    @abc.abstractmethod
-    def __getitem__(self, key):
-        pass
+class RedisService:
+    def __init__(self, db: int = 0):
+        self.redis_db = None
+        self.redis_url = str(s.REDIS_URL)
+        self.db = db
 
-    @abc.abstractmethod
-    def __setitem__(self, key: str, value: Any):
-        pass
-
-    @abc.abstractmethod
-    def store_dict(self, data: dict):
-        pass
-
-    @abc.abstractmethod
-    def dict(self):
-        pass
-
-    @abc.abstractmethod
-    def delete(self, key: str):
-        pass
-
-    @abc.abstractmethod
-    def clear(self):
-        pass
-
-
-class RedisCache(Cache):
-    def __init__(self, host: str, port: int, db: int):
-        self.redis_db = redis.Redis(
-            host=host, port=port, db=db, password=s.REDIS_PASSWORD
-        )
-        self.redis_db.config_set("maxmemory-policy", "allkeys-lru")
-        self.__port = port
-        self.__host = host
-
-    def __str__(self):
-        return "{}(host={}, port={}, data={})".format(
-            type(self).__name__,
-            self.__host,
-            self.__port,
-            list(self.dict().keys()),
+    async def connect(self):
+        self.redis_db = await aioredis.from_url(
+            self.redis_url,
+            db=self.db
         )
 
-    def __getitem__(self, key: str) -> Any:
-        """Método para recuperar um valor do cache."""
+    async def close(self):
+        if self.redis_db is None:
+            raise ValueError('Necessário conectar antes')
 
-        value = self.redis_db.get(key)
+        if self.redis_db:
+            await self.redis_db.close()
+
+    async def __aenter__(self):
+        await self.connect()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.close()
+
+    async def get(self, key: str) -> Any:
+        if self.redis_db is None:
+            raise ValueError('Necessário conectar antes')
+
+        value = await self.redis_db.get(key)
         if value:
-            # print('Retornando cache do redis')
-            return pickle.loads(value)
+            return value.decode()
 
-        return None
+    async def set(
+        self,
+        key: str,
+        value: Any,
+        key_ttl: Optional[int] = None,
+    ) -> None:
 
-    def __setitem__(self, key: str, value: Any) -> None:
-        """Método para definir um valor no cache."""
+        if self.redis_db is None:
+            raise ValueError('Necessário conectar antes')
 
-        # print('Atribuindo valor ao redis')
+        value_dumped = value
+        if key_ttl is None:
+            key_ttl = int(s.CACHE_DEFAULT_TIMEOUT)
 
-        # print('value to dump:', str(value))
-        value_dumped = pickle.dumps(value)
-        if isinstance(key, tuple):
-            key_ttl = key[1]
-            if key_ttl is None:
-                key_ttl = s.CACHE_DEFAULT_TIMEOUT
-            # print(f'Setting ttl as {key_ttl}')
-            key_name = key[0]
-            self.redis_db.setex(key_name, key_ttl, value_dumped)
+        await self.redis_db.setex(
+            key,
+            key_ttl,
+            value_dumped
+        )
 
-        else:
-            self.redis_db.setex(key, s.CACHE_DEFAULT_TIMEOUT, value_dumped)
-
-    def store_dict(self, data: dict) -> None:
-        """Método para armazenar um dicionário completo no cache."""
+    async def store_json(self, key, data: dict) -> None:
         print("Armazenando dicionario ao redis")
+        json_data = json.dumps(data)
+        await self.set(key, json_data)
 
-        for key, value in data.items():
-            self[key] = value
+    async def get_json(self, key) -> dict:
+        print("Armazenando dicionario ao redis")
+        value = await self.get(key)
+        json_data = json.loads(value.decode('utf-8'))
+        return json_data
 
-    def dict(self) -> dict:
-        """
-        Método para recuperar todos os pares chave-valor
-        do cache como um dicionário.
-        """
-        print("Retornando dicionario do redis")
+    # async def dict(self) -> dict:
+    #     if self.redis_db is None:
+    #         raise ValueError('Necessário conectar antes')
 
-        keys = [key.decode() for key in self.redis_db.keys("*")]
+    #     print("Retornando dicionario do redis")
+    #     keys = await self.redis_db.keys("*")
+    #     data = {}
+    #     for key in keys:
+    #         data[key.decode()] = await self.get(key)
+    #     return data
 
-        data = {}
-        for key in keys:
-            data[key] = self[key]
+    # async def delete(self, key: str) -> None:
+    #     if self.redis_db is None:
+    #         raise ValueError('Necessário conectar antes')
 
-        return data
+    #     print("Deletando chave do redis")
+    #     await self.redis_db.delete(key)
 
-    def delete(self, key: str) -> None:
-        print("Deletando chave do redis")
-        self.redis_db.delete(key)
+    # async def clear(self) -> None:
+    #     if self.redis_db is None:
+    #         raise ValueError('Necessário conectar antes')
 
-    def clear(self) -> None:
-        print("Limpando cache do redis")
-        keys = [key.decode() for key in self.redis_db.keys("*")]
-
-        for key in keys:
-            self.delete(key)
+    #     print("Limpando cache do redis")
+    #     keys = await self.redis_db.keys("*")
+    #     for key in keys:
+    #         await self.delete(key)
 
 
-def get_cache() -> RedisCache:
-    cache = RedisCache(host=s.REDIS_HOST, port=s.REDIS_PORT, db=s.REDIS_DB)
-    cache["hello"] = "world"
-
+async def get_cache() -> RedisService:
+    cache = RedisService(db=int(s.REDIS_DB))
+    await cache.connect()
+    await cache.set("hello", "world")
     return cache

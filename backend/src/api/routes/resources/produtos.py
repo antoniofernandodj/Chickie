@@ -109,6 +109,8 @@ async def cadastrar_produto(
         response = await produto_service.save_produto(produto_data)
         return response
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=("Erro no cadastro do produto ou"

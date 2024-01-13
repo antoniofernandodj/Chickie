@@ -62,6 +62,8 @@
   <label for="cep">CEP:</label><br>
   <input
     [(ngModel)]="cepValue"
+    mask="00000-000"
+    (input)="getCEPData()"
     type="text"
     id="cep"
     name="cep"

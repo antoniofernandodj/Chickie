@@ -6,7 +6,7 @@
       <label for="">Login</label>
       <input
         type="text"
-        (keyup.enter)="doCompanyLogin()"
+        (keyup.enter)="doCompanyLogin($event)"
         [(ngModel)]="loginCompanyValue"
       />
     </div>
@@ -14,7 +14,7 @@
       <label for="">Senha</label>
       <input
         type="password"
-        (keyup.enter)="doCompanyLogin()"
+        (keyup.enter)="doCompanyLogin($event)"
         [(ngModel)]="passwordCompanyValue"
       />
     </div>
@@ -24,11 +24,7 @@
       para se inscrever
     </div>
   </div>
-  @if (!companyLoginStart) {
-    <button (click)="doCompanyLogin()">Login</button>
-  } @else {
-    <div>Logando...</div>
-  }
+    <button (click)="doCompanyLogin($event)" id="btn_loja">Login</button>
 </div>
 
 <div>
@@ -38,7 +34,7 @@
       <label for="">Login</label>
       <input
         type="text"
-        (keyup.enter)="doUserLogin()"
+        (keyup.enter)="doUserLogin($event)"
         [(ngModel)]="loginUserValue"
       />
     </div>
@@ -48,7 +44,7 @@
     <label for="">Senha</label>
     <input
       type="password"
-      (keyup.enter)="doUserLogin()"
+      (keyup.enter)="doUserLogin($event)"
       [(ngModel)]="passwordUserValue"
     />
   </div>
@@ -57,9 +53,6 @@
     <a routerLink="/signup/user">Clique aqui</a>
     para se inscrever
   </div>
-  @if (!userLoginStart) {
-    <button (click)="doUserLogin()">Login</button>
-  } @else {
-    <div>Logando...</div>
-  }
+  <button (click)="doUserLogin($event)" id="btn_user">Login</button>
+
 </div>

@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthService, SignupService } from '../../../services/services';
+import { AuthService, SignupService, ViaCepService } from '../../../services/services';
 import { Response201Wrapper } from '../../../models/models';
-
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-signup-user',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgxMaskDirective],
   templateUrl: './signup-user.component.html',
   styleUrl: './signup-user.component.sass'
 })
@@ -29,7 +29,11 @@ export class SignupUserComponent {
   ufValue: string
 
 
-  constructor(private service: SignupService, private authService: AuthService) {
+  constructor(
+    private service: SignupService,
+    private authService: AuthService,
+    private viaCepService: ViaCepService
+  ) {
     this.usernameValue = ''
     this.emailValue = ''
     this.passwordValue = ''
@@ -44,6 +48,25 @@ export class SignupUserComponent {
     this.bairroValue = ''
     this.cidadeValue = ''
     this.ufValue = ''
+  }
+
+  getCEPData() {
+    console.log({'this.cepValue': this.cepValue})
+    const numerosEncontrados = this.cepValue.match(/\d/g);
+    if (numerosEncontrados?.length == 8) {
+      this.viaCepService.getAddressInfo(this.cepValue).subscribe({
+        next: (result: any) => {
+          this.viaCepService.setCachedData(result)
+          this.logradouroValue = result.logradouro
+          this.bairroValue = result.bairro
+          this.cidadeValue = result.localidade
+          this.ufValue = result.uf
+        },
+        error: (result) => {
+          alert('Erro na requisição')
+        }
+      })
+    }
   }
 
   doSignUp() {

@@ -60,7 +60,11 @@ class ProdutoService(BaseService):
                 filename=produto_data.filename,
                 produto=produto
             )
-            image_url = image_service.get_public_url_image_produto(produto)
+            try:
+                image_url = image_service.get_public_url_image_produto(produto)
+            except ValueError:
+                image_url = None
+
         except Exception:
             await self.repo.delete_from_uuid(produto.uuid)
             raise

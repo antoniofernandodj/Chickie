@@ -7,3 +7,4 @@ export { ProdutoService } from "./produto.service";
 export { SignupService } from "./signup.service";
 export { StatusService } from "./status.service";
 export { PrecoService } from "./preco.service";
+export { ViaCepService } from "./viacep.service"

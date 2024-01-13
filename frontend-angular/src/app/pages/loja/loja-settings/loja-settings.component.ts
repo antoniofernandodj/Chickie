@@ -8,7 +8,8 @@ import {  FormGroup, FormBuilder,
           ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import {  LojaService, AuthService,
-          CompanyAuthData, ImageService } from '../../../services/services';
+          CompanyAuthData, ImageService, ViaCepService } from '../../../services/services';
+import { ButtonHandler } from '../../../handlers/button';
 
 @Component({
   selector: 'app-loja-settings',
@@ -21,7 +22,6 @@ export class LojaSettingsComponent {
 
   imageForm: FormGroup
   file: FileDataRequest
-  atualizandoImagem: boolean
   atualizandoCadastro: boolean
   companyData: BehaviorSubject<CompanyAuthData | null>
   imageBase64String: string
@@ -45,7 +45,8 @@ export class LojaSettingsComponent {
     private formBuilder: FormBuilder,
     private imageService: ImageService,
     private lojaService: LojaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private viaCepService: ViaCepService
   ) {
 
     this.celularValue = ''
@@ -89,7 +90,6 @@ export class LojaSettingsComponent {
     }
 
     this.imageForm = this.formBuilder.group({ imageFile: [''] });
-    this.atualizandoImagem = false
     this.file = { bytes_base64: '', filename: '' }
     if (!this.companyData.value) {
       let msg = 'Dados da loja não encontrados!';
@@ -117,12 +117,39 @@ export class LojaSettingsComponent {
     }
   }
 
-  uploadImage() {
+  getCEPData() {
+    const numerosEncontrados = this.cep.match(/\d/g);
+    console.log({numerosEncontrados: numerosEncontrados})
+    if (numerosEncontrados?.length == 8) {
+      this.viaCepService.getAddressInfo(this.cep).subscribe({
+        next: (result: any) => {
+          console.log({erro: result.erro})
+          if (result.erro) {
+            throw new Error('CEP inválido')
+          }
+
+          this.viaCepService.setCachedData(result)
+          console.log({result: result})
+          this.logradouroValue = result.logradouro
+          this.bairroValue = result.bairro
+          this.cidadeValue = result.localidade
+          this.uf = result.uf
+        },
+        error: (result) => {
+          alert('Erro na requisição')
+        }
+      })
+    }
+  }
+
+  uploadImage(event: Event) {
+    let button = new ButtonHandler(event)
+    button.disable('Atualizando...')
     console.log(this.file)
-    this.atualizandoImagem = true
     let companyData = this.authService.companyData.getValue()
 
     if (!companyData) {
+      button.enable()
       let msg = 'Dados da loja não encontrados!'
       alert(msg); throw new Error(msg)
     }
@@ -130,9 +157,11 @@ export class LojaSettingsComponent {
 
     this.lojaService.atualizarImagemCadastro(this.file, companyData).subscribe({
       next: (response: any) => {
+        button.enable()
         let result: UploadImageDataResponse = {...response.result}
 
         if (!this.companyData.value) {
+
           let msg = 'Dados de autenticação não encontrados!';
           alert(msg); throw new Error(msg);
         }
@@ -141,18 +170,21 @@ export class LojaSettingsComponent {
         this.authService.setCompanyData(this.companyData.value)
 
         alert('Imagem atualizada com sucesso!')
-        this.atualizandoImagem = false
 
       },
       error: (result: HttpErrorResponse) => {
+        button.enable()
         console.log({result: result.error})
         alert('Erro no upload da imagem!')
-        this.atualizandoImagem = false
       }
     })
   }
 
-  atualizarCadastro() {
+  atualizarCadastro(event: Event) {
+
+    let button = new ButtonHandler(event)
+    button.disable('Atualizando...')
+
     this.atualizandoCadastro = true
     let companyData = this.authService.companyData.getValue()
 
@@ -183,17 +215,16 @@ export class LojaSettingsComponent {
 
     this.lojaService.atualizarCadastro(body, companyData).subscribe({
       next: (response) => {
-
+        button.enable()
         console.log({response: response})
 
         this.authService.refreshLojaData()
         alert('Cadastro atualizado com sucesso!')
-        this.atualizandoImagem = false
       },
       error: (result: HttpErrorResponse) => {
+        button.enable()
         console.log({result: result.error})
         alert('Erro na atualização dos dados!')
-        this.atualizandoImagem = false
       }
     })
   }

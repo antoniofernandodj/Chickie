@@ -7,6 +7,7 @@ import { CurrencyPipe } from '@angular/common';
 
 import {  AuthService, CompanyAuthData, ImageService,
           PrecoService, ProdutoService } from '../../../services/services';
+import { ButtonHandler } from '../../../handlers/button';
 
 
 class Produto {
@@ -91,7 +92,6 @@ export class ProdutoComponent {
   diasDaSemanaDisponiveis: BehaviorSubject<Array<DiaSemana>>
 
   selectedImage: string
-  saving: boolean
   fileData: FileDataRequest
   atualizandoImagem: boolean
 
@@ -110,7 +110,6 @@ export class ProdutoComponent {
     this.atualizandoImagem = false
     this.fileData = { bytes_base64: '', filename: '' }
     this.selectedImage = ''
-    this.saving = false
     this.produto = new BehaviorSubject<Produto | null>(null)
     this.produtoUUID = ''
     this.diaDaSemanaValue = ''
@@ -143,7 +142,10 @@ export class ProdutoComponent {
   }
 
 
-  removeImage() {
+  removeImage(event: Event) {
+    let button = new ButtonHandler(event)
+    button.disable('Removendo a imagem...')
+
     this.produtoService.removeImage(this.produtoUUID).subscribe({
       next: (result) => {
         alert('Imagem removida com sucesso!')
@@ -151,35 +153,42 @@ export class ProdutoComponent {
         this.fileData.bytes_base64 = ''
         this.imageForm = this.formBuilder.group({ imageFile: [''] })
         this.refreshProdutoPrecos()
+        button.enable()
       },
       error: (result) => {
         alert('Erro na remoção da imagem!')
+        button.enable()
       }
     })
   }
 
-  uploadImage() {
+  uploadImage(event: Event) {
+    let button = new ButtonHandler(event)
+    button.disable('Atualizando a imagem...')
+
+
     if (!this.fileData.bytes_base64) {
+      button.enable()
       let msg = 'Selecione uma imagem!'
       alert(msg); throw new Error(msg)
     }
     this.produtoService.uploadImage(this.produtoUUID, this.fileData).subscribe({
       next: (result) => {
+        button.enable()
         alert('Imagem atualizada com sucesso!')
       },
       error: (result) => {
+        button.enable()
         alert('Erro na atualização da imagem!')
       }
     })
   }
 
   updateProdutoData(event: Event) {
-    let button = event.target as HTMLButtonElement
-
-    button.disabled = true
-    button.innerHTML = 'Atualizando os dados...'
+    let button = new ButtonHandler(event)
 
     if (!this.companyData) {
+      button.enable()
       let msg = 'Não deu';
       alert(msg); throw new Error()
     }
@@ -191,17 +200,13 @@ export class ProdutoComponent {
     }
     this.produtoService.update(this.produtoUUID, body).subscribe({
       next: (result) => {
+        button.enable()
         alert('Dados atualizados com sucesso!')
-
-        button.disabled = false
-        button.innerHTML = 'Atualizar dados'
 
       },
       error: (result) => {
+        button.enable()
         alert('Erro na atualização dos dados do produto!')
-
-        button.disabled = false
-        button.innerHTML = 'Atualizar dados'
 
       }
     })
@@ -247,21 +252,18 @@ export class ProdutoComponent {
   }
 
   removerPreco(event: Event, preco: any) {
-    let button  = event.target as HTMLButtonElement
+    let button  = new ButtonHandler(event)
 
-    let initialHTML = button.innerHTML
-
-    button.innerHTML = 'Removendo...'
-    button.disabled = true
+    button.disable('Removendo...')
 
     this.precoService.delete(preco).subscribe({
       next: (response) => {
+        button.enable()
         alert('Preço removido com sucesso!');
         this.refreshProdutoPrecos()
       },
       error: (response) => {
-        button.innerHTML = initialHTML
-        button.disabled = false
+        button.enable()
         alert('Erro ao remover preço de produto')
       }
     })
@@ -270,21 +272,16 @@ export class ProdutoComponent {
   clearInputs() {
     this.valorValue = null
     this.diaDaSemanaValue = ''
-    this.saving = false
   }
 
   cadastrarPreco(event: Event) {
+    let button = new ButtonHandler(event)
+    button.disable('Salvando...')
 
-    let button = event.target as HTMLButtonElement
-
-    button.disabled = true
-    button.innerHTML = 'Salvando...'
-
-    this.saving = true
     for (let input of [this.valorValue, this.diaDaSemanaValue]) {
       if (!input) {
+        button.enable()
         let msg = 'É necessário preencher todos os campos!'
-        this.saving = false
         alert(msg); throw new Error(msg)
       }
     }
@@ -297,20 +294,16 @@ export class ProdutoComponent {
 
     this.precoService.save(body).subscribe({
       next: (response) => {
+        button.enable()
         alert('Preço cadastrado com sucesso!')
         this.refreshProdutoPrecos()
         this.clearInputs()
 
-        button.disabled = true
-        button.innerHTML = 'Salvar'
 
       },
       error: (response) => {
-        this.saving = false
+        button.enable()
         alert('Erro no cadasto do preço')
-
-        button.disabled = true
-        button.innerHTML = 'Salvar'
 
       }
     })

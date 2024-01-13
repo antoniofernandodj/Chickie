@@ -7,7 +7,7 @@ import {  FormGroup, FormBuilder,
           ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import {  SignupService, AuthService, ImageService,
-          CompanyAuthData  } from '../../../services/services';
+          CompanyAuthData, ViaCepService  } from '../../../services/services';
 
 import { Response201Wrapper } from '../../../models/models';
 
@@ -48,6 +48,7 @@ export class SignupLojaComponent {
     private authService: AuthService,
     private formBuilder: FormBuilder,
     private imageService: ImageService,
+    private viaCepService: ViaCepService,
     private router: Router
   ) {
 
@@ -88,6 +89,27 @@ export class SignupLojaComponent {
       this.imageFilename = file.name
       this.selectedImage = URL.createObjectURL(file)
       this.imageBytesBase64 = await this.imageService.getImageBytes(file)
+    }
+  }
+
+
+  getCEPData() {
+    console.log({'this.cepValue': this.cepValue})
+    const numerosEncontrados = this.cepValue.match(/\d/g);
+    if (numerosEncontrados?.length == 8) {
+      this.viaCepService.getAddressInfo(this.cepValue).subscribe({
+        next: (result: any) => {
+          this.viaCepService.setCachedData(result)
+          console.log({result: result})
+          this.logradouroValue = result.logradouro
+          this.bairroValue = result.bairro
+          this.cidadeValue = result.localidade
+          this.ufValue = result.uf
+        },
+        error: (result) => {
+          alert('Erro na requisição')
+        }
+      })
     }
   }
 

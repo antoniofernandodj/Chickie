@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {  CompanyAuthData, AuthService, PedidoService,
           ProdutoService, StatusService } from '../../../services/services';
+import { ButtonHandler } from '../../../handlers/button';
 
 
 @Component({
@@ -75,23 +76,20 @@ export class PedidosComponent {
   }
 
   concluir(event: Event, pedido: Pedido) {
-    let button = event.target as HTMLButtonElement
+    let button = new ButtonHandler(event)
+    button.disable('Concluindo...')
 
-    button.innerHTML = 'Concluindo...'
-    button.disabled = true
 
     this.pedidoService.concluir(pedido.uuid).subscribe({
       next: (result) => {
+        button.enable()
         alert('Pedido concluído com sucesso!')
-        button.innerHTML = 'Marcar como concluido'
-        button.disabled = false
 
         this.ngOnInit()
       },
       error: (result) => {
+        button.enable()
         alert('Erro na conclusão do pedido')
-        button.innerHTML = 'Marcar como concluido'
-        button.disabled = false
       }
     })
   }

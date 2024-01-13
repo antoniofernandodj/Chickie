@@ -12,7 +12,11 @@
 
     <div>
       cep
-      <input type="text" [(ngModel)]="cepValue" mask="00000-000">
+      <input
+        type="text"
+        [(ngModel)]="cepValue"
+        (input)="getCEPData()"
+        mask="00000-000">
     </div>
 
     <div>

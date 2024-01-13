@@ -43,7 +43,7 @@
     @if (!atualizandoImagem) {
 
       @if (fileData.bytes_base64) {
-        <button (click)="uploadImage()">Atualizar Imagem</button>
+        <button (click)="uploadImage($event)">Atualizar Imagem</button>
       }
     } @else {
       <strong>Atualizando a imagem de cadastro...</strong>
@@ -51,7 +51,7 @@
 </div>
 <div>
   @if (produto.value?.image_url) {
-    <button (click)="removeImage()">Remover imagem X</button>
+    <button (click)="removeImage($event)">Remover imagem X</button>
   }
 </div>
 
@@ -121,13 +121,10 @@
 
       </div>
 
-      @if (!saving) {
-        <button (click)="cadastrarPreco($event)">
-          Salvar
-        </button>
-      } @else {
-        Saving ...
-      }
+      <button (click)="cadastrarPreco($event)">
+        Salvar
+      </button>
+
     } @else {
       <strong>Nenhum preço disponível!</strong>
     }

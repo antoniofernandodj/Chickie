@@ -5,6 +5,7 @@ import { Response201Wrapper, StatusResponse } from '../../../models/models';
 
 import {  AuthService, CompanyAuthData,
           StatusService } from '../../../services/services';
+import { ButtonHandler } from '../../../handlers/button';
 
 
 @Component({
@@ -84,15 +85,12 @@ export class StatusComponent {
 
   public deletarStatus(event: Event, status: StatusResponse): void {
 
-    let button = event.target as HTMLButtonElement
-
-    let initialHTML = button.innerHTML
-
-    button.disabled = true
-    button.innerHTML = 'Removendo...'
+    let button = new ButtonHandler(event)
+    button.disable('Removendo...')
 
     this.statusService.delete(status).subscribe({
       next: (response) => {
+        button.enable()
         let newList = this.statusList.value
         .filter(item => item.uuid !== status.uuid);
 
@@ -102,8 +100,7 @@ export class StatusComponent {
       error: (response) => {
         let msg = 'Erro na remoção do item';
 
-        button.disabled = false
-        button.innerHTML = initialHTML
+        button.enable()
 
         alert(msg); throw new Error(msg)
       }

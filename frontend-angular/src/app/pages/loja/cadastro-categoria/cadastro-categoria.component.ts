@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import {  CompanyAuthData, AuthService,
           CategoriaService } from '../../../services/services';
+import { ButtonHandler } from '../../../handlers/button';
 
 
 @Component({
@@ -48,7 +49,9 @@ export class CadastroCategoriaComponent {
     }
   }
 
-  registerCategoria() {
+  registerCategoria(event: Event) {
+    let button = new ButtonHandler(undefined, 'btn_cad')
+    button.disable('Cadastrando...')
     if (!this.companyData) {
       alert('Nenhuma empresa logada!')
       throw new Error('Nenhuma empresa logada!')
@@ -62,11 +65,13 @@ export class CadastroCategoriaComponent {
 
     this.service.save(body).subscribe({
       next: (response) => {
+        button.enable()
         let r = new Response201Wrapper(response)
         alert('Item salvo com sucesso!');
         this.categorias.value.push({...body, uuid: r.uuid})
       },
       error: (response) => {
+        button.enable()
         alert('Erro no registro da categoria');
         throw new Error(JSON.stringify(response))
       }
@@ -74,9 +79,14 @@ export class CadastroCategoriaComponent {
   }
 
 
-  deleteCategoria(categoria: CategoriaResponse) {
+  deleteCategoria(event: Event, categoria: CategoriaResponse) {
+
+    let button = new ButtonHandler(event)
+    button.disable('Removendo...')
+
     this.service.delete(categoria).subscribe({
       next: (response: Object) => {
+        button.enable()
         let newArray = this.categorias.getValue()
         .filter(i => i.uuid != categoria.uuid)
 
@@ -84,7 +94,10 @@ export class CadastroCategoriaComponent {
         alert('Item removido');
       },
       error: (response: Object) => {
-        alert('Erro na remoção da categoria');
+        button.enable()
+        alert(
+          `Erro na remoção da categoria. Verifique se ela possui produtos cadastrados`
+        );
         throw new Error(JSON.stringify(response))
       }
     })

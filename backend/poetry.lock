@@ -44,6 +44,24 @@ psycopg2-binary = ">=2.9.5"
 sa = ["sqlalchemy[postgresql-psycopg2binary] (>=1.3,<1.5)"]
 
 [[package]]
+name = "aioredis"
+version = "2.0.1"
+description = "asyncio (PEP 3156) Redis support"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "aioredis-2.0.1-py3-none-any.whl", hash = "sha256:9ac0d0b3b485d293b8ca1987e6de8658d7dafcca1cddfcd1d506cae8cdebfdd6"},
+    {file = "aioredis-2.0.1.tar.gz", hash = "sha256:eaa51aaf993f2d71f54b70527c440437ba65340588afeb786cd87c55c89cd98e"},
+]
+
+[package.dependencies]
+async-timeout = "*"
+typing-extensions = "*"
+
+[package.extras]
+hiredis = ["hiredis (>=1.0)"]
+
+[[package]]
 name = "alembic"
 version = "1.12.1"
 description = "A database migration tool for SQLAlchemy."
@@ -2581,4 +2599,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.12"
-content-hash = "cf831e2dca4c03da4e0df0759e66826df517a529185c48395acbbca1106a3134"
+content-hash = "0ea77524c539be0e46af112779e07de4f1d5da6036c115f8db74747e7823829b"

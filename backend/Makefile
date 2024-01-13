@@ -3,4 +3,4 @@ reset_schema:
 	poetry run alembic upgrade head
 
 dev:
-	poetry run uvicorn asgi:app --reload --host 0.0.0.0 --port 8000
+	poetry run uvicorn asgi:app --reload --host 0.0.0.0 --port 8010
