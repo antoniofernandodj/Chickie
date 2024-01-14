@@ -1,7 +1,4 @@
 from src.infra.database_postgres.repository import Repository
-from src.models import (
-    Produto
-)
 from typing import List, Any, Optional
 
 
