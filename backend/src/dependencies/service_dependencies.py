@@ -1,7 +1,7 @@
 from .connection_dependency import connection_dependency
 from typing import Annotated
 from fastapi import Depends
-from src.services import (
+from src.domain.services import (
     ProdutoService,
     PedidoService,
     AvaliacaoDeLojaService,

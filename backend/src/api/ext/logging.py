@@ -129,16 +129,22 @@ def init_app(app: Union[FastAPI, None] = None):
         "OFF": 0,
     }
 
-    log_level = codes[str(s.LOG_LEVEL).upper()]
+    codes_v2 = {
+        50: "CRITICAL",
+        40: "ERROR",
+        30: "WARNING",
+        20: "INFO",
+        10: "DEBUG",
+        0: "OFF",
+    }
+
+    log_level = codes.get(str(s.LOG_LEVEL)) or codes['INFO']
     if log_level == 0:
         return None
 
     logging.basicConfig(format=fmt, datefmt=datefmt, level=log_level)
     logger.setLevel(log_level)
     # logger.addHandler(MongoDBHandler())
-    logger.info(f"Logging inicializado em level {str(s.LOG_LEVEL).upper()}")
-
-    if app is not None:
-        app._logger = logger
+    logger.info(f"Logging inicializado em level {codes_v2[log_level]}")
 
     return logger

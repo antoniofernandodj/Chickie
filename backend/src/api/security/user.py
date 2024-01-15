@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from config import settings as s
 from src.infra.database_postgres.repository import Repository
 from src.infra.database_postgres.manager import DatabaseConnectionManager
-from src.models import Usuario
+from src.domain.models import Usuario
 from src.api.security.scheme import oauth2_scheme
 
 

@@ -1,5 +1,5 @@
 from fastapi.security import OAuth2PasswordRequestForm
-from src.models import Loja, Usuario
+from src.domain.models import Loja, Usuario
 from typing import Annotated
 from src.api import security
 from fastapi import (  # noqa

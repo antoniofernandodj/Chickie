@@ -12,7 +12,7 @@ from src.infra.database_postgres.commands import (
 )
 from src.infra.database_postgres.manager import DatabaseConnectionManager
 from src.infra.database_postgres.repository import Repository
-from src.models import Usuario
+from src.domain.models import Usuario
 
 f = Faker()
 
@@ -26,9 +26,10 @@ logging.basicConfig(
 async def main():
 
     bus = get_message_bus()
-    
+
     name = f.name()
     user = Usuario(
+        modo_de_cadastro='auto_cadastro',
         nome=name,
         username=name.replace(' ', '_').lower(),
         email=f.email(),

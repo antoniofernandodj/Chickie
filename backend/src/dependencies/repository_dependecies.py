@@ -1,6 +1,6 @@
 from src.infra.database_postgres.repository import Repository
 from .connection_dependency import connection_dependency
-from src.models import (
+from src.domain.models import (
     Loja,
     Status
 )
