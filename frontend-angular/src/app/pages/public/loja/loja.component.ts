@@ -1,9 +1,4 @@
 import { Component } from '@angular/core';
-
-import {  PedidoService, CategoriaService,
-          AuthService, LojaService, AuthData,
-          ProdutoService } from '../../../services/services';
-
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
@@ -12,10 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { NgxMaskDirective } from 'ngx-mask';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ButtonHandler } from '../../../handlers/button';
 
 import {  ProdutoResponse, CategoriaResponse, LojaResponse,
           ItemPedido, Endereco } from '../../../models/models';
-import { ButtonHandler } from '../../../handlers/button';
+
+import {  PedidoService, CategoriaService,
+          AuthService, LojaService, AuthData,
+          ProdutoService } from '../../../services/services';
 
 
 @Component({
@@ -42,6 +41,7 @@ export class LojaComponent {
   endereco: Endereco
   celular: string
   observacoes: string
+  comentarios: string
   lojaUUID: string
 
   constructor(
@@ -55,6 +55,7 @@ export class LojaComponent {
   ) {
     this.lojaUUID = ''
     this.observacoes = ''
+    this.comentarios = ''
     this.userData = null
     this.loja = null
     this.companyData = null
@@ -229,6 +230,7 @@ export class LojaComponent {
         observacoes: item.observacoes
       })),
       loja_uuid: this.loja.uuid,
+      comentarios: this.comentarios,
       status_uuid: null,
       usuario_uuid: null,
     }
@@ -236,8 +238,6 @@ export class LojaComponent {
     if (this.userData) {
       body.usuario_uuid = this.userData.uuid
     }
-
-    console.log({body: body })
 
     this.pedidoService.save(body).subscribe({
       next: (response) => {

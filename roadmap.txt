@@ -7,7 +7,6 @@ feitos -> {
         FRONTEND: x
     }
 
-
     loja: Ajustar pedido para concluido -> {
 
         // PedidoService
@@ -18,7 +17,6 @@ feitos -> {
         FRONTEND: x
     }
 
-
     loja: Atualizacao de imagem para os produtos -> {
 
         // ProdutoService
@@ -27,7 +25,6 @@ feitos -> {
         ENDPONTS: x
         FRONTEND: x
     }
-
 
     usuario: corrigir logica de aplicação de descontos -> {
         MODELS: x
@@ -73,16 +70,16 @@ feitos -> {
         FRONTEND: x
     }
 
+    usuario: adicionar comentarios a um pedido -> {
+
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: x
+    }
+
 }
 
-
-usuario: adicionar comentarios a um pedido -> {
-
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
 
 loja: Alteração de status de pedido -> {
     
@@ -104,15 +101,6 @@ usuario: listar pedidos -> {
 admin: requisitar pedido so pode ser acessivel à loja ou ao user {
     ...
 }
-
-
-
-
-
-
-
-
-
 
 usuario: avaliação de loja -> {
 
@@ -232,7 +220,6 @@ admin {
         ENDPONTS:
         FRONTEND:
     }
-
 
     admin: excluir loja -> {
         MODELS: x

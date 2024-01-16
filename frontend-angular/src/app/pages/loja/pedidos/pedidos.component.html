@@ -30,7 +30,7 @@
         <p>Status: Pedido Realizado</p>
       }
 
-      Concluído: {{ pedido.concluido }}
+      Comentarios: {{ pedido.comentarios }}
 
       <div>
         <button (click)="concluir($event, pedido)">Marcar como concluído</button>
@@ -68,11 +68,11 @@
           <li>Produto: {{item.produto_nome}}</li>
           <li>Subtotal: {{item.valor * item.quantidade | currency:"BRL" }}</li>
           <li>Quantidade: {{item.quantidade}}</li>
+          <li>Comentarios: {{ item.observacoes }}</li>
           <hr>
         }
         </ul>
       </div>
-
   }
 }
 

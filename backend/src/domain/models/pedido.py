@@ -16,6 +16,7 @@ class Pedido(BaseModel):
     loja_uuid: str
     frete: float
     concluido: bool
+    comentarios: str
 
     status_uuid: Optional[str] = None
     uuid: Optional[str] = None
@@ -28,6 +29,7 @@ class PedidoGET(BaseModel):
     loja_uuid: str
     celular: str
     total: float
+    comentarios: str
     uuid: Optional[str] = None
     status_uuid: Optional[str] = None
     status: Optional[Status] = None
@@ -45,6 +47,7 @@ class PedidoPOST(BaseModel):
     itens: List[ItemPedidoPOST]
     loja_uuid: str
     usuario_uuid: str
+    comentarios: str
     status_uuid: Optional[str] = None
 
 

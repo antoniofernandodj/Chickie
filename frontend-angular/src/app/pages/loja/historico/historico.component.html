@@ -12,6 +12,7 @@
       </p>
       <div>Total: {{ pedido.total | currency:'BRL' }}</div>
 
+      Comentarios: {{ pedido.comentarios }}
 
       <p>Celular:
         <a href="http://wa.me/55{{pedido.celular}}">{{pedido.celular}}</a>
@@ -39,6 +40,7 @@
           <li>Produto: {{item.produto_nome}}</li>
           <li>Subtotal: {{item.valor * item.quantidade | currency:"BRL" }}</li>
           <li>Quantidade: {{item.quantidade}}</li>
+          <li>Comentarios: {{ item.observacoes }}</li>
           <hr>
         }
         </ul>

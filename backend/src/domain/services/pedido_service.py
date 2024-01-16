@@ -93,7 +93,8 @@ class PedidoService(BaseService):
                     itens=items,
                     total=total,
                     data_hora=pedido.data_hora,
-                    concluido=pedido.concluido
+                    concluido=pedido.concluido,
+                    comentarios=pedido.comentarios
                 )
             )
 
@@ -182,7 +183,8 @@ class PedidoService(BaseService):
             total=total,
             itens=items,
             data_hora=pedido.data_hora,
-            concluido=pedido.concluido
+            concluido=pedido.concluido,
+            comentarios=pedido.comentarios
         )
 
     async def save_pedido(
@@ -195,7 +197,8 @@ class PedidoService(BaseService):
             loja_uuid=pedido_data.loja_uuid,
             frete=pedido_data.frete,
             celular=pedido_data.celular,
-            concluido=False
+            concluido=False,
+            comentarios=pedido_data.comentarios
         )
 
         pedido.uuid = await self.repo.save(pedido)
