@@ -4,13 +4,12 @@
 
 @if (!loading) {
 
-
   @for (pedido of pedidos.value; track $index) {
 
     @if (!pedido.concluido) {
 
         <p>
-          <a [routerLink]="['/loja/pedidos', pedido.uuid]" >
+          <a [routerLink]="">
             <strong>ID: {{pedido.uuid}}</strong>
           </a>
         </p>
@@ -24,7 +23,6 @@
             <option value="{{ s.uuid }}">{{s.nome}}</option>
           }
           </select>
-          <button (click)="atualizarStatusDePedido(pedido)">Atualizar Status</button>
         }
 
 
@@ -36,14 +34,11 @@
 
         Comentarios: {{ pedido.comentarios }}
 
-        <div>
-          <button (click)="concluir($event, pedido)">Marcar como concluído</button>
-        </div>
 
         <p>Celular:
           <a href="http://wa.me/55{{pedido.celular}}">{{pedido.celular}}</a>
         </p>
-        <p>Data e Hora: {{ pedido.data_hora | formatDate }}</p>
+        <p>Data e Hora: {{pedido.data_hora}}</p>
         <h3>Endereço:</h3>
         <ul>
             <li>Bairro: {{pedido.endereco.bairro}}</li>
@@ -60,11 +55,9 @@
           <input
           type="number"
           min="0"
-          [(ngModel)]="pedido.frete"
-          (keyup.enter)="atualizarFreteDePedido(pedido)">
+          [value]="pedido.frete">
         </p>
 
-        <button (click)="atualizarFreteDePedido(pedido)">Atualizar Frete</button>
         <h3>Itens do Pedido:</h3>
         <div style="border: 1px solid black;">
           <ul>

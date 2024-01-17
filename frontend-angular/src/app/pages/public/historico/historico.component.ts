@@ -1,38 +1,36 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { FormsModule } from '@angular/forms';
 import { Pedido, StatusResponse } from '../../../models/models';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { CurrencyPipe, NgStyle } from '@angular/common';
 import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 import { FormatDatePipe } from '../../../pipes/format-date.pipe';
 
-import {  CompanyAuthData, AuthService, PedidoService,
-          ProdutoService, StatusService } from '../../../services/services';
+import {  AuthData, PedidoService, ProdutoService,
+          StatusService, AuthService } from '../../../services/services';
 
 
 @Component({
-  selector: 'app-pedido',
+  selector: 'app-historico',
   standalone: true,
   imports: [
-    FormsModule,
-    CommonModule,
+    FormatDatePipe,
     RouterModule,
-    SpinnerComponent,
-    FormatDatePipe
+    CurrencyPipe,
+    NgStyle,
+    SpinnerComponent
   ],
   templateUrl: './historico.component.html',
   styleUrl: './historico.component.sass'
 })
-export class HistoricoComponent {
+export class UserHistoricoComponent {
 
   pedidoUUID: string
   pedidos: BehaviorSubject<Array<Pedido>>
-  companyData: CompanyAuthData | null
   statusList: Array<StatusResponse>
   nenhumEmAndamento: BehaviorSubject<Boolean>
   loading: boolean
+  userData: AuthData | null
 
   constructor(
     private pedidoService: PedidoService,
@@ -41,35 +39,28 @@ export class HistoricoComponent {
     private route: ActivatedRoute,
     private statusService: StatusService
   ) {
+    this.userData = null
     this.loading = false
     this.nenhumEmAndamento = new BehaviorSubject<Boolean>(false)
     this.pedidos = new BehaviorSubject<Array<Pedido>>([])
     this.statusList = []
     this.pedidoUUID = ''
-    this.companyData = this.authService.currentCompany()
   }
+
 
   ngOnInit() {
     this.loading = true
+    this.userData = this.authService.currentUser()
     this.route.params.subscribe(params => {
 
-      if (!this.companyData) {
-        let msg = "Dados de empresa não encontrados"
+      if (!this.userData) {
+        let msg = "Dados de usuario não encontrados"
         alert(msg); throw new Error(msg)
       }
 
-      this.statusService.getAll(this.companyData.loja.uuid).subscribe({
+      this.pedidoService.getAllFromUser(this.userData.uuid).subscribe({
         next: (response: any) => {
           this.loading = false
-          this.statusList.push(...response)
-        },
-        error: (response) => {
-          throw new Error('Erro na requisição dos dados')
-        }
-      })
-
-      this.pedidoService.getAll(this.companyData.loja.uuid).subscribe({
-        next: (response: any) => {
           this.pedidos.next(response)
           this.nenhumEmAndamento.next(
             this.pedidos.value.filter(item => item.concluido).length == 0

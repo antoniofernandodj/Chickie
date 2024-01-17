@@ -10,10 +10,9 @@ def init_app(app: FastAPI):
     if app.openapi_schema:
         return app.openapi_schema
 
-    openapi_schema = get_openapi(
+    app.openapi_schema = get_openapi(
         title=info['name'],
         version=info['version'],
         description=info['description'],
         routes=app.routes  # noqa
     )
-    app.openapi_schema = openapi_schema

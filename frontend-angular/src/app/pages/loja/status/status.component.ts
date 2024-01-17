@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Response201Wrapper, StatusResponse } from '../../../models/models';
+import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 
 import {  AuthService, CompanyAuthData,
           StatusService } from '../../../services/services';
@@ -11,7 +12,7 @@ import { ButtonHandler } from '../../../handlers/button';
 @Component({
   selector: 'app-status',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, SpinnerComponent],
   templateUrl: './status.component.html',
   styleUrl: './status.component.sass'
 })

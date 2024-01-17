@@ -94,7 +94,8 @@ class PedidoService(BaseService):
                     total=total,
                     data_hora=pedido.data_hora,
                     concluido=pedido.concluido,
-                    comentarios=pedido.comentarios
+                    comentarios=pedido.comentarios,
+                    usuario_uuid=pedido.usuario_uuid
                 )
             )
 
@@ -198,7 +199,8 @@ class PedidoService(BaseService):
             frete=pedido_data.frete,
             celular=pedido_data.celular,
             concluido=False,
-            comentarios=pedido_data.comentarios
+            comentarios=pedido_data.comentarios,
+            usuario_uuid=pedido_data.usuario_uuid
         )
 
         pedido.uuid = await self.repo.save(pedido)
@@ -312,6 +314,7 @@ class PedidoService(BaseService):
         if pedido is None:
             raise ValueError("Pedido não encontrado")
 
+        print({'status_uuid': status_uuid})
         novo_status = await self.status_repo.find_one(uuid=status_uuid)
         if novo_status is None:
             raise ValueError("Novo status não encontrado")

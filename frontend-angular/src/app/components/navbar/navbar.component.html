@@ -1,6 +1,12 @@
 <nav>
 
   <ul>
+    @if (userIsLoggedIn.value) {
+      <li><a routerLink="user/pedidos/">Pedidos</a></li>
+      <li><a routerLink="user/historico/">Historico</a></li>
+      <li><a routerLink="user/home">Home</a></li>
+    }
+
     @if (companyIsLoggedIn.value) {
       <li><a routerLink="loja/home">Home</a></li>
       <li><a routerLink="loja/produtos">Produtos</a></li>

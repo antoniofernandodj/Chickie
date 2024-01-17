@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { AuthService, CompanyAuthData } from '../../../services/services';
 import { BehaviorSubject } from 'rxjs';
+import { SpinnerComponent } from '../../../components/spinner/spinner.component';
+
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [SpinnerComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.sass'
 })

@@ -1,5 +1,22 @@
 feitos -> {
 
+    usuario: listar pedidos -> {
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: x
+    }
+
+    loja: Alteração de status de pedido -> {
+        
+        // PedidoService
+
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: x
+        FRONTEND: x
+    }
+
     loja: exibir historico -> {
         MODELS: X
         BANCO / MIGRACAO: X
@@ -78,24 +95,6 @@ feitos -> {
         FRONTEND: x
     }
 
-}
-
-
-loja: Alteração de status de pedido -> {
-    
-    // PedidoService
-
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS:
-    FRONTEND:
-}
-
-usuario: listar pedidos -> {
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
 }
 
 admin: requisitar pedido so pode ser acessivel à loja ou ao user {

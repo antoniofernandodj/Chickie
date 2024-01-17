@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { RouterModule } from '@angular/router';
+import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 
 import {  AuthService, AuthData,
           LojaService } from '../../../services/services';
@@ -11,7 +12,7 @@ import { LojaResponse } from '../../../models/models';
 @Component({
   selector: 'app-user-home',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, SpinnerComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.sass'
 })

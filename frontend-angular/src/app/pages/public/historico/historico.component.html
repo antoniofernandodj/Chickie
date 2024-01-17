@@ -9,7 +9,7 @@
     @if (pedido.concluido) {
 
         <p>
-          <a [routerLink]="['/loja/pedidos', pedido.uuid]" >
+          <a [routerLink]="['/pedidos', pedido.uuid]" >
             <strong>ID: {{pedido.uuid}}</strong>
           </a>
         </p>
@@ -20,16 +20,16 @@
         <p>Celular:
           <a href="http://wa.me/55{{pedido.celular}}">{{pedido.celular}}</a>
         </p>
-        <p>Data e Hora: {{pedido.data_hora | formatDate }}</p>
+        <p>Data e Hora: {{ pedido.data_hora | formatDate }}</p>
         <h3>Endereço:</h3>
         <ul>
-            <li>Bairro: {{pedido.endereco.bairro}}</li>
-            <li>CEP: {{pedido.endereco.cep}}</li>
-            <li>Cidade: {{pedido.endereco.cidade}}</li>
-            <li>UF: {{pedido.endereco.uf}}</li>
-            <li>Logradouro: {{pedido.endereco.logradouro}}</li>
-            <li>Numero: {{pedido.endereco.numero}}</li>
-            <li>Complemento: {{pedido.endereco.complemento}}</li>
+            <li>Bairro: {{ pedido.endereco.bairro }}</li>
+            <li>CEP: {{ pedido.endereco.cep }}</li>
+            <li>Cidade: {{ pedido.endereco.cidade }}</li>
+            <li>UF: {{ pedido.endereco.uf }}</li>
+            <li>Logradouro: {{ pedido.endereco.logradouro }}</li>
+            <li>Numero: {{ pedido.endereco.numero }}</li>
+            <li>Complemento: {{ pedido.endereco.complemento }}</li>
         </ul>
 
         <p>

@@ -4,15 +4,17 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { ButtonHandler } from '../../../handlers/button';
+import { SpinnerComponent } from '../../../components/spinner/spinner.component';
+
 import {  CompanyAuthData, AuthService,
           CategoriaService } from '../../../services/services';
-import { ButtonHandler } from '../../../handlers/button';
 
 
 @Component({
   selector: 'app-cadastro-categoria',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SpinnerComponent],
   templateUrl: './cadastro-categoria.component.html',
   styleUrl: './cadastro-categoria.component.sass'
 })

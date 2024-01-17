@@ -79,6 +79,7 @@ async def alterar_status_de_pedido(
     data: AlterarStatusPedidoPATCH,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
 ):
+    print({'data': data})
     try:
         await service.alterar_status_de_pedido(
             pedido_uuid=uuid,
@@ -86,6 +87,8 @@ async def alterar_status_de_pedido(
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'Erro no cadastro do pedido! detail: {error}'
