@@ -16,5 +16,5 @@ from .funcionario import Funcionario  # noqa
 from .metodo_de_pagamento import MetodoDePagamento  # noqa
 from .pagamento import Pagamento  # noqa
 from .zona_de_entrega import ZonaDeEntrega  # noqa
-from .cliente import Cliente  # noqa
+from .cliente import Cliente, ClientePOST  # noqa
 from .imagem_cadastro import LojaUpdateImageCadastro  # noqa

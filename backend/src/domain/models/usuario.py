@@ -7,6 +7,7 @@ import bcrypt
 class UsuarioFollowEmpresaRequest(BaseModel):
     usuario_uuid: str
     loja_uuid: str
+    follow: bool
 
 
 class Usuario(BaseModel):

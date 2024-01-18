@@ -1,5 +1,23 @@
 feitos -> {
 
+    loja: loja cadastrar usuario -> {
+
+        // LojaService
+
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: X
+    }
+
+    usuario: seguir loja -> {
+
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND: X
+    }
+
     usuario: listar pedidos -> {
         MODELS: X
         BANCO / MIGRACAO: X
@@ -101,10 +119,93 @@ admin: requisitar pedido so pode ser acessivel à loja ou ao user {
     ...
 }
 
+depois -> {
+
+    usuario: buscar loja por avaliação -> [{
+
+        // AvaliacaoService
+
+        ** qual a forma mais rapida de checar a avaliação media de uma empresa,
+        dado que há uma tabela Avaliações e que nela há uma coluna nota? -> {
+            SELECT AVG(nota) AS media_avaliacao
+            FROM Avaliacoes
+            WHERE empresa__uuid = 'ID_DA_EMPRESA';
+        },
+        ** qual a forma mais rapida de checar empresas com
+        avaliação media maior que nota 4, dado que há uma
+        tabela Avaliações e que nela há uma coluna nota? -> {
+            SELECT empresa_id, AVG(nota) AS media_avaliacao
+            FROM Avaliacoes
+            GROUP BY empresa_id
+            HAVING AVG(nota) > 4;
+        }
+    },
+    {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }]
+
+    loja: notificação de promoções -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    loja: sistemas de ticket / suporte ao cliente -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    loja: sistema para esqueci a senha -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    usuario: sistema para esqueci a senha -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    usuario: definir a senha no primeiro acesso -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+}
+
+
+usuario: Listar lojas que segue -> {
+
+    // UserService
+    MODELS:
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: Listar seguidores -> {
+
+    // LojaService
+    MODELS:
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
 usuario: avaliação de loja -> {
 
     // LojaService
-
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
@@ -114,20 +215,9 @@ usuario: avaliação de loja -> {
 usuario: avaliação de produto -> {
 
     // ProdutoService
-
     MODELS: X
     BANCO / MIGRACAO: X
     ENDPONTS: X
-    FRONTEND:
-}
-
-loja: loja cadastrar usuario -> {
-
-    // LojaService
-
-    MODELS: X
-    BANCO / MIGRACAO:
-    ENDPONTS:
     FRONTEND:
 }
 
@@ -141,27 +231,6 @@ usuario: Atualizar configuracoes de conta -> {
     FRONTEND:
 }
 
-loja: sistema para esqueci a senha -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
-}
-
-usuario: sistema para esqueci a senha -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
-}
-
-usuario: definir a senha no primeiro acesso -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
-}
-
 usuario: buscar loja por localização -> {
 
     // LojaService
@@ -170,46 +239,6 @@ usuario: buscar loja por localização -> {
     criar tabela EnderecoDeUsuario X
     criar tabela EnderecoDePedido X
     ENDPOINTS / QUERIES:
-}
-
-usuario: buscar loja por avaliação -> [{
-
-    // AvaliacaoService
-
-    ** qual a forma mais rapida de checar a avaliação media de uma empresa,
-    dado que há uma tabela Avaliações e que nela há uma coluna nota? -> {
-        SELECT AVG(nota) AS media_avaliacao
-        FROM Avaliacoes
-        WHERE empresa__uuid = 'ID_DA_EMPRESA';
-    },
-    ** qual a forma mais rapida de checar empresas com
-    avaliação media maior que nota 4, dado que há uma
-    tabela Avaliações e que nela há uma coluna nota? -> {
-        SELECT empresa_id, AVG(nota) AS media_avaliacao
-        FROM Avaliacoes
-        GROUP BY empresa_id
-        HAVING AVG(nota) > 4;
-    }
-},
-{
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
-}]
-
-loja: notificação de promoções -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
-}
-
-loja: sistemas de ticket / suporte ao cliente -> {
-    MODELS:
-    BANCO / MIGRACAO:
-    ENDPONTS:
-    FRONTEND:
 }
 
 admin {

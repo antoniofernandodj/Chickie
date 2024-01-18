@@ -1,23 +1,24 @@
 import { Component } from '@angular/core';
+import { SignupService } from '../../../services/signup.service';
+import { AuthService, CompanyAuthData } from '../../../services/auth.service';
+import { ViaCepService } from '../../../services/viacep.service';
 import { FormsModule } from '@angular/forms';
-import { AuthService, SignupService, ViaCepService } from '../../../services/services';
-import { Response201Wrapper } from '../../../models/models';
 import { NgxMaskDirective } from 'ngx-mask';
+import { Response201Wrapper } from '../../../models/wrapper';
 import { ButtonHandler } from '../../../handlers/button';
+import { LojaService } from '../../../services/loja.service';
 
 @Component({
-  selector: 'app-signup-user',
+  selector: 'app-cadastro-cliente',
   standalone: true,
   imports: [FormsModule, NgxMaskDirective],
-  templateUrl: './signup-user.component.html',
-  styleUrl: './signup-user.component.sass'
+  templateUrl: './cadastro-cliente.component.html',
+  styleUrl: './cadastro-cliente.component.sass'
 })
-export class SignupUserComponent {
+export class CadastroClienteComponent {
 
   usernameValue: string
   emailValue: string
-  passwordValue: string
-  password2Value: string
   nomeValue: string
   celularValue: string
   telefoneValue: string
@@ -28,17 +29,17 @@ export class SignupUserComponent {
   bairroValue: string
   cidadeValue: string
   ufValue: string
-
+  companyData: CompanyAuthData | null
 
   constructor(
     private service: SignupService,
     private authService: AuthService,
-    private viaCepService: ViaCepService
+    private viaCepService: ViaCepService,
+    private lojaService: LojaService
   ) {
+    this.companyData = this.authService.currentCompany()
     this.usernameValue = ''
     this.emailValue = ''
-    this.passwordValue = ''
-    this.password2Value = ''
     this.nomeValue = ''
     this.celularValue = ''
     this.telefoneValue = ''
@@ -71,20 +72,21 @@ export class SignupUserComponent {
   }
 
   doSignUp(event: Event) {
+
+    if (!this.companyData) {
+      let msg = 'Dados da empresa não encontrados!'
+      alert(msg); throw new Error(msg)
+    }
+
     let button = new ButtonHandler(event)
     button.disable('Cadastrando...')
-
-    if (this.passwordValue != this.password2Value) {
-      alert('A senha e a confirmação não são iguais')
-      return
-    }
 
     let body = {
 
       celular: this.celularValue,
       email: this.emailValue,
       nome: this.nomeValue,
-      password: this.passwordValue,
+      password: '123456',
       telefone: this.telefoneValue,
       username: this.usernameValue,
 
@@ -96,16 +98,20 @@ export class SignupUserComponent {
       numero: this.numeroValue,
       uf: this.ufValue,
 
-      modo_de_cadastro: 'auto_cadastro'
+      modo_de_cadastro: 'cadastro_de_loja'
 
     }
 
-    this.service.doUserSignUp(body).subscribe({
+    this.lojaService.cadastrarUser(
+      this.companyData.loja.uuid,
+      body,
+      this.companyData
+    ).subscribe({
       next: (response) => {
         button.enable()
         let r = new Response201Wrapper(response)
         alert("Cadastro realizado com sucesso!")
-        this.authService.doUserLogin(this.usernameValue, this.passwordValue)
+        this.clearInputs()
       },
       error: (response) => {
         button.enable()
@@ -115,5 +121,19 @@ export class SignupUserComponent {
     })
   }
 
+  clearInputs() {
+    this.usernameValue = ''
+    this.emailValue = ''
+    this.nomeValue = ''
+    this.celularValue = ''
+    this.telefoneValue = ''
+    this.cepValue = ''
+    this.logradouroValue = ''
+    this.numeroValue = ''
+    this.complementoValue = ''
+    this.bairroValue = ''
+    this.cidadeValue = ''
+    this.ufValue = ''
+  }
 
 }

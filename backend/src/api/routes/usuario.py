@@ -1,6 +1,6 @@
 from typing import Any, Annotated, Optional
 from src.exceptions import UnauthorizedException
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Response
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.requests import Request
@@ -13,6 +13,7 @@ from src.domain.models import (
     EnderecoUsuario as Endereco,
     Usuario,
     Cliente,
+    ClientePOST,
     UserAuthData,
 )
 from src import use_cases
@@ -144,25 +145,58 @@ async def update_user(
         )
 
 
-@router.post("/cliente", status_code=status.HTTP_201_CREATED)
+@router.post("/seguir-loja")
 async def seguir_loja(
+    response: Response,
     connection: connection_dependency,
     current_user: current_user,
-    usuario: UsuarioFollowEmpresaRequest
+    follow_request_data: UsuarioFollowEmpresaRequest
 ) -> Any:
-
-    if usuario.loja_uuid is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="uuid da loja em falta",
-        )
-
-    cliente = Cliente(
-        usuario_uuid=usuario.usuario_uuid,
-        loja_uuid=usuario.loja_uuid
+    result: str | int
+    cliente = ClientePOST(
+        usuario_uuid=follow_request_data.usuario_uuid,
+        loja_uuid=follow_request_data.loja_uuid
     )
 
     cliente_repository = Repository(Cliente, connection=connection)
-    cliente_uuid = await cliente_repository.save(cliente)
 
-    return {"uuid": cliente_uuid}
+    if follow_request_data.follow:
+        response.status_code = 201
+        result = await cliente_repository.save(cliente)
+        return {"result": result, 'follow': follow_request_data.follow}
+
+    else:
+        relationship: Optional[Cliente] = await cliente_repository.find_one(
+            usuario_uuid=follow_request_data.usuario_uuid,
+            loja_uuid=follow_request_data.loja_uuid
+        )
+
+        if relationship:
+            result = await cliente_repository.delete(relationship)
+            return {'result': result, 'follow': follow_request_data.follow}
+
+    return {'result': None, 'follow': follow_request_data.follow}
+
+
+@router.get("/segue-loja/{uuid}")
+async def segue_loja(
+    connection: connection_dependency,
+    current_user: current_user,
+    uuid: str
+) -> Any:
+    if current_user.uuid is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Usuario sem uuid'
+        )
+
+    cliente_repository = Repository(Cliente, connection=connection)
+    follows: Optional[Cliente] = await cliente_repository.find_one(
+        usuario_uuid=current_user.uuid,
+        loja_uuid=uuid
+    )
+    if follows:
+        return {'result': True}
+
+    else:
+        return {'result': False}
