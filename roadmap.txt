@@ -1,3 +1,105 @@
+
+usuario: Listar lojas que segue -> {
+
+    // UserService
+    MODELS:
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: Cadastrar pedido para user -> {
+
+    // LojaService
+    MODELS:
+    BANCO / MIGRACAO: x
+    ENDPONTS:
+    FRONTEND:
+}
+
+loja: Listar seguidores -> {
+
+    // LojaService
+    MODELS:
+    BANCO / MIGRACAO: X
+    ENDPONTS:
+    FRONTEND:
+}
+
+usuario: avaliação de loja -> {
+
+    // LojaService
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: avaliação de produto -> {
+
+    // ProdutoService
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: Atualizar configuracoes de conta -> {
+
+    // UserService
+
+    MODELS: X
+    BANCO / MIGRACAO: X
+    ENDPONTS: X
+    FRONTEND:
+}
+
+usuario: buscar loja por localização -> {
+
+    // LojaService
+
+    criar tabela EnderecoDeLoja  X
+    criar tabela EnderecoDeUsuario X
+    criar tabela EnderecoDePedido X
+    ENDPOINTS / QUERIES:
+}
+
+admin {
+
+    admin: requisitar pedido so pode ser acessivel à loja ou ao user {
+        ...
+    }
+
+    admin: pesquisar api para pagamento -> {
+        MODELS:
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    admin: excluir loja -> {
+        MODELS: x
+        BANCO / MIGRACAO:
+        ENDPONTS: x
+        FRONTEND:
+    }
+
+    admin: excluir user -> {
+        MODELS: x
+        BANCO / MIGRACAO:
+        ENDPONTS:
+        FRONTEND:
+    }
+
+    admin: inativar loja -> {
+        MODELS: X
+        BANCO / MIGRACAO: X
+        ENDPONTS: X
+        FRONTEND:
+    }
+}
+
+
 feitos -> {
 
     loja: loja cadastrar usuario -> {
@@ -115,9 +217,6 @@ feitos -> {
 
 }
 
-admin: requisitar pedido so pode ser acessivel à loja ou ao user {
-    ...
-}
 
 depois -> {
 
@@ -184,89 +283,3 @@ depois -> {
 
 }
 
-
-usuario: Listar lojas que segue -> {
-
-    // UserService
-    MODELS:
-    BANCO / MIGRACAO: X
-    ENDPONTS:
-    FRONTEND:
-}
-
-loja: Listar seguidores -> {
-
-    // LojaService
-    MODELS:
-    BANCO / MIGRACAO: X
-    ENDPONTS:
-    FRONTEND:
-}
-
-usuario: avaliação de loja -> {
-
-    // LojaService
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
-
-usuario: avaliação de produto -> {
-
-    // ProdutoService
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
-
-usuario: Atualizar configuracoes de conta -> {
-
-    // UserService
-
-    MODELS: X
-    BANCO / MIGRACAO: X
-    ENDPONTS: X
-    FRONTEND:
-}
-
-usuario: buscar loja por localização -> {
-
-    // LojaService
-
-    criar tabela EnderecoDeLoja  X
-    criar tabela EnderecoDeUsuario X
-    criar tabela EnderecoDePedido X
-    ENDPOINTS / QUERIES:
-}
-
-admin {
-    admin: pesquisar api para pagamento -> {
-        MODELS:
-        BANCO / MIGRACAO:
-        ENDPONTS:
-        FRONTEND:
-    }
-
-    admin: excluir loja -> {
-        MODELS: x
-        BANCO / MIGRACAO:
-        ENDPONTS: x
-        FRONTEND:
-    }
-
-    admin: excluir user -> {
-        MODELS: x
-        BANCO / MIGRACAO:
-        ENDPONTS:
-        FRONTEND:
-    }
-
-    admin: inativar loja -> {
-        MODELS: X
-        BANCO / MIGRACAO: X
-        ENDPONTS: X
-        FRONTEND:
-    }
-}
