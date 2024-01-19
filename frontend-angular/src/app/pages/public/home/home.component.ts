@@ -60,7 +60,8 @@ export class UserHomeComponent {
   ngOnInit() {
     this.lojaService.getAll().subscribe({
       next: (result: any) => {
-        let lojas = result.map((item: any) => new Loja(item))
+        let payload = result.payload
+        let lojas = payload.map((item: any) => new Loja(item))
         this.checkIfFollows(lojas)
         this.lojas.next(lojas);
       },
@@ -91,7 +92,7 @@ export class UserHomeComponent {
     checkbox.disabled = true
 
     this.userService.followLoja(follow, loja).subscribe({
-      next: (result) => {
+      next: (result: any) => {
         checkbox.disabled = false
 
         if (follow) {

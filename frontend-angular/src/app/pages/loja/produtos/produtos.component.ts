@@ -58,7 +58,8 @@ export class ProdutosComponent {
 
     this.produtoService.getAll(this.companyData.loja.uuid).subscribe({
       next: (response: any) => {
-        this.companyProducts.next(response)
+        let payload = response.payload
+        this.companyProducts.next(payload)
         this.fetchCategoriasForProducts()
       },
       error: (response) => {

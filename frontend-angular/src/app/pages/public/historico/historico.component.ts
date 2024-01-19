@@ -51,27 +51,25 @@ export class UserHistoricoComponent {
   ngOnInit() {
     this.loading = true
     this.userData = this.authService.currentUser()
-    this.route.params.subscribe(params => {
 
-      if (!this.userData) {
-        let msg = "Dados de usuario não encontrados"
-        alert(msg); throw new Error(msg)
+    if (!this.userData) {
+      let msg = "Dados de usuario não encontrados"
+      alert(msg); throw new Error(msg)
+    }
+
+    this.pedidoService.getAllFromUser(this.userData.uuid).subscribe({
+      next: (result: any) => {
+        let payload = result.payload
+        this.loading = false
+        this.pedidos.next(payload)
+        this.nenhumEmAndamento.next(
+          this.pedidos.value.filter(item => item.concluido).length == 0
+        )
+      },
+      error: (result) => {
+        let msg = 'Erro na busca do pedido'
+        alert(msg); console.log(result); throw new Error(msg)
       }
-
-      this.pedidoService.getAllFromUser(this.userData.uuid).subscribe({
-        next: (response: any) => {
-          this.loading = false
-          this.pedidos.next(response)
-          this.nenhumEmAndamento.next(
-            this.pedidos.value.filter(item => item.concluido).length == 0
-          )
-          console.log({response: response})
-        },
-        error: (response) => {
-          let msg = 'Erro na busca do pedido'
-          alert(msg); console.log(response); throw new Error(msg)
-        }
-      })
     })
   }
 

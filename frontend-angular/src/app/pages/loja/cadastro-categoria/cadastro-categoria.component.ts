@@ -38,14 +38,15 @@ export class CadastroCategoriaComponent {
     this.loading = true
     if (this.companyData) {
       this.service.getAll(this.companyData.loja.uuid).subscribe({
-        next: (response: Object) => {
+        next: (result: any) => {
           this.loading = false
-          if (Array.isArray(response)) {
-            this.categorias.next(response)
+          let payload = result.payload
+          if (Array.isArray(payload)) {
+            this.categorias.next(payload)
           }
         },
-        error: (response: Object) => {
-          throw new Error(JSON.stringify(response))
+        error: (result: Object) => {
+          throw new Error(JSON.stringify(result))
         }
       })
     }

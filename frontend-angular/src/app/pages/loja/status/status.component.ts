@@ -41,13 +41,14 @@ export class StatusComponent {
       alert(msg); throw new Error(msg)
     }
     this.statusService.getAll(this.companyData.loja.uuid).subscribe({
-      next: (response) => {
-        if (Array.isArray(response)) {
-          this.statusList.value.push(...response)
+      next: (result: any) => {
+        let payload = result.payload
+        if (Array.isArray(payload)) {
+          this.statusList.value.push(...payload)
         }
         this.fetching = false
       },
-      error: (response) => {
+      error: (result) => {
         throw new Error('Erro na requisição dos dados')
       }
     })
@@ -99,7 +100,7 @@ export class StatusComponent {
         alert('Item removido com sucesso!')
       },
       error: (response) => {
-        let msg = 'Erro na remoção do item';
+        let msg = 'Erro na remoção do item. Algum pedido pode estar vinculado';
 
         button.enable()
 

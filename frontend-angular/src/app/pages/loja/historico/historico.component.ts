@@ -51,37 +51,37 @@ export class HistoricoComponent {
 
   ngOnInit() {
     this.loading = true
-    this.route.params.subscribe(params => {
 
-      if (!this.companyData) {
-        let msg = "Dados de empresa não encontrados"
-        alert(msg); throw new Error(msg)
+    if (!this.companyData) {
+      let msg = "Dados de empresa não encontrados"
+      alert(msg); throw new Error(msg)
+    }
+
+    this.statusService.getAll(this.companyData.loja.uuid).subscribe({
+      next: (result: any) => {
+        let payload = result.payload
+        this.loading = false
+        this.statusList.push(...payload)
+      },
+      error: (result) => {
+        throw new Error('Erro na requisição dos dados')
       }
-
-      this.statusService.getAll(this.companyData.loja.uuid).subscribe({
-        next: (response: any) => {
-          this.loading = false
-          this.statusList.push(...response)
-        },
-        error: (response) => {
-          throw new Error('Erro na requisição dos dados')
-        }
-      })
-
-      this.pedidoService.getAll(this.companyData.loja.uuid).subscribe({
-        next: (response: any) => {
-          this.pedidos.next(response)
-          this.nenhumEmAndamento.next(
-            this.pedidos.value.filter(item => item.concluido).length == 0
-          )
-          console.log({response: response})
-        },
-        error: (response) => {
-          let msg = 'Erro na busca do pedido'
-          alert(msg); console.log(response); throw new Error(msg)
-        }
-      })
     })
+
+    this.pedidoService.getAll(this.companyData.loja.uuid).subscribe({
+      next: (result: any) => {
+        let payload = result.payload
+        this.pedidos.next(payload)
+        this.nenhumEmAndamento.next(
+          this.pedidos.value.filter(item => item.concluido).length == 0
+        )
+      },
+      error: (result) => {
+        let msg = 'Erro na busca do pedido'
+        alert(msg); console.log(result); throw new Error(msg)
+      }
+    })
+
   }
 
 }

@@ -60,27 +60,27 @@ export class PedidosComponent {
       }
 
       this.statusService.getAll(this.companyData.loja.uuid).subscribe({
-        next: (response: any) => {
+        next: (result: any) => {
+          let payload = result.payload
           this.loading = false
-          this.statusList.push(...response)
+          this.statusList.push(...payload)
         },
-        error: (response) => {
+        error: (result) => {
           throw new Error('Erro na requisição dos dados')
         }
       })
 
       this.pedidoService.getAll(this.companyData.loja.uuid).subscribe({
-        next: (response: any) => {
-          this.pedidos.next(response)
-          console.log({response: response})
-          this.pedidos.next(response)
+        next: (result: any) => {
+          let payload = result.payload
+          this.pedidos.next(payload)
           this.nenhumEmAndamento.next(
             this.pedidos.value.filter(item => !item.concluido).length == 0
           )
         },
-        error: (response) => {
+        error: (result) => {
           let msg = 'Erro na busca do pedido'
-          alert(msg); console.log(response); throw new Error(msg)
+          alert(msg); console.log(result); throw new Error(msg)
         }
       })
     })

@@ -63,10 +63,11 @@ export class CategoriaComponent {
       this.companyData.loja.uuid,
       this.categoriaUUID
     ).subscribe({
-      next: (response) => {
+      next: (response: any) => {
+        let payload = response.payload
         this.loading = false
-        if (Array.isArray(response)) {
-          this.companyProducts.next(response);
+        if (Array.isArray(payload)) {
+          this.companyProducts.next(payload);
         }
       },
       error: (response) => {

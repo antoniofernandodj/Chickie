@@ -21,7 +21,6 @@ export class LojaHomeComponent {
     if (this.companyData.value) {
       this.imageBase64String = this.companyData.value.loja.imagem_cadastro
     }
-
   }
 
 

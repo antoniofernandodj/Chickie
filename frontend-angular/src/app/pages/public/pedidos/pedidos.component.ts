@@ -18,7 +18,6 @@ import {  PedidoService, AuthService,
   styleUrl: './pedidos.component.sass'
 })
 export class UserPedidosComponent {
-  pedidoUUID: string
   pedidos: BehaviorSubject<Array<Pedido>>
   userData: AuthData | null
   statusList: Array<StatusResponse>
@@ -35,33 +34,30 @@ export class UserPedidosComponent {
     this.nenhumEmAndamento = new BehaviorSubject<Boolean>(false)
     this.pedidos = new BehaviorSubject<Array<Pedido>>([])
     this.statusList = []
-    this.pedidoUUID = ''
     this.userData = this.authService.currentUser()
   }
 
   ngOnInit() {
     this.loading = true
-    this.route.params.subscribe(params => {
 
-      if (!this.userData || !this.userData.uuid) {
-        let msg = 'Dados de usuário não encontrados!'
-        alert(msg); throw new Error(msg)
+    if (!this.userData || !this.userData.uuid) {
+      let msg = 'Dados de usuário não encontrados!'
+      alert(msg); throw new Error(msg)
+    }
+
+    this.pedidoService.getAllFromUser(this.userData.uuid).subscribe({
+      next: (response: any) => {
+        let payload = response.payload
+        this.loading = false
+        this.pedidos.next(payload)
+        this.nenhumEmAndamento.next(
+          this.pedidos.value.filter(item => !item.concluido).length == 0
+        )
+      },
+      error: (response) => {
+        let msg = 'Erro na busca do pedido'
+        alert(msg); console.log(response); throw new Error(msg)
       }
-
-      this.pedidoService.getAllFromUser(this.userData.uuid).subscribe({
-        next: (response: any) => {
-          this.pedidos.next(response)
-          this.loading = false
-          this.pedidos.next(response)
-          this.nenhumEmAndamento.next(
-            this.pedidos.value.filter(item => !item.concluido).length == 0
-          )
-        },
-        error: (response) => {
-          let msg = 'Erro na busca do pedido'
-          alert(msg); console.log(response); throw new Error(msg)
-        }
-      })
     })
   }
 }

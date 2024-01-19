@@ -226,10 +226,10 @@ export class ProdutoComponent {
     this.imageLoading = true
     if (this.companyData) {
       this.produtoService.getOne(this.produtoUUID).subscribe({
-        next: (response) => {
+        next: (result: any) => {
           this.imageLoading = false
-          console.log({response: response})
-          let produto = new Produto(response)
+          console.log({result: result})
+          let produto = new Produto(result)
           this.produto.next(produto)
 
           this.nomeValue = produto.nome
@@ -253,7 +253,7 @@ export class ProdutoComponent {
           }
           this.diasDaSemanaDisponiveis.next(newArr)
         },
-        error: (response) => {
+        error: (result) => {
           alert('Erro na busca pelo produto')
         }
       })
