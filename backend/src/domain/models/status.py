@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class Status(BaseModel):
@@ -10,3 +10,13 @@ class Status(BaseModel):
 
     descricao: Optional[str] = None
     uuid: Optional[str] = None
+
+
+#######
+
+
+class StatusList(BaseModel):
+    payload: List[Status]
+    limit: int
+    offset: int
+    length: int

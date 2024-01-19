@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class MetodoDePagamento(BaseModel):
@@ -8,3 +8,13 @@ class MetodoDePagamento(BaseModel):
     nome: str
     descricao: Optional[str] = None
     uuid: Optional[str] = None
+
+
+#################
+
+
+class MetodosDePagamento(BaseModel):
+    payload: List[MetodoDePagamento]
+    limit: int
+    offset: int
+    length: int

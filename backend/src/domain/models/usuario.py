@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import base64
 import bcrypt
 
@@ -42,3 +42,9 @@ class Usuario(BaseModel):
         hash_bytes = base64.b64decode(self.password_hash.encode("utf-8"))
         return bcrypt.checkpw(senha_usuario.encode("utf-8"), hash_bytes)
 
+
+class Usuarios(BaseModel):
+    payload: List[Usuario]
+    limit: int
+    offset: int
+    length: int

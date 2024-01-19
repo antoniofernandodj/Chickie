@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class ZonaDeEntrega(BaseModel):
@@ -13,3 +13,13 @@ class ZonaDeEntrega(BaseModel):
 
     bairro: Optional[str] = None
     uuid: Optional[str] = None
+
+
+#######################
+
+
+class ZonasDeEntrega(BaseModel):
+    payload: List[ZonaDeEntrega]
+    limit: int
+    offset: int
+    length: int

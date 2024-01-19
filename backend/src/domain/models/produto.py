@@ -46,3 +46,10 @@ class ProdutoGET(BaseModel):
     image_url: Optional[str] = None
     preco_hoje: Optional[float] = None
     uuid: Optional[str] = None
+
+
+class Produtos(BaseModel):
+    payload: List[ProdutoGET]
+    limit: int
+    offset: int
+    length: int
