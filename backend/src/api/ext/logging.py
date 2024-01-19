@@ -28,8 +28,11 @@ def init_app(app: Union[FastAPI, None] = None):
         10: "DEBUG",
         0: "OFF",
     }
+    try:
+        log_level = codes.get(str(s.LOG_LEVEL)) or codes['INFO']
+    except AttributeError:
+        log_level = 10
 
-    log_level = codes.get(str(s.LOG_LEVEL)) or codes['INFO']
     if log_level == 0:
         return None
 
