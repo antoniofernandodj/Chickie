@@ -133,9 +133,10 @@ export class RealizarPedidoiComponent {
 
   fetchProducts(companyUUID: string) {
     this.produtoService.getAll(companyUUID).subscribe({
-      next: (res) => {
-        if (Array.isArray(res)) {
-          this.companyProducts.next(res)
+      next: (result: any) => {
+        let payload = result.payload
+        if (Array.isArray(payload)) {
+          this.companyProducts.next(payload)
           this.fetchCategoriasForProducts()
         }
       },
@@ -160,7 +161,6 @@ export class RealizarPedidoiComponent {
       })
 
     }
-
   }
 
   getPrecoTotal():number {
