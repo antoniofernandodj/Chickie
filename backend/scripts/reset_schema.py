@@ -7,7 +7,7 @@ parent = str(Path(os.path.dirname(__file__)).parent)
 
 sys.path.append(parent)
 
-from src.infra.database_postgres.config import (  # noqa
+from src.infra.database_postgres.manager import (  # noqa
     DatabaseConnectionManager
 )
 
