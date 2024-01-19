@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class CategoriaProdutos(BaseModel):
@@ -9,3 +9,10 @@ class CategoriaProdutos(BaseModel):
     loja_uuid: str
 
     uuid: Optional[str] = None
+
+
+class CategoriasProdutos(BaseModel):
+    payload: List[CategoriaProdutos]
+    limit: int
+    offset: int
+    length: int

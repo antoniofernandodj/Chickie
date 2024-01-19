@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class Entregador(BaseModel):
@@ -13,3 +13,13 @@ class Entregador(BaseModel):
     telefone: Optional[str] = None
     email: Optional[str] = None
     uuid: Optional[str] = None
+
+
+#########################
+
+
+class Entregadores(BaseModel):
+    payload: List[Entregador]
+    limit: int
+    offset: int
+    length: int

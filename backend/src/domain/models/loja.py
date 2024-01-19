@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from src.domain.models import EnderecoLoja
 import base64
 import bcrypt
@@ -16,6 +16,14 @@ class LojaGET(BaseModel):
     telefone: Optional[str] = None
     imagem_cadastro: Optional[str] = None
     horarios_de_funcionamento: Optional[str] = None
+
+
+class Lojas(BaseModel):
+    __tablename__ = "lojas"
+    limit: int
+    offset: int
+    payload: List[LojaGET]
+    length: int
 
 
 class Loja(BaseModel):

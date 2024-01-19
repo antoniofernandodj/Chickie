@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class AvaliacaoDeLoja(BaseModel):
@@ -23,3 +23,20 @@ class AvaliacaoDeProduto(BaseModel):
     nota: int
     descricao: str
     uuid: Optional[str] = None
+
+
+################
+
+
+class AvaliacoesDeProduto(BaseModel):
+    payload: List[AvaliacaoDeProduto]
+    limit: int
+    offset: int
+    length: int
+
+
+class AvaliacoesDeLoja(BaseModel):
+    payload: List[AvaliacaoDeLoja]
+    limit: int
+    offset: int
+    length: int

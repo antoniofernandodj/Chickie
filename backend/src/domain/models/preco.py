@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class Preco(BaseModel):
@@ -8,3 +8,13 @@ class Preco(BaseModel):
     valor: float
     dia_da_semana: str
     uuid: Optional[str] = None
+
+
+####################
+
+
+class Precos(BaseModel):
+    payload: List[Preco]
+    limit: int
+    offset: int
+    length: int

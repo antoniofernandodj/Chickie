@@ -40,6 +40,14 @@ class PedidoGET(BaseModel):
     concluido: Optional[bool] = None
 
 
+class Pedidos(BaseModel):
+    __tablename__ = "pedidos"
+    payload: List[PedidoGET]
+    limit: int
+    offset: int
+    length: int
+
+
 class PedidoPOST(BaseModel):
 
     celular: str
