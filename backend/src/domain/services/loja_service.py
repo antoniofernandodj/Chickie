@@ -1,12 +1,20 @@
 from src.infra.database_postgres.repository import Repository
-from src.domain.models import Loja, LojaSignUp, EnderecoLoja, LojaGET, LojaPUT
+from src.domain.models import (
+    Loja,
+    LojaSignUp,
+    EnderecoLoja,
+    LojaGET,
+    LojaPUT,
+    Cliente,
+    Usuario
+)
 from src.exceptions import (
     LojaJaCadastradaException,
     InvalidPasswordException
 )
 import base64
 import bcrypt
-from typing import Optional
+from typing import Optional, List
 from src.domain.services.base import BaseService
 
 from aiopg.connection import Connection
@@ -21,9 +29,14 @@ class LojaService(BaseService):
         self.repo = Repository(
             model=self.model, connection=self.connection
         )
-
         self.endereco_repo = Repository(
             model=EnderecoLoja, connection=connection
+        )
+        self.cliente_repo = Repository(
+            model=Cliente, connection=self.connection
+        )
+        self.usuario_repo = Repository(
+            model=Usuario, connection=self.connection
         )
 
     async def update_loja_data(self, uuid: str, data: LojaPUT):
@@ -172,3 +185,27 @@ class LojaService(BaseService):
 
         hash_bytes = base64.b64decode(loja.password_hash.encode("utf-8"))
         return bcrypt.checkpw(senha_loja.encode("utf-8"), hash_bytes)
+
+    async def get_clientes(
+        self,
+        loja_uuid: Optional[str],
+        ativo: Optional[bool]
+    ) -> List[Usuario]:
+
+        results: List[Usuario] = []
+        clientes: List[Cliente] = await self.cliente_repo.find_all(
+            loja_uuid=loja_uuid
+        )
+
+        for cliente in clientes:
+            usuario = await self.usuario_repo.find_one(
+                uuid=cliente.usuario_uuid
+            )
+            if usuario:
+                if ativo is None:
+                    results.append(usuario)
+                else:
+                    if ativo is True:
+                        results.append(usuario)
+
+        return results
