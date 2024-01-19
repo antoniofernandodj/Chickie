@@ -8,6 +8,14 @@ from src.domain.models import (
 from aiopg.connection import Connection
 from typing import Optional
 from .base import BaseService
+from src.misc import Paginador
+from typing import TypedDict, List, Any
+
+
+class PaginateOptions(TypedDict):
+    limit: int
+    offset: int
+    payload: List[Any]
 
 
 class AvaliacaoDeLojaService(BaseService):
@@ -44,6 +52,7 @@ class AvaliacaoDeLojaService(BaseService):
     async def buscar_lojas_por_avaliacao_acima_de(
         self,
         nota: int,
+        pag_data: PaginateOptions
     ):
         avaliacoes = await self.buscar_avaliacoes_de_loja_acima_de(nota)
 
@@ -52,7 +61,12 @@ class AvaliacaoDeLojaService(BaseService):
             loja = await self.get_loja(avaliacao)
             lojas.append(loja)
 
-        return lojas
+        paginador = Paginador(
+            data=lojas,
+            offset=pag_data['offset'],
+            limit=pag_data['limit']
+        )
+        return paginador.get_response()
 
     async def buscar_avaliacoes_de_loja_acima_de(
         self,
