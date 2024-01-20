@@ -25,6 +25,7 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 @router.get("/")
 async def requisitar_pedidos(
+    request: Request,
     service: pedido_service_dependency,
     loja_uuid: Optional[str] = Query(None),
     usuario_uuid: Optional[str] = Query(None)
@@ -42,6 +43,7 @@ async def requisitar_pedidos(
 
 @router.get("/{uuid}")
 async def requisitar_pedido(
+    request: Request,
     service: pedido_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer get")]
 ) -> PedidoGET:
@@ -55,6 +57,7 @@ async def requisitar_pedido(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pedidos(
+    request: Request,
     pedido_data: PedidoPOST,
     service: pedido_service_dependency,
 ) -> Dict[str, Any]:
@@ -75,6 +78,7 @@ async def cadastrar_pedidos(
 
 @router.patch("/alterar_status_de_pedido/{uuid}")
 async def alterar_status_de_pedido(
+    request: Request,
     current_company: current_company,
     service: pedido_service_dependency,
     data: AlterarStatusPedidoPATCH,
@@ -98,6 +102,7 @@ async def alterar_status_de_pedido(
 
 @router.patch("/concluir_pedido/{uuid}")
 async def concluir_pedido(
+    request: Request,
     current_company: current_company,
     response: Response,
     service: pedido_service_dependency,
@@ -118,6 +123,7 @@ async def concluir_pedido(
 
 @router.delete("/{uuid}")
 async def remover_pedido(
+    request: Request,
     current_company: current_company,
     service: pedido_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]

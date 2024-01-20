@@ -20,6 +20,7 @@ router = APIRouter(prefix="/status", tags=["Status"])
 
 @router.get("/")
 async def requisitar_varios_status(
+    request: Request,
     repository: status_repository_dependency,
     loja_uuid: Optional[str] = Query(None)
 ) -> List[Status]:
@@ -35,6 +36,7 @@ async def requisitar_varios_status(
 
 @router.get("/{uuid}")
 async def requisitar_status(
+    request: Request,
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do status a fazer get")]
 ) -> Status:
@@ -48,6 +50,7 @@ async def requisitar_status(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_status(
+    request: Request,
     status: Status,
     current_company: current_company,
     repository: status_repository_dependency
@@ -63,6 +66,7 @@ async def cadastrar_status(
 
 @router.put("/{uuid}")
 async def atualizar_status_put(
+    request: Request,
     statusData: Status,
     current_company: current_company,
     repository: status_repository_dependency,
@@ -82,6 +86,7 @@ async def atualizar_status_put(
 
 @router.patch("/{uuid}")
 async def atualizar_status_patch(
+    request: Request,
     statusData: Status,
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do Status a fazer patch")],
@@ -91,6 +96,7 @@ async def atualizar_status_patch(
 
 @router.delete("/{uuid}")
 async def remover_status(
+    request: Request,
     current_company: current_company,
     repository: status_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid do status a fazer delete")]

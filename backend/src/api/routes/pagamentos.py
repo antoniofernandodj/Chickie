@@ -17,6 +17,7 @@ router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
 @router.get("/")
 async def requisitar_pagamentos(
+    request: Request,
     connection: connection_dependency,
     loja_uuid: Optional[str] = Query(None)
 ) -> List[Pagamento]:
@@ -34,6 +35,7 @@ async def requisitar_pagamentos(
 
 @router.get("/{uuid}")
 async def requisitar_pagamento(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ) -> Pagamento:
@@ -49,6 +51,7 @@ async def requisitar_pagamento(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pagamentos(
+    request: Request,
     connection: connection_dependency,
     pagamento: Pagamento
 ) -> Dict[str, str]:
@@ -65,6 +68,7 @@ async def cadastrar_pagamentos(
 
 @router.put("/{uuid}")
 async def atualizar_pagamento_put(
+    request: Request,
     pagamento_Data: Pagamento,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
@@ -85,6 +89,7 @@ async def atualizar_pagamento_put(
 
 @router.patch("/{uuid}")
 async def atualizar_pagamento_patch(
+    request: Request,
     pagamentoData: Pagamento,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
@@ -104,6 +109,7 @@ async def atualizar_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_pagamento(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ) -> Dict[str, int]:

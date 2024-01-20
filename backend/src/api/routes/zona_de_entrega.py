@@ -17,6 +17,7 @@ router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 
 @router.get("/")
 async def requisitar_zonas_de_entrega(
+    request: Request,
     connection: connection_dependency,
 ):
     """
@@ -33,6 +34,7 @@ async def requisitar_zonas_de_entrega(
 
 @router.get("/{uuid}")
 async def requisitar_zona_de_entrega(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
@@ -58,6 +60,7 @@ async def requisitar_zona_de_entrega(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_zonas_de_entrega(
+    request: Request,
     connection: connection_dependency,
     zona_de_entrega: ZonaDeEntrega
 ):
@@ -85,6 +88,7 @@ async def cadastrar_zonas_de_entrega(
 
 @router.put("/{uuid}")
 async def atualizar_zona_de_entrega_put(
+    request: Request,
     connection: connection_dependency,
     zona_de_entrega_Data: ZonaDeEntrega,
     uuid: Annotated[
@@ -120,6 +124,7 @@ async def atualizar_zona_de_entrega_put(
 
 @router.patch("/{uuid}")
 async def atualizar_zona_de_entrega_patch(
+    request: Request,
     connection: connection_dependency,
     zona_de_entregaData: ZonaDeEntrega,
     uuid: Annotated[
@@ -140,6 +145,7 @@ async def atualizar_zona_de_entrega_patch(
 
 @router.delete("/{uuid}")
 async def remover_zona_de_entrega(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")

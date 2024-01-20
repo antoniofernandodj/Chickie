@@ -21,6 +21,7 @@ router = APIRouter(
 
 @router.get("/")
 async def requisitar_avaliacoes(
+    request: Request,
     connection: connection_dependency
 ) -> List[AvaliacaoDeProduto]:
 
@@ -32,6 +33,7 @@ async def requisitar_avaliacoes(
 
 @router.get("/{uuid}")
 async def requisitar_avaliacao(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
 ) -> AvaliacaoDeProduto:
@@ -47,6 +49,7 @@ async def requisitar_avaliacao(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_avaliacoes(
+    request: Request,
     connection: connection_dependency,
     avaliacao: AvaliacaoDeProduto
 ) -> Dict[str, str]:
@@ -63,6 +66,7 @@ async def cadastrar_avaliacoes(
 
 @router.put("/{uuid}")
 async def atualizar_avaliacao_put(
+    request: Request,
     connection: connection_dependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
@@ -83,6 +87,7 @@ async def atualizar_avaliacao_put(
 
 @router.patch("/{uuid}")
 async def atualizar_avaliacao_patch(
+    request: Request,
     avaliacaoData: AvaliacaoDeProduto,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
@@ -104,6 +109,7 @@ async def atualizar_avaliacao_patch(
 
 @router.delete("/{uuid}")
 async def remover_avaliacao(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ) -> Dict[str, int]:

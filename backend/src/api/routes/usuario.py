@@ -9,7 +9,6 @@ from fastapi import (
 )
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.requests import Request
 from src.exceptions import NotFoundException
 from src.infra.database_postgres.repository import Repository
 from src.api import security
@@ -72,7 +71,10 @@ async def login_post(
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, tags=["Auth"])
-async def signup(usuario: UsuarioSignUp) -> Any:
+async def signup(
+    request: Request,
+    usuario: UsuarioSignUp
+) -> Any:
 
     try:
         usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
@@ -87,6 +89,7 @@ async def signup(usuario: UsuarioSignUp) -> Any:
 
 @router.put("/{uuid}")
 async def update_user(
+    request: Request,
     uuid: str,
     user_data: UsuarioSignUp,
     current_user: current_user,
@@ -153,6 +156,7 @@ async def update_user(
 
 @router.post("/seguir-loja")
 async def seguir_loja(
+    request: Request,
     response: Response,
     connection: connection_dependency,
     current_user: current_user,
@@ -186,6 +190,7 @@ async def seguir_loja(
 
 @router.get("/segue-loja/{uuid}")
 async def segue_loja(
+    request: Request,
     connection: connection_dependency,
     current_user: current_user,
     uuid: str

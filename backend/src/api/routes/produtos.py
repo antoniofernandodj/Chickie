@@ -30,6 +30,7 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 
 @router.get("/")
 async def requisitar_produtos(
+    request: Request,
     produto_service: produto_service_dependency,
     loja_uuid: Optional[str] = Query(None),
     categoria_uuid: Optional[str] = Query(None)
@@ -60,6 +61,7 @@ async def requisitar_produtos(
 
 @router.get("/{uuid}")
 async def requisitar_produto(
+    request: Request,
     produto_service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ) -> ProdutoGET:
@@ -73,6 +75,7 @@ async def requisitar_produto(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_produto(
+    request: Request,
     produto_data: ProdutoPOST,
     current_company: current_company,
     produto_service: produto_service_dependency
@@ -96,6 +99,7 @@ async def cadastrar_produto(
     summary='Atualizar dados de cadastro de produto'
 )
 async def atualizar_produto_put(
+    request: Request,
     produto_data: ProdutoPUT,
     current_company: current_company,
     produto_service: produto_service_dependency,
@@ -123,6 +127,7 @@ async def atualizar_produto_put(
     }
 )
 async def atualizar_imagem_de_produto(
+    request: Request,
     uuid: str,
     loja: current_company,
     image: LojaUpdateImageCadastro,
@@ -163,6 +168,7 @@ async def atualizar_imagem_de_produto(
     }
 )
 async def remover_imagem_de_produto(
+    request: Request,
     uuid: str,
     loja: current_company,
     service: produto_service_dependency
@@ -188,6 +194,7 @@ async def remover_imagem_de_produto(
 
 @router.delete("/{uuid}")
 async def remover_produto(
+    request: Request,
     current_company: current_company,
     service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]

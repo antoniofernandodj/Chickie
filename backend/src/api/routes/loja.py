@@ -57,6 +57,7 @@ router = APIRouter(prefix="/loja", tags=["Loja"])
     "/{uuid}"
 )
 async def requisitar_loja(
+    request: Request,
     loja_service: loja_service_dependency,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
@@ -77,6 +78,7 @@ async def requisitar_loja(
     "/"
 )
 async def requisitar_lojas(
+    request: Request,
     connection: connection_dependency,
     loja_service: loja_service_dependency,
 ) -> List[LojaGET]:
@@ -97,6 +99,7 @@ async def requisitar_lojas(
     response_model=LojaAuthData
 )
 async def login(
+    request: Request,
     form_data: oauth2_password_request_form_dependency,
     loja_service: loja_service_dependency,
     connection: connection_dependency
@@ -123,6 +126,7 @@ async def login(
 
 @router.put("/{uuid}", summary='Atualizar dados de cadastro da Loja')
 async def update_loja(
+    request: Request,
     service: loja_service_dependency,
     connection: connection_dependency,
     updated_data: LojaPUT,
@@ -145,6 +149,7 @@ async def update_loja(
     status_code=status.HTTP_201_CREATED
 )
 async def signup(
+    request: Request,
     loja: LojaSignUp,
     loja_service: loja_service_dependency
 ) -> Any:
@@ -172,6 +177,7 @@ async def signup(
 
 @router.get("/{loja_uuid}/produtos")
 async def requisitar_produtos_de_loja(
+    request: Request,
     connection: connection_dependency,
     loja_uuid: str,
     categoria_uuid: str
@@ -220,6 +226,7 @@ async def requisitar_produtos_de_loja(
     }
 )
 async def atualizar_imagem_de_cadastro(
+    request: Request,
     loja: current_company,
     image: LojaUpdateImageCadastro
 ) -> Dict[str, ImageUploadServiceResponse]:
@@ -255,6 +262,7 @@ async def atualizar_imagem_de_cadastro(
     }
 )
 async def remover_imagem_de_cadastro(
+    request: Request,
     loja: current_company,
     image: LojaUpdateImageCadastro
 ):
@@ -275,6 +283,7 @@ async def remover_imagem_de_cadastro(
     "/ativar_inativar/{uuid}"
 )
 async def ativar_inativar_loja(
+    request: Request,
     loja_repository: loja_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ativar/inativar")],
     ativar: bool
@@ -294,6 +303,7 @@ async def ativar_inativar_loja(
     "/{uuid}"
 )
 async def deletar_loja(
+    request: Request,
     uuid: Annotated[str, Path(title="O uuid da loja a ser deletada")]
 ) -> Any:
 
@@ -326,6 +336,7 @@ async def cadastrar_cliente(
 
 @router.post("/cliente_v2/{loja_uuid}", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente_v2(
+    request: Request,
     connection: connection_dependency,
     current_company: current_company,
     usuario: UsuarioSignUp,
@@ -364,6 +375,7 @@ async def cadastrar_cliente_v2(
 
 @router.post('/refresh')
 async def refresh(
+    request: Request,
     loja: current_company,
     service: loja_service_dependency,
     complete: str = Query('0')

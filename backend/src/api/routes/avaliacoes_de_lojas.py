@@ -18,7 +18,10 @@ router = APIRouter(prefix="/avaliacoes_loja", tags=["Avaliações de Lojas"])
 
 
 @router.get("/")
-async def requisitar_avaliacoes_loja(connection: connection_dependency):
+async def requisitar_avaliacoes_loja(
+    request: Request,
+    connection: connection_dependency
+):
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     results = await repository.find_all()
@@ -28,6 +31,7 @@ async def requisitar_avaliacoes_loja(connection: connection_dependency):
 
 @router.get("/{uuid}")
 async def requisitar_avaliacao_loja(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação fazer get")]
 ):
@@ -42,6 +46,7 @@ async def requisitar_avaliacao_loja(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_avaliacao_loja(
+    request: Request,
     connection: connection_dependency,
     avaliacao: AvaliacaoDeLoja,
 ):
@@ -57,6 +62,7 @@ async def cadastrar_avaliacao_loja(
 
 @router.put("/{uuid}")
 async def atualizar_avaliacao_loja_put(
+    request: Request,
     avaliacao_loja_data: AvaliacaoDeLoja,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer put")],
@@ -76,6 +82,7 @@ async def atualizar_avaliacao_loja_put(
 
 @router.patch("/{uuid}")
 async def atualizar_avaliacoes_loja_patch(
+    request: Request,
     avaliacoes_loja_data: AvaliacaoDeLoja,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer patch")],
@@ -94,6 +101,7 @@ async def atualizar_avaliacoes_loja_patch(
 
 @router.delete("/{uuid}")
 async def remover_avaliacoes_loja(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer delete")]
 ):

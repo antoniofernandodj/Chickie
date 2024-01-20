@@ -22,6 +22,7 @@ router = APIRouter(
 
 @router.get("/")
 async def requisitar_metodos_de_pagamento(
+    request: Request,
     connection: connection_dependency,
     loja_uuid: Optional[str] = Query(None),
 ) -> List[MetodoDePagamento]:
@@ -39,6 +40,7 @@ async def requisitar_metodos_de_pagamento(
 
 @router.get("/{uuid}")
 async def requisitar_metodo_de_pagamento(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagamento a fazer get")
@@ -56,6 +58,7 @@ async def requisitar_metodo_de_pagamento(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_metodos_de_pagamento(
+    request: Request,
     connection: connection_dependency,
     metodo_de_pagamento: MetodoDePagamento,
     current_company: current_company,
@@ -73,6 +76,7 @@ async def cadastrar_metodos_de_pagamento(
 
 @router.put("/{uuid}")
 async def atualizar_metodo_de_pagamento_put(
+    request: Request,
     connection: connection_dependency,
     metodo_de_pagamento_data: MetodoDePagamento,
     current_company: current_company,
@@ -99,6 +103,7 @@ async def atualizar_metodo_de_pagamento_put(
 
 @router.patch("/{uuid}")
 async def atualizar_metodo_de_pagamento_patch(
+    request: Request,
     connection: connection_dependency,
     metodo_de_pagamentoData: MetodoDePagamento,
     current_company: current_company,
@@ -124,6 +129,7 @@ async def atualizar_metodo_de_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_metodo_de_pagamento(
+    request: Request,
     connection: connection_dependency,
     current_company: current_company,
     uuid: Annotated[

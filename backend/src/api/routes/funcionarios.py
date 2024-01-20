@@ -22,6 +22,7 @@ router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
 
 @router.get("/")
 async def requisitar_funcionarios(
+    request: Request,
     connection: connection_dependency,
     loja_uuid: Optional[str] = Query(None)
 ):
@@ -39,6 +40,7 @@ async def requisitar_funcionarios(
 
 @router.get("/{uuid}")
 async def requisitar_funcionario(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do funcionário a fazer get")]
 ):
@@ -54,6 +56,7 @@ async def requisitar_funcionario(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_funcionarios(
+    request: Request,
     funcionario: Funcionario,
     current_company: current_company,
     connection: connection_dependency
@@ -71,6 +74,7 @@ async def cadastrar_funcionarios(
 
 @router.put("/{uuid}")
 async def atualizar_funcionario_put(
+    request: Request,
     funcionarioData: Funcionario,
     current_company: current_company,
     connection: connection_dependency,
@@ -92,6 +96,7 @@ async def atualizar_funcionario_put(
 
 @router.patch("/{uuid}")
 async def atualizar_funcionario_patch(
+    request: Request,
     funcionarioData: Funcionario,
     current_company: current_company,
     connection: connection_dependency,
@@ -112,6 +117,7 @@ async def atualizar_funcionario_patch(
 
 @router.delete("/{uuid}")
 async def remover_funcionario(
+    request: Request,
     current_company: current_company,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer delete")],

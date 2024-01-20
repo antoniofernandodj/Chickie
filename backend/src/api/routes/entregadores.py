@@ -23,6 +23,7 @@ router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
 
 @router.get("/")
 async def requisitar_entregadores(
+    request: Request,
     connection: connection_dependency,
     loja_uuid: Optional[str] = Query(None)
 ):
@@ -40,6 +41,7 @@ async def requisitar_entregadores(
 
 @router.get("/{uuid}")
 async def requisitar_entregador(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer get")]
 ):
@@ -55,6 +57,7 @@ async def requisitar_entregador(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_entregadores(
+    request: Request,
     entregador: Entregador,
     current_company: current_company,
     connection: connection_dependency,
@@ -72,6 +75,7 @@ async def cadastrar_entregadores(
 
 @router.put("/{uuid}")
 async def atualizar_entregador_put(
+    request: Request,
     entregadorData: Entregador,
     current_company: current_company,
     connection: connection_dependency,
@@ -93,6 +97,7 @@ async def atualizar_entregador_put(
 
 @router.patch("/{uuid}")
 async def atualizar_entregador_patch(
+    request: Request,
     entregadorData: Entregador,
     connection: connection_dependency,
     current_company: current_company,
@@ -113,6 +118,7 @@ async def atualizar_entregador_patch(
 
 @router.delete("/{uuid}")
 async def remover_entregador(
+    request: Request,
     current_company: current_company,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")],

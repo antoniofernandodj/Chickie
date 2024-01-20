@@ -22,6 +22,7 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 
 @router.get("/")
 async def requisitar_precos(
+    request: Request,
     connection: connection_dependency,
     produto_uuid: Optional[str] = Query(None)
 ) -> List[Preco]:
@@ -39,6 +40,7 @@ async def requisitar_precos(
 
 @router.get("/{uuid}")
 async def requisitar_preco(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ) -> Preco:
@@ -54,6 +56,7 @@ async def requisitar_preco(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_precos(
+    request: Request,
     preco: Preco,
     current_company: current_company,
     connection: connection_dependency,
@@ -79,6 +82,7 @@ async def cadastrar_precos(
 
 @router.patch("/{uuid}")
 async def atualizar_preco_patch(
+    request: Request,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
 ):
@@ -87,6 +91,7 @@ async def atualizar_preco_patch(
 
 @router.put("/{uuid}")
 async def atualizar_preco_put(
+    request: Request,
     itemData: Preco,
     current_company: current_company,
     connection: connection_dependency,
@@ -108,6 +113,7 @@ async def atualizar_preco_put(
 
 @router.delete("/{uuid}")
 async def remover_preco(
+    request: Request,
     current_company: current_company,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]

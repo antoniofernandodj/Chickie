@@ -16,18 +16,12 @@ from src.dependencies import (
 from src.dependencies.connection_dependency import connection_dependency
 
 
-router = APIRouter(
-    prefix="/categorias",
-    tags=["Categorias"],
-    # dependencies=[Depends(get_token_header)],
-    # responses={
-    #     404: {"description": "Categoria não encontrada"}
-    # }
-)
+router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
 
 @router.get("/")
 async def requisitar_categorias(
+    request: Request,
     connection: connection_dependency,
     nome: Optional[str] = Query(None),
     loja_uuid: Optional[str] = Query(None)
@@ -48,6 +42,7 @@ async def requisitar_categorias(
 
 @router.get("/{uuid}")
 async def requisitar_categoria(
+    request: Request,
     connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
     nome: Optional[str] = Query(None)
@@ -68,6 +63,7 @@ async def requisitar_categoria(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_categorias(
+    request: Request,
     categoria: CategoriaProdutos,
     connection: connection_dependency,
     current_company: current_company,
@@ -85,6 +81,7 @@ async def cadastrar_categorias(
 
 @router.patch("/{uuid}")
 async def atualizar_categoria_patch(
+    request: Request,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")],
 ):
@@ -93,6 +90,7 @@ async def atualizar_categoria_patch(
 
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
+    request: Request,
     connection: connection_dependency,
     current_company: current_company,
     itemData: CategoriaProdutos,
@@ -117,6 +115,7 @@ async def atualizar_categoria_put(
 
 @router.delete("/{uuid}")
 async def remover_categoria(
+    request: Request,
     connection: connection_dependency,
     current_company: current_company,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
