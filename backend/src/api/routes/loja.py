@@ -18,7 +18,14 @@ from src.dependencies import (  # noqa
     loja_service_dependency,
 )
 from src.dependencies.connection_dependency import connection_dependency
-from fastapi import HTTPException, status, Path, Response, Query
+from fastapi import (
+    HTTPException,
+    status,
+    Path,
+    Response,
+    Query,
+    Request
+)
 from typing import Any, Optional, List, Dict
 from src.domain.models import (
     Cliente,

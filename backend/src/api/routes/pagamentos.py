@@ -6,7 +6,8 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Query
+    Query,
+    Request
 )
 from src.domain.models import Pagamento
 from src.dependencies.connection_dependency import connection_dependency

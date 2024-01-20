@@ -6,7 +6,8 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Response
+    Response,
+    Request
 )
 from src.domain.models import (
     PedidoGET,

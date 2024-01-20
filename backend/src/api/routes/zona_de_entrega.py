@@ -4,7 +4,8 @@ from fastapi import (  # noqa
     APIRouter,
     HTTPException,
     status,
-    Path
+    Path,
+    Request
 )
 from src.domain.models import ZonaDeEntrega
 from src.infra.database_postgres.repository import Repository

@@ -1,6 +1,12 @@
 from typing import Any, Annotated, Optional
 from src.exceptions import UnauthorizedException
-from fastapi import Depends, HTTPException, status, Response
+from fastapi import (
+    Depends,
+    HTTPException,
+    status,
+    Response,
+    Request
+)
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.requests import Request

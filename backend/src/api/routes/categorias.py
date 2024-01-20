@@ -7,6 +7,7 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
+    Request
 )
 from src.domain.models import CategoriaProdutos
 from src.dependencies import (

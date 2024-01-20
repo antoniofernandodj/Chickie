@@ -4,7 +4,8 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Query
+    Query,
+    Request
 )
 from typing import Optional
 from src.domain.models import Entregador

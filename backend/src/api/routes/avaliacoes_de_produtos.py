@@ -5,7 +5,8 @@ from fastapi import (  # noqa
     APIRouter,
     HTTPException,
     status,
-    Path
+    Path,
+    Request
 )
 from src.domain.models import AvaliacaoDeProduto
 from src.dependencies.connection_dependency import (
