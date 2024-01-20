@@ -1,1 +1,1 @@
-from . import config, middlewares, logging  # noqa
+from . import config, middlewares, logging, events  # noqa

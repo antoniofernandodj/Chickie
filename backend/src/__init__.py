@@ -11,6 +11,7 @@ def create_app(args: list) -> FastAPI:
     routes.init_app(app)
     ext.config.init_app(app)
     ext.middlewares.init_app(app)
+    ext.events.init_app(app)
     ext.logging.init_app(app)
 
     return app
