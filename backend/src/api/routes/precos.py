@@ -8,13 +8,14 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request
+    Request,
+    Depends
 )
+from src.api.security import oauth2_scheme, AuthService
+from aiopg import Connection
 from src.domain.models import Preco
-from src.dependencies import (
-    current_company
-)
-from src.dependencies.connection_dependency import connection_dependency
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/precos", tags=["Preços"])
@@ -23,12 +24,14 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 @router.get("/")
 async def requisitar_precos(
     request: Request,
-    connection: connection_dependency,
-    produto_uuid: Optional[str] = Query(None)
+    produto_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
 ) -> List[Preco]:
 
-    repository = Repository(Preco, connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(Preco, connection)
     kwargs = {}
     if produto_uuid is not None:
         kwargs["produto_uuid"] = produto_uuid
@@ -41,12 +44,12 @@ async def requisitar_precos(
 @router.get("/{uuid}")
 async def requisitar_preco(
     request: Request,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ) -> Preco:
 
-    repository = Repository(Preco, connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(Preco, connection)
     result: Optional[Preco] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Preço não encontrado")
@@ -58,12 +61,13 @@ async def requisitar_preco(
 async def cadastrar_precos(
     request: Request,
     preco: Preco,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Preco, connection)
-
     query = await repository.find_one(
         dia_da_semana=preco.dia_da_semana,
         produto_uuid=preco.produto_uuid
@@ -71,7 +75,6 @@ async def cadastrar_precos(
     if query:
         raise ConflictException('Preço já cadastrado para este '
                                 'produto e para este dia da semana!')
-
     try:
         uuid = await repository.save(preco)
     except Exception as error:
@@ -83,9 +86,12 @@ async def cadastrar_precos(
 @router.patch("/{uuid}")
 async def atualizar_preco_patch(
     request: Request,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
 ):
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     return {}
 
 
@@ -93,13 +99,14 @@ async def atualizar_preco_patch(
 async def atualizar_preco_put(
     request: Request,
     itemData: Preco,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")]
 ) -> Dict[str, int]:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Preco, connection)
-
     preco = await repository.find_one(uuid=uuid)
     if preco is None:
         raise NotFoundException("Preço não encontrado")
@@ -114,11 +121,13 @@ async def atualizar_preco_put(
 @router.delete("/{uuid}")
 async def remover_preco(
     request: Request,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
 ) -> Dict[str, int]:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Preco, connection)
 
     try:

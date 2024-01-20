@@ -8,25 +8,19 @@ from src.exceptions import (
     InvalidPasswordException
 )
 from fastapi.routing import APIRouter
-from src.api import security
 from src.dependencies import (
-    current_company,
     oauth2_password_request_form_dependency
 )
-from src.dependencies import (  # noqa
-    loja_repository_dependency,
-    loja_service_dependency,
-)
-from src.dependencies.connection_dependency import connection_dependency
 from fastapi import (
     HTTPException,
     status,
     Path,
     Response,
     Query,
-    Request
+    Request,
+    Depends
 )
-from typing import Any, Optional, List, Dict
+from typing import Any, Optional, List, Dict, Annotated
 from src.domain.models import (
     Cliente,
     UsuarioSignUp,
@@ -36,6 +30,7 @@ from src.domain.models import (
     LojaAuthData,
     Loja,
     Produto,
+    Lojas,
     LojaGET,
     ProdutoGET,
     LojaUpdateImageCadastro,
@@ -45,9 +40,12 @@ from src.services import (
     ImageUploadService,
     ImageUploadServiceResponse,
 )
-from src.domain.services import ProdutoService
-from typing import Annotated
+from src.domain.services import ProdutoService, LojaService
+from src.api.security import oauth2_scheme, AuthService
 from src import use_cases  # noqa
+from aiopg import Connection
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/loja", tags=["Loja"])
@@ -58,19 +56,19 @@ router = APIRouter(prefix="/loja", tags=["Loja"])
 )
 async def requisitar_loja(
     request: Request,
-    loja_service: loja_service_dependency,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
 ) -> LojaGET:
 
+    connection: Connection = request.state.connection
+
+    service = LojaService(connection)
     repository = Repository(Loja, connection=connection)
 
     loja: Optional[Loja] = await repository.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
 
-    response = await loja_service.get_data(loja)
-
+    response = await service.get_data(loja)
     return response
 
 
@@ -79,18 +77,22 @@ async def requisitar_loja(
 )
 async def requisitar_lojas(
     request: Request,
-    connection: connection_dependency,
-    loja_service: loja_service_dependency,
-) -> List[LojaGET]:
+    limit: int = Query(0),
+    offset: int = Query(1),
+) -> Lojas:
 
+    connection: Connection = request.state.connection
+
+    service = LojaService(connection)
     repository = Repository(Loja, connection=connection)
-    response: List[LojaGET] = []
+    result: List[LojaGET] = []
     lojas: List[Loja] = await repository.find_all()
     for loja in lojas:
-        loja_data = await loja_service.get_data(loja)
-        response.append(loja_data)
+        loja_data = await service.get_data(loja)
+        result.append(loja_data)
 
-    return response
+    paginate = Paginador(result, offset, limit)
+    return Lojas(**paginate.get_response())
 
 
 @router.post(
@@ -99,23 +101,23 @@ async def requisitar_lojas(
     response_model=LojaAuthData
 )
 async def login(
-    request: Request,
     form_data: oauth2_password_request_form_dependency,
-    loja_service: loja_service_dependency,
-    connection: connection_dependency
+    connection: Connection = Depends(connection),
 ) -> Any:
 
-    loja = await security.authenticate_company(
+    # connection: Connection = request.state.connection
+
+    service = LojaService(connection)
+    auth_service = AuthService(connection)
+    loja = await auth_service.authenticate_company(
         form_data.username, form_data.password
     )
     if not loja:
         raise UnauthorizedException("Credenciais inválidas!")
 
-    access_token = security.create_access_token(
-        data={"sub": loja.username}
-    )
+    access_token = AuthService.create_access_token({"sub": loja.username})
 
-    loja_data = await loja_service.get_data(loja)
+    loja_data = await service.get_data(loja)
 
     return LojaAuthData(
         access_token=access_token,
@@ -127,12 +129,13 @@ async def login(
 @router.put("/{uuid}", summary='Atualizar dados de cadastro da Loja')
 async def update_loja(
     request: Request,
-    service: loja_service_dependency,
-    connection: connection_dependency,
     updated_data: LojaPUT,
     uuid: Annotated[str, Path(title="O uuid da loja a ser atualizada")]
 ):
 
+    connection: Connection = request.state.connection
+
+    service = LojaService(connection)
     try:
         await service.update_loja_data(uuid, updated_data)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -148,14 +151,13 @@ async def update_loja(
     tags=["Auth"],
     status_code=status.HTTP_201_CREATED
 )
-async def signup(
-    request: Request,
-    loja: LojaSignUp,
-    loja_service: loja_service_dependency
-) -> Any:
+async def signup(request: Request, loja: LojaSignUp) -> Any:
 
+    connection: Connection = request.state.connection
+
+    service = LojaService(connection)
     try:
-        loja_cadastrada = await loja_service.registrar(loja_data=loja)
+        loja_cadastrada = await service.registrar(loja_data=loja)
 
     except InvalidPasswordException:
         raise HTTPException(
@@ -178,10 +180,11 @@ async def signup(
 @router.get("/{loja_uuid}/produtos")
 async def requisitar_produtos_de_loja(
     request: Request,
-    connection: connection_dependency,
     loja_uuid: str,
     categoria_uuid: str
 ) -> List[ProdutoGET]:
+
+    connection: Connection = request.state.connection
 
     loja_repository = Repository(Loja, connection=connection)
     produto_repository = Repository(Produto, connection=connection)
@@ -227,10 +230,14 @@ async def requisitar_produtos_de_loja(
 )
 async def atualizar_imagem_de_cadastro(
     request: Request,
-    loja: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     image: LojaUpdateImageCadastro
 ) -> Dict[str, ImageUploadServiceResponse]:
 
+    connection: Connection = request.state.connection
+
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)
     try:
         image_service = ImageUploadService(loja=loja)
         try:
@@ -263,10 +270,14 @@ async def atualizar_imagem_de_cadastro(
 )
 async def remover_imagem_de_cadastro(
     request: Request,
-    loja: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     image: LojaUpdateImageCadastro
 ):
 
+    connection: Connection = request.state.connection
+
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)
     try:
         image_service = ImageUploadService(loja=loja)
         image_service.delete_image_cadastro()
@@ -284,11 +295,13 @@ async def remover_imagem_de_cadastro(
 )
 async def ativar_inativar_loja(
     request: Request,
-    loja_repository: loja_repository_dependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ativar/inativar")],
     ativar: bool
 ) -> Any:
 
+    connection: Connection = request.state.connection
+
+    loja_repository = Repository(Loja, connection)
     loja: Optional[Loja] = await loja_repository.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
@@ -312,10 +325,14 @@ async def deletar_loja(
 
 @router.post("/cliente", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente(
-    connection: connection_dependency,
-    current_company: current_company,
+    request: Request,
+    token: Annotated[str, Depends(oauth2_scheme)],
     usuario: UsuarioFollowEmpresaRequest
 ) -> Any:
+
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
 
     if usuario.loja_uuid is None:
         raise HTTPException(
@@ -337,15 +354,18 @@ async def cadastrar_cliente(
 @router.post("/cliente_v2/{loja_uuid}", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente_v2(
     request: Request,
-    connection: connection_dependency,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     usuario: UsuarioSignUp,
     loja_uuid: str
 ) -> Any:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+
     try:
         usuario_cadastrado = await use_cases.usuarios.registrar(
-            user_data=usuario
+            user_data=usuario, connection=connection
         )
     except use_cases.usuarios.InvalidPasswordException:
         raise HTTPException(
@@ -376,13 +396,16 @@ async def cadastrar_cliente_v2(
 @router.post('/refresh')
 async def refresh(
     request: Request,
-    loja: current_company,
-    service: loja_service_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     complete: str = Query('0')
 ):
-    access_token = security.create_access_token(
-        data={"sub": loja.username}
-    )
+
+    connection: Connection = request.state.connection
+
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)
+    service = LojaService(connection)
+    access_token = AuthService.create_access_token({"sub": loja.username})
 
     loja_data = None
 

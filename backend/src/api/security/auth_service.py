@@ -1,17 +1,21 @@
-from typing import Annotated, Optional
-from fastapi import Depends, HTTPException, status
+from typing import Optional
+from fastapi import HTTPException, status
 from jose import JWTError, jwt
 from config import settings as s
 from src.infra.database_postgres.repository import Repository
 from src.domain.models import Loja, Usuario
-from src.api.security.scheme import oauth2_scheme
 from src.domain.services import LojaService
 from aiopg import Connection
-from src.infra.database_postgres.manager import DatabaseConnectionManager
 import datetime
 
 
 class AuthService:
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
     def __init__(self, connection: Connection):
         self.connection = connection
@@ -78,6 +82,67 @@ class AuthService:
 
         return user
 
+    async def current_company(self, token: str) -> Loja:
+        """
+        Obtém o objeto da loja atualmente autenticada.
+
+        Args:
+            token (str): O token de acesso JWT.
+
+        Returns:
+            Loja: O objeto da loja autenticada.
+
+        Raises:
+            HTTPException: Se a autenticação falhar.
+        """
+        try:
+            payload = jwt.decode(
+                token, s.SECRET_KEY, algorithms=[s.AUTH_ALGORITHM]
+            )
+            username = payload.get("sub")
+            if username is None:
+                raise AuthService.credentials_exception
+        except JWTError:
+            raise AuthService.credentials_exception
+
+        loja = await self.loja_repo.find_one(username=username)
+
+        if loja is None or not isinstance(loja, Loja):
+            raise AuthService.credentials_exception
+
+        return loja
+
+    async def current_user(self, token: str) -> Usuario:
+        """
+        Obtém o objeto do usuário atualmente autenticado.
+
+        Args:
+            token (str): O token de acesso JWT.
+
+        Returns:
+            Usuario: O objeto do usuário autenticado.
+
+        Raises:
+            HTTPException: Se a autenticação falhar.
+        """
+
+        try:
+            payload = jwt.decode(
+                token, s.SECRET_KEY, algorithms=[s.AUTH_ALGORITHM]
+            )
+            username = payload.get("sub")
+            if username is None:
+                raise AuthService.credentials_exception
+        except JWTError:
+            raise AuthService.credentials_exception
+
+        user = await self.user_repo.find_one(username=username)
+
+        if user is None or not isinstance(user, Usuario):
+            raise AuthService.credentials_exception
+
+        return user
+
     def only_numbers(self, string: Optional[str]) -> Optional[str]:
         if string is None:
             return None
@@ -112,68 +177,3 @@ class AuthService:
             to_encode, s.SECRET_KEY, algorithm=s.AUTH_ALGORITHM
         )
         return encoded_jwt
-
-
-credentials_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
-
-
-async def current_company(
-    cls, token: Annotated[str, Depends(oauth2_scheme)]
-) -> Loja:
-    """
-    Obtém o objeto da loja atualmente autenticada.
-    Args:
-        token (Annotated[str, Depends(oauth2_scheme)]): O token de acesso JWT.  # noqa
-    Returns:
-        Loja: O objeto da loja autenticada.
-    Raises:
-        HTTPException: Se a autenticação falhar.
-    """
-    try:
-        payload = jwt.decode(
-            token, s.SECRET_KEY, algorithms=[s.AUTH_ALGORITHM]
-        )
-        username = payload.get("sub")
-        if username is None:
-            raise cls.credentials_exception
-    except JWTError:
-        raise cls.credentials_exception
-    async with DatabaseConnectionManager() as connection:
-        loja_repo = Repository(Loja, connection=connection)
-        loja = await loja_repo.find_one(username=username)
-    if loja is None or not isinstance(loja, Loja):
-        raise cls.credentials_exception
-    return loja
-
-
-async def current_user(
-    cls, token: Annotated[str, Depends(oauth2_scheme)]
-) -> Usuario:
-    """
-    Obtém o objeto do usuário atualmente autenticado.
-    Args:
-        token (Annotated[str, Depends(oauth2_scheme)]): O token de acesso JWT.  # noqa
-    Returns:
-        Usuario: O objeto do usuário autenticado.
-    Raises:
-        HTTPException: Se a autenticação falhar.
-    """
-    try:
-        payload = jwt.decode(
-            token, s.SECRET_KEY, algorithms=[s.AUTH_ALGORITHM]
-        )
-        username = payload.get("sub")
-        if username is None:
-            raise cls.credentials_exception
-    except JWTError:
-        raise cls.credentials_exception
-    async with DatabaseConnectionManager() as connection:
-        user_repo = Repository(Usuario, connection=connection)
-        user = await user_repo.find_one(username=username)
-    if user is None or not isinstance(user, Usuario):
-        raise cls.credentials_exception
-    return user

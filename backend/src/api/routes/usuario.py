@@ -1,17 +1,19 @@
 from typing import Any, Annotated, Optional
 from src.exceptions import UnauthorizedException
 from fastapi import (
-    Depends,
     HTTPException,
     status,
     Response,
-    Request
+    Request,
+    Depends
 )
+from aiopg import Connection
+from src.misc import Paginador  # noqa
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from src.exceptions import NotFoundException
 from src.infra.database_postgres.repository import Repository
-from src.api import security
+from src.api.security import AuthService, oauth2_scheme
 from src.domain.models import (
     UsuarioFollowEmpresaRequest,
     UsuarioSignUp,
@@ -22,11 +24,7 @@ from src.domain.models import (
     UserAuthData,
 )
 from src import use_cases
-from src.dependencies import (
-    current_user
-)
-
-from src.dependencies.connection_dependency import connection_dependency
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/user", tags=["Usuario"])
@@ -35,24 +33,25 @@ router = APIRouter(prefix="/user", tags=["Usuario"])
 @router.post("/login", response_model=UserAuthData, tags=["Auth"])
 async def login_post(
     request: Request,
-    connection: connection_dependency,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Any:
 
-    endereco_repository = Repository(Endereco, connection=connection)
+    connection = request.state.connection
 
-    user = await security.authenticate_user(
+    endereco_repository = Repository(Endereco, connection=connection)
+    auth_service = AuthService(connection)
+
+    user = await auth_service.authenticate_user(
         form_data.username, form_data.password
     )
 
     if not user:
         raise UnauthorizedException("Credenciais Inválidas!")
 
+    access_token = AuthService.create_access_token({"sub": user.username})
     endereco: Optional[Endereco] = await endereco_repository.find_one(
         usuario_uuid=user.uuid
     )
-
-    access_token = security.create_access_token(data={"sub": user.username})
 
     response = {
         "access_token": access_token,
@@ -76,8 +75,13 @@ async def signup(
     usuario: UsuarioSignUp
 ) -> Any:
 
+    connection: Connection = request.state.connection
+
     try:
-        usuario_uuid = await use_cases.usuarios.registrar(user_data=usuario)
+        usuario_uuid = await use_cases.usuarios.registrar(
+            user_data=usuario,
+            connection=connection
+        )
     except use_cases.usuarios.InvalidPasswordException:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -92,10 +96,12 @@ async def update_user(
     request: Request,
     uuid: str,
     user_data: UsuarioSignUp,
-    current_user: current_user,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Any:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     endereco_repository = Repository(Endereco, connection)
     user_repository = Repository(Endereco, connection)
 
@@ -158,11 +164,14 @@ async def update_user(
 async def seguir_loja(
     request: Request,
     response: Response,
-    connection: connection_dependency,
-    current_user: current_user,
+    token: Annotated[str, Depends(oauth2_scheme)],
     follow_request_data: UsuarioFollowEmpresaRequest
 ) -> Any:
     result: str | int
+
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     cliente = ClientePOST(
         usuario_uuid=follow_request_data.usuario_uuid,
         loja_uuid=follow_request_data.loja_uuid
@@ -191,10 +200,14 @@ async def seguir_loja(
 @router.get("/segue-loja/{uuid}")
 async def segue_loja(
     request: Request,
-    connection: connection_dependency,
-    current_user: current_user,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: str
 ) -> Any:
+
+    connection: Connection = request.state.connection
+
+    auth_service = AuthService(connection)
+    current_user = await auth_service.current_user(token)
     if current_user.uuid is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

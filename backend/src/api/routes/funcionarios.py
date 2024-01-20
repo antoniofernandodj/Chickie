@@ -6,15 +6,17 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request
+    Request,
+    Depends
 )
+from src.api.security import oauth2_scheme
+from aiopg import Connection
 from typing import Optional
 from src.domain.models import Funcionario
 from src.infra.database_postgres.repository import Repository
-from src.dependencies import (
-    current_company
-)
-from src.dependencies.connection_dependency import connection_dependency
+from src.api.security import AuthService
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
@@ -23,12 +25,13 @@ router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
 @router.get("/")
 async def requisitar_funcionarios(
     request: Request,
-    connection: connection_dependency,
-    loja_uuid: Optional[str] = Query(None)
+    loja_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
 ):
+    connection: Connection = request.state.connection
 
     repository = Repository(Funcionario, connection=connection)
-
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -41,12 +44,11 @@ async def requisitar_funcionarios(
 @router.get("/{uuid}")
 async def requisitar_funcionario(
     request: Request,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do funcionário a fazer get")]
 ):
+    connection: Connection = request.state.connection
 
     repository = Repository(Funcionario, connection=connection)
-
     result = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -58,12 +60,12 @@ async def requisitar_funcionario(
 async def cadastrar_funcionarios(
     request: Request,
     funcionario: Funcionario,
-    current_company: current_company,
-    connection: connection_dependency
+    token: Annotated[str, Depends(oauth2_scheme)],
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
-
     try:
         uuid = await repository.save(funcionario)
     except Exception as error:
@@ -76,13 +78,13 @@ async def cadastrar_funcionarios(
 async def atualizar_funcionario_put(
     request: Request,
     funcionarioData: Funcionario,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer put")]
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
-
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -98,10 +100,12 @@ async def atualizar_funcionario_put(
 async def atualizar_funcionario_patch(
     request: Request,
     funcionarioData: Funcionario,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")],
 ):
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
 
     funcionario = await repository.find_one(uuid=uuid)
@@ -118,13 +122,13 @@ async def atualizar_funcionario_patch(
 @router.delete("/{uuid}")
 async def remover_funcionario(
     request: Request,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer delete")],
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
-
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

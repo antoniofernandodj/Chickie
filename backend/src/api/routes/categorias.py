@@ -7,13 +7,15 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request
+    Request,
+    Depends,
+    Query
 )
+from src.api.security import oauth2_scheme, AuthService
+from aiopg import Connection
 from src.domain.models import CategoriaProdutos
-from src.dependencies import (
-    current_company,
-)
-from src.dependencies.connection_dependency import connection_dependency
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
@@ -22,10 +24,13 @@ router = APIRouter(prefix="/categorias", tags=["Categorias"])
 @router.get("/")
 async def requisitar_categorias(
     request: Request,
-    connection: connection_dependency,
     nome: Optional[str] = Query(None),
-    loja_uuid: Optional[str] = Query(None)
+    loja_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
 ) -> List[CategoriaProdutos]:
+
+    connection: Connection = request.state.connection
 
     repository = Repository(CategoriaProdutos, connection)
 
@@ -43,13 +48,13 @@ async def requisitar_categorias(
 @router.get("/{uuid}")
 async def requisitar_categoria(
     request: Request,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
     nome: Optional[str] = Query(None)
 ) -> CategoriaProdutos:
 
-    repository = Repository(CategoriaProdutos, connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(CategoriaProdutos, connection)
     kwargs = {}
     if nome is not None:
         kwargs["nome"] = nome
@@ -65,12 +70,14 @@ async def requisitar_categoria(
 async def cadastrar_categorias(
     request: Request,
     categoria: CategoriaProdutos,
-    connection: connection_dependency,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
-    repository = Repository(CategoriaProdutos, connection)
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
 
+    repository = Repository(CategoriaProdutos, connection)
     try:
         uuid = await repository.save(categoria)
     except Exception as error:
@@ -82,23 +89,28 @@ async def cadastrar_categorias(
 @router.patch("/{uuid}")
 async def atualizar_categoria_patch(
     request: Request,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")],
 ):
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     return {}
 
 
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
     request: Request,
-    connection: connection_dependency,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     itemData: CategoriaProdutos,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
 ) -> Dict[str, int]:
 
-    repository = Repository(CategoriaProdutos, connection)
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
 
+    repository = Repository(CategoriaProdutos, connection)
     try:
         categoria = await repository.find_one(uuid=uuid)
     except Exception as error:
@@ -116,13 +128,14 @@ async def atualizar_categoria_put(
 @router.delete("/{uuid}")
 async def remover_categoria(
     request: Request,
-    connection: connection_dependency,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
 ) -> Dict[str, int]:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(CategoriaProdutos, connection)
-
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

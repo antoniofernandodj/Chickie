@@ -5,17 +5,18 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request
+    Request,
+    Depends
 )
+from src.api.security import oauth2_scheme
+from aiopg import Connection
 from typing import Optional
 from src.domain.models import Entregador
 from src.exceptions import NotFoundException
+from src.api.security import AuthService
 from src.infra.database_postgres.repository import Repository
-from src.dependencies import (
-    current_company
-)
-
-from src.dependencies.connection_dependency import connection_dependency
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
@@ -24,12 +25,13 @@ router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
 @router.get("/")
 async def requisitar_entregadores(
     request: Request,
-    connection: connection_dependency,
-    loja_uuid: Optional[str] = Query(None)
+    loja_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
 ):
+    connection: Connection = request.state.connection
 
     repository = Repository(Entregador, connection=connection)
-
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -42,12 +44,11 @@ async def requisitar_entregadores(
 @router.get("/{uuid}")
 async def requisitar_entregador(
     request: Request,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer get")]
 ):
+    connection: Connection = request.state.connection
 
     repository = Repository(Entregador, connection=connection)
-
     result = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Entregador não encontrado")
@@ -59,12 +60,13 @@ async def requisitar_entregador(
 async def cadastrar_entregadores(
     request: Request,
     entregador: Entregador,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
 ):
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
 
     repository = Repository(Entregador, connection=connection)
-
     try:
         uuid = await repository.save(entregador)
     except Exception as error:
@@ -77,13 +79,13 @@ async def cadastrar_entregadores(
 async def atualizar_entregador_put(
     request: Request,
     entregadorData: Entregador,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer put")],
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Entregador, connection=connection)
-
     entregador = await repository.find_one(uuid=uuid)
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
@@ -99,10 +101,13 @@ async def atualizar_entregador_put(
 async def atualizar_entregador_patch(
     request: Request,
     entregadorData: Entregador,
-    connection: connection_dependency,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")],
 ):
+
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Entregador, connection=connection)
 
     entregador = await repository.find_one(uuid=uuid)
@@ -119,13 +124,14 @@ async def atualizar_entregador_patch(
 @router.delete("/{uuid}")
 async def remover_entregador(
     request: Request,
-    current_company: current_company,
-    connection: connection_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")],
 ):
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Entregador, connection=connection)
-
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

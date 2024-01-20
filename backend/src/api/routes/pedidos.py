@@ -7,17 +7,20 @@ from fastapi import (  # noqa
     Path,
     Query,
     Response,
-    Request
+    Request,
+    Depends
 )
 from src.domain.models import (
     PedidoGET,
     PedidoPOST,
+    Pedidos,
     AlterarStatusPedidoPATCH,
 )
-from src.dependencies import (
-    pedido_service_dependency,
-    current_company
-)
+from src.api.security import oauth2_scheme, AuthService
+from src.domain.services import PedidoService
+from aiopg import Connection
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
@@ -26,11 +29,15 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 @router.get("/")
 async def requisitar_pedidos(
     request: Request,
-    service: pedido_service_dependency,
     loja_uuid: Optional[str] = Query(None),
-    usuario_uuid: Optional[str] = Query(None)
-):
+    usuario_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
+) -> Pedidos:
 
+    connection: Connection = request.state.connection
+
+    service = PedidoService(connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -38,16 +45,19 @@ async def requisitar_pedidos(
         kwargs["usuario_uuid"] = usuario_uuid
 
     pedidos_itens = await service.get_all_pedidos(**kwargs)
-    return pedidos_itens
+    paginate = Paginador(pedidos_itens, offset, limit)
+    return Pedidos(**paginate.get_response())
 
 
 @router.get("/{uuid}")
 async def requisitar_pedido(
     request: Request,
-    service: pedido_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer get")]
 ) -> PedidoGET:
 
+    connection: Connection = request.state.connection
+
+    service = PedidoService(connection)
     pedido = await service.get_pedido(uuid)
     if pedido is None or pedido.uuid is None:
         raise NotFoundException("Pedido não encontrado")
@@ -59,9 +69,11 @@ async def requisitar_pedido(
 async def cadastrar_pedidos(
     request: Request,
     pedido_data: PedidoPOST,
-    service: pedido_service_dependency,
 ) -> Dict[str, Any]:
 
+    connection: Connection = request.state.connection
+
+    service = PedidoService(connection)
     try:
         response = await service.save_pedido(pedido_data=pedido_data)
         return response
@@ -79,12 +91,15 @@ async def cadastrar_pedidos(
 @router.patch("/alterar_status_de_pedido/{uuid}")
 async def alterar_status_de_pedido(
     request: Request,
-    current_company: current_company,
-    service: pedido_service_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     data: AlterarStatusPedidoPATCH,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
 ):
-    print({'data': data})
+
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+    service = PedidoService(connection)
     try:
         await service.alterar_status_de_pedido(
             pedido_uuid=uuid,
@@ -103,12 +118,14 @@ async def alterar_status_de_pedido(
 @router.patch("/concluir_pedido/{uuid}")
 async def concluir_pedido(
     request: Request,
-    current_company: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     response: Response,
-    service: pedido_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+    service = PedidoService(connection)
     try:
         await service.concluir_pedido(pedido_uuid=uuid)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -124,11 +141,14 @@ async def concluir_pedido(
 @router.delete("/{uuid}")
 async def remover_pedido(
     request: Request,
-    current_company: current_company,
-    service: pedido_service_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]
 ) -> Dict[str, int]:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+    service = PedidoService(connection)
     try:
         response = await service.remover_pedido(uuid=uuid)
         return response

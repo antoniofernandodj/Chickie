@@ -1,4 +1,4 @@
-from typing import Annotated, Optional, List, Dict
+from typing import Annotated, Optional, Dict
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -7,12 +7,13 @@ from fastapi import (  # noqa
     Path,
     Query,
     Response,
-    Request
+    Request,
+    Depends
 )
-from src.dependencies import (
-    produto_service_dependency,
-    current_company,
-)
+from src.api.security import oauth2_scheme, AuthService
+from aiopg import Connection
+from src.domain.services import ProdutoService
+from src.misc import Paginador  # noqa
 from src.services import (
     ImageUploadService,
     ImageUploadServiceResponse,
@@ -22,7 +23,9 @@ from src.domain.models import (
     ProdutoPOST,
     ProdutoPUT,
     LojaUpdateImageCadastro,
+    Produtos
 )
+from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/produtos", tags=["Produto"])
@@ -31,42 +34,36 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 @router.get("/")
 async def requisitar_produtos(
     request: Request,
-    produto_service: produto_service_dependency,
     loja_uuid: Optional[str] = Query(None),
-    categoria_uuid: Optional[str] = Query(None)
-) -> List[ProdutoGET]:
+    categoria_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
+) -> Produtos:
 
-    """
-    Requisita os produtos cadastrados na plataforma.
-    Aceita um uuid como query para buscar os
-    produtos de uma empresa específica
+    connection: Connection = request.state.connection
 
-    Args:
-        loja_uuid (Optional[str]): O uuid da empresa,
-        caso necessário
-
-    Returns:
-        list[Produto]
-    """
-
+    service = ProdutoService(connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
     if categoria_uuid is not None:
         kwargs["categoria_uuid"] = categoria_uuid
 
-    produtos = await produto_service.get_all_produtos(**kwargs)
-    return produtos
+    produtos = await service.get_all_produtos(**kwargs)
+    paginate = Paginador(produtos, offset, limit)
+    return Produtos(**paginate.get_response())
 
 
 @router.get("/{uuid}")
 async def requisitar_produto(
     request: Request,
-    produto_service: produto_service_dependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ) -> ProdutoGET:
 
-    produto = await produto_service.get_produto(uuid)
+    connection: Connection = request.state.connection
+
+    service = ProdutoService(connection)
+    produto = await service.get_produto(uuid)
     if produto is None:
         raise NotFoundException("Produto não encontrado")
 
@@ -77,12 +74,15 @@ async def requisitar_produto(
 async def cadastrar_produto(
     request: Request,
     produto_data: ProdutoPOST,
-    current_company: current_company,
-    produto_service: produto_service_dependency
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+    service = ProdutoService(connection)
     try:
-        response = await produto_service.save_produto(produto_data)
+        response = await service.save_produto(produto_data)
         return response
     except Exception as error:
         import traceback
@@ -101,13 +101,15 @@ async def cadastrar_produto(
 async def atualizar_produto_put(
     request: Request,
     produto_data: ProdutoPUT,
-    current_company: current_company,
-    produto_service: produto_service_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+    service = ProdutoService(connection)
     try:
-        await produto_service.atualizar_produto(
+        await service.atualizar_produto(
             uuid=uuid, produto_data=produto_data
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -129,11 +131,15 @@ async def atualizar_produto_put(
 async def atualizar_imagem_de_produto(
     request: Request,
     uuid: str,
-    loja: current_company,
+    token: Annotated[str, Depends(oauth2_scheme)],
     image: LojaUpdateImageCadastro,
-    service: produto_service_dependency
 ) -> Dict[str, ImageUploadServiceResponse]:
 
+    connection: Connection = request.state.connection
+
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)
+    service = ProdutoService(connection)
     produto = await service.get(uuid)
     if produto is None:
         raise NotFoundException('O produto não foi encontrado!')
@@ -170,10 +176,13 @@ async def atualizar_imagem_de_produto(
 async def remover_imagem_de_produto(
     request: Request,
     uuid: str,
-    loja: current_company,
-    service: produto_service_dependency
+    token: Annotated[str, Depends(oauth2_scheme)],
 ):
+    connection: Connection = request.state.connection
 
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)
+    service = ProdutoService(connection)
     produto = await service.get(uuid)
     if produto is None:
         raise NotFoundException('O produto não foi encontrado!')
@@ -195,11 +204,13 @@ async def remover_imagem_de_produto(
 @router.delete("/{uuid}")
 async def remover_produto(
     request: Request,
-    current_company: current_company,
-    service: produto_service_dependency,
+    token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
 ):
-
+    connection: Connection = request.state.connection
+    auth_service = AuthService(connection)
+    loja = await auth_service.current_company(token)  # noqa
+    service = ProdutoService(connection)
     try:
         await service.remove_produto(uuid=uuid)
         return Response(status_code=status.HTTP_204_NO_CONTENT)

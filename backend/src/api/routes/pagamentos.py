@@ -7,10 +7,14 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request
+    Request,
+    Depends
 )
+from aiopg import Connection
 from src.domain.models import Pagamento
-from src.dependencies.connection_dependency import connection_dependency
+from src.misc import Paginador  # noqa
+from src.dependencies import ConnectionDependency
+
 
 router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
@@ -18,12 +22,14 @@ router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 @router.get("/")
 async def requisitar_pagamentos(
     request: Request,
-    connection: connection_dependency,
-    loja_uuid: Optional[str] = Query(None)
+    loja_uuid: Optional[str] = Query(None),
+    limit: int = Query(0),
+    offset: int = Query(1),
 ) -> List[Pagamento]:
 
-    repository = Repository(Pagamento, connection=connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(Pagamento, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -36,12 +42,12 @@ async def requisitar_pagamentos(
 @router.get("/{uuid}")
 async def requisitar_pagamento(
     request: Request,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ) -> Pagamento:
 
-    repository = Repository(Pagamento, connection=connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(Pagamento, connection=connection)
     result: Optional[Pagamento] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -52,12 +58,12 @@ async def requisitar_pagamento(
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pagamentos(
     request: Request,
-    connection: connection_dependency,
     pagamento: Pagamento
 ) -> Dict[str, str]:
 
-    repository = Repository(Pagamento, connection=connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(Pagamento, connection=connection)
     try:
         uuid = await repository.save(pagamento)
     except Exception as error:
@@ -70,12 +76,12 @@ async def cadastrar_pagamentos(
 async def atualizar_pagamento_put(
     request: Request,
     pagamento_Data: Pagamento,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ) -> Dict[str, int]:
 
-    repository = Repository(Pagamento, connection=connection)
+    connection: Connection = request.state.connection
 
+    repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -91,11 +97,12 @@ async def atualizar_pagamento_put(
 async def atualizar_pagamento_patch(
     request: Request,
     pagamentoData: Pagamento,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ) -> Dict[str, int]:
-    repository = Repository(Pagamento, connection=connection)
 
+    connection: Connection = request.state.connection
+
+    repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -110,9 +117,10 @@ async def atualizar_pagamento_patch(
 @router.delete("/{uuid}")
 async def remover_pagamento(
     request: Request,
-    connection: connection_dependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ) -> Dict[str, int]:
+
+    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
 
