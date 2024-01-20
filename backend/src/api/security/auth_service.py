@@ -132,9 +132,9 @@ class AuthService:
             )
             username = payload.get("sub")
             if username is None:
-                raise AuthService.credentials_exception
+                raise self.credentials_exception
         except JWTError:
-            raise AuthService.credentials_exception
+            raise self.credentials_exception
 
         user = await self.user_repo.find_one(username=username)
 

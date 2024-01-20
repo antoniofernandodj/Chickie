@@ -4,11 +4,8 @@ from fastapi import (  # noqa
     APIRouter,
     HTTPException,
     status,
-    Path,
-    Request,
-    Depends
+    Path
 )
-from aiopg import Connection
 from src.misc import Paginador  # noqa
 from src.domain.models import ZonaDeEntrega
 from src.infra.database_postgres.repository import Repository
@@ -19,9 +16,7 @@ router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 
 
 @router.get("/")
-async def requisitar_zonas_de_entrega(request: Request):
-
-    connection: Connection = request.state.connection
+async def requisitar_zonas_de_entrega(connection: ConnectionDependency):
 
     repository = Repository(ZonaDeEntrega, connection)
     results = await repository.find_all()
@@ -31,11 +26,9 @@ async def requisitar_zonas_de_entrega(request: Request):
 
 @router.get("/{uuid}")
 async def requisitar_zona_de_entrega(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(ZonaDeEntrega, connection)
     result = await repository.find_one(uuid=uuid)
@@ -47,11 +40,9 @@ async def requisitar_zona_de_entrega(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_zonas_de_entrega(
-    request: Request,
+    connection: ConnectionDependency,
     zona_de_entrega: ZonaDeEntrega
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(ZonaDeEntrega, connection)
     try:
@@ -64,14 +55,12 @@ async def cadastrar_zonas_de_entrega(
 
 @router.put("/{uuid}")
 async def atualizar_zona_de_entrega_put(
-    request: Request,
+    connection: ConnectionDependency,
     zona_de_entrega_Data: ZonaDeEntrega,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer put")
     ],
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(ZonaDeEntrega, connection)
     zona_de_entrega = await repository.find_one(uuid=uuid)
@@ -87,14 +76,12 @@ async def atualizar_zona_de_entrega_put(
 
 @router.patch("/{uuid}")
 async def atualizar_zona_de_entrega_patch(
-    request: Request,
+    connection: ConnectionDependency,
     zona_de_entregaData: ZonaDeEntrega,
     uuid: Annotated[
         str, Path(title="O uuid da zona de entrega a fazer patch")
     ],
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(ZonaDeEntrega, connection)
     zona_de_entrega = await repository.find_one(uuid=uuid)
@@ -110,13 +97,11 @@ async def atualizar_zona_de_entrega_patch(
 
 @router.delete("/{uuid}")
 async def remover_zona_de_entrega(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
     ]
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(ZonaDeEntrega, connection)
     try:

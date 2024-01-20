@@ -4,10 +4,8 @@ from fastapi import (
     HTTPException,
     status,
     Response,
-    Request,
     Depends
 )
-from aiopg import Connection
 from src.misc import Paginador  # noqa
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
@@ -32,11 +30,9 @@ router = APIRouter(prefix="/user", tags=["Usuario"])
 
 @router.post("/login", response_model=UserAuthData, tags=["Auth"])
 async def login_post(
-    request: Request,
+    connection: ConnectionDependency,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Any:
-
-    connection = request.state.connection
 
     endereco_repository = Repository(Endereco, connection=connection)
     auth_service = AuthService(connection)
@@ -71,11 +67,9 @@ async def login_post(
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, tags=["Auth"])
 async def signup(
-    request: Request,
+    connection: ConnectionDependency,
     usuario: UsuarioSignUp
 ) -> Any:
-
-    connection: Connection = request.state.connection
 
     try:
         usuario_uuid = await use_cases.usuarios.registrar(
@@ -93,13 +87,11 @@ async def signup(
 
 @router.put("/{uuid}")
 async def update_user(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: str,
     user_data: UsuarioSignUp,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Any:
-
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     endereco_repository = Repository(Endereco, connection)
@@ -162,14 +154,12 @@ async def update_user(
 
 @router.post("/seguir-loja")
 async def seguir_loja(
-    request: Request,
+    connection: ConnectionDependency,
     response: Response,
     token: Annotated[str, Depends(oauth2_scheme)],
     follow_request_data: UsuarioFollowEmpresaRequest
 ) -> Any:
     result: str | int
-
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     cliente = ClientePOST(
@@ -199,12 +189,10 @@ async def seguir_loja(
 
 @router.get("/segue-loja/{uuid}")
 async def segue_loja(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: str
 ) -> Any:
-
-    connection: Connection = request.state.connection
 
     auth_service = AuthService(connection)
     current_user = await auth_service.current_user(token)

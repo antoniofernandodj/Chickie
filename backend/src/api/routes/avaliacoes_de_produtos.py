@@ -10,7 +10,6 @@ from fastapi import (  # noqa
     Query,
     Depends
 )
-from aiopg import Connection
 from src.domain.models import AvaliacaoDeProduto
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
@@ -29,8 +28,6 @@ async def requisitar_avaliacoes(
     offset: int = Query(1),
 ) -> List[AvaliacaoDeProduto]:
 
-    connection: Connection = request.state.connection
-
     repository = Repository(AvaliacaoDeProduto, connection)
     results: List[AvaliacaoDeProduto] = await repository.find_all()
 
@@ -39,10 +36,9 @@ async def requisitar_avaliacoes(
 
 @router.get("/{uuid}")
 async def requisitar_avaliacao(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
 ) -> AvaliacaoDeProduto:
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeProduto, connection)
 
@@ -55,11 +51,9 @@ async def requisitar_avaliacao(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_avaliacoes(
-    request: Request,
+    connection: ConnectionDependency,
     avaliacao: AvaliacaoDeProduto
 ) -> Dict[str, str]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeProduto, connection)
     try:
@@ -72,12 +66,10 @@ async def cadastrar_avaliacoes(
 
 @router.put("/{uuid}")
 async def atualizar_avaliacao_put(
-    request: Request,
+    connection: ConnectionDependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
 ) -> Dict[str, int]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeProduto, connection)
     avaliacao = await repository.find_one(uuid=uuid)
@@ -93,12 +85,10 @@ async def atualizar_avaliacao_put(
 
 @router.patch("/{uuid}")
 async def atualizar_avaliacao_patch(
-    request: Request,
+    connection: ConnectionDependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
 ) -> Dict[str, int]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeProduto, connection)
     avaliacao = await repository.find_one(uuid=uuid)
@@ -115,11 +105,9 @@ async def atualizar_avaliacao_patch(
 
 @router.delete("/{uuid}")
 async def remover_avaliacao(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ) -> Dict[str, int]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeProduto, connection)
     try:

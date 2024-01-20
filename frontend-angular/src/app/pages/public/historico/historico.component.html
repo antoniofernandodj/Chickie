@@ -41,6 +41,7 @@
           <ul>
           @for (item of pedido.itens; track $index) {
             <li>Produto: {{item.produto_nome}}</li>
+            <li>Preço: {{ item.valor | currency:"BRL" }}</li>
             <li>Subtotal: {{item.valor * item.quantidade | currency:"BRL" }}</li>
             <li>Quantidade: {{item.quantidade}}</li>
             <li>Comentarios: {{ item.observacoes }}</li>

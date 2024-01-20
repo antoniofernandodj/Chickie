@@ -6,12 +6,10 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
     Depends
 )
 from src.api.security import oauth2_scheme, AuthService
 from src.misc import Paginador  # noqa
-from aiopg import Connection
 from src.domain.models import Status
 from src.infra.database_postgres.repository import Repository
 from src.dependencies import ConnectionDependency
@@ -22,11 +20,9 @@ router = APIRouter(prefix="/status", tags=["Status"])
 
 @router.get("/")
 async def requisitar_varios_status(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None)
 ) -> List[Status]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Status, connection)
     kwargs = {}
@@ -40,11 +36,9 @@ async def requisitar_varios_status(
 
 @router.get("/{uuid}")
 async def requisitar_status(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do status a fazer get")]
 ) -> Status:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Status, connection)
     result: Optional[Status] = await repository.find_one(uuid=uuid)
@@ -56,12 +50,11 @@ async def requisitar_status(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_status(
-    request: Request,
+    connection: ConnectionDependency,
     status: Status,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Status, connection)
@@ -75,13 +68,12 @@ async def cadastrar_status(
 
 @router.put("/{uuid}")
 async def atualizar_status_put(
-    request: Request,
+    connection: ConnectionDependency,
     statusData: Status,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do status a fazer put")],
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Status, connection)
@@ -98,7 +90,7 @@ async def atualizar_status_put(
 
 @router.patch("/{uuid}")
 async def atualizar_status_patch(
-    request: Request,
+    connection: ConnectionDependency,
     statusData: Status,
     uuid: Annotated[str, Path(title="O uuid do Status a fazer patch")],
 ) -> Dict:
@@ -107,12 +99,11 @@ async def atualizar_status_patch(
 
 @router.delete("/{uuid}")
 async def remover_status(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do status a fazer delete")]
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Status, connection)

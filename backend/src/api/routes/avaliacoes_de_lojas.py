@@ -10,7 +10,6 @@ from fastapi import (  # noqa
 )
 from src.domain.models import AvaliacaoDeLoja
 from src.infra.database_postgres.repository import Repository
-from aiopg import Connection
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 
@@ -20,12 +19,10 @@ router = APIRouter(prefix="/avaliacoes_loja", tags=["Avaliações de Lojas"])
 
 @router.get("/")
 async def requisitar_avaliacoes_loja(
-    request: Request,
+    connection: ConnectionDependency,
     limit: int = Query(0),
     offset: int = Query(1),
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     results = await repository.find_all()
@@ -35,11 +32,9 @@ async def requisitar_avaliacoes_loja(
 
 @router.get("/{uuid}")
 async def requisitar_avaliacao_loja(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação fazer get")]
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     result = await repository.find_one(uuid=uuid)
@@ -51,11 +46,9 @@ async def requisitar_avaliacao_loja(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_avaliacao_loja(
-    request: Request,
+    connection: ConnectionDependency,
     avaliacao: AvaliacaoDeLoja,
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     try:
@@ -68,12 +61,10 @@ async def cadastrar_avaliacao_loja(
 
 @router.put("/{uuid}")
 async def atualizar_avaliacao_loja_put(
-    request: Request,
+    connection: ConnectionDependency,
     avaliacao_loja_data: AvaliacaoDeLoja,
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer put")],
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     avaliacao = await repository.find_one(uuid=uuid)
@@ -89,12 +80,10 @@ async def atualizar_avaliacao_loja_put(
 
 @router.patch("/{uuid}")
 async def atualizar_avaliacoes_loja_patch(
-    request: Request,
+    connection: ConnectionDependency,
     avaliacoes_loja_data: AvaliacaoDeLoja,
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer patch")],
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     avaliacao = await repository.find_one(uuid=uuid)
@@ -110,11 +99,9 @@ async def atualizar_avaliacoes_loja_patch(
 
 @router.delete("/{uuid}")
 async def remover_avaliacoes_loja(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer delete")]
 ):
-
-    connection: Connection = request.state.connection
 
     repository = Repository(AvaliacaoDeLoja, connection=connection)
     try:

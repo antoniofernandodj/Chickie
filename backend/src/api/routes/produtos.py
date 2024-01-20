@@ -7,11 +7,9 @@ from fastapi import (  # noqa
     Path,
     Query,
     Response,
-    Request,
     Depends
 )
 from src.api.security import oauth2_scheme, AuthService
-from aiopg import Connection
 from src.domain.services import ProdutoService
 from src.misc import Paginador  # noqa
 from src.services import (
@@ -33,14 +31,12 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 
 @router.get("/")
 async def requisitar_produtos(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None),
     categoria_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> Produtos:
-
-    connection: Connection = request.state.connection
 
     service = ProdutoService(connection)
     kwargs = {}
@@ -56,11 +52,9 @@ async def requisitar_produtos(
 
 @router.get("/{uuid}")
 async def requisitar_produto(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ) -> ProdutoGET:
-
-    connection: Connection = request.state.connection
 
     service = ProdutoService(connection)
     produto = await service.get_produto(uuid)
@@ -72,12 +66,10 @@ async def requisitar_produto(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_produto(
-    request: Request,
+    connection: ConnectionDependency,
     produto_data: ProdutoPOST,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
-
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = ProdutoService(connection)
@@ -99,12 +91,12 @@ async def cadastrar_produto(
     summary='Atualizar dados de cadastro de produto'
 )
 async def atualizar_produto_put(
-    request: Request,
+    connection: ConnectionDependency,
     produto_data: ProdutoPUT,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = ProdutoService(connection)
@@ -129,13 +121,11 @@ async def atualizar_produto_put(
     }
 )
 async def atualizar_imagem_de_produto(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: str,
     token: Annotated[str, Depends(oauth2_scheme)],
     image: LojaUpdateImageCadastro,
 ) -> Dict[str, ImageUploadServiceResponse]:
-
-    connection: Connection = request.state.connection
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)
@@ -174,11 +164,10 @@ async def atualizar_imagem_de_produto(
     }
 )
 async def remover_imagem_de_produto(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: str,
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
-    connection: Connection = request.state.connection
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)
@@ -203,11 +192,11 @@ async def remover_imagem_de_produto(
 
 @router.delete("/{uuid}")
 async def remover_produto(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = ProdutoService(connection)

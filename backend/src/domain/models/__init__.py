@@ -28,7 +28,7 @@ from .produto import (  # noqa
 )
 from .signup import UsuarioSignUp, LojaSignUp  # noqa
 from .auth import UserAuthData, LojaAuthData, LojaGET  # noqa
-from .usuario import Usuario, Usuarios, UsuarioFollowEmpresaRequest  # noqa
+from .usuario import Usuario, Usuarios, UsuarioGET, UsuarioFollowEmpresaRequest  # noqa
 from .entregador import Entregador, Entregadores  # noqa
 from .avaliacao import (  # noqa
     AvaliacaoDeProduto,

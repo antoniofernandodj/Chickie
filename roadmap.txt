@@ -8,24 +8,6 @@ usuario: Listar lojas que segue -> {
     FRONTEND:
 }
 
-loja: Cadastrar pedido para user -> {
-
-    // LojaService
-    MODELS:
-    BANCO / MIGRACAO: x
-    ENDPONTS:
-    FRONTEND:
-}
-
-loja: Listar seguidores -> {
-
-    // LojaService
-    MODELS:
-    BANCO / MIGRACAO: X
-    ENDPONTS:
-    FRONTEND:
-}
-
 usuario: avaliação de loja -> {
 
     // LojaService
@@ -101,6 +83,25 @@ admin {
 
 
 feitos -> {
+
+    loja: Cadastrar pedido para user -> {
+
+        // LojaService
+        MODELS: x
+        BANCO / MIGRACAO: x
+        ENDPONTS: x
+        FRONTEND: x
+    }
+
+    loja: Listar seguidores -> {
+
+        // LojaService
+        MODELS: x
+        BANCO / MIGRACAO: X
+        ENDPONTS: x
+        FRONTEND: x
+    }
+
 
     loja: loja cadastrar usuario -> {
 

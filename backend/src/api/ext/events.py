@@ -11,7 +11,16 @@ def init_app(app: FastAPI):
     async def startup() -> None:
 
         async def on_pool_connect(connection: Connection):
-            msg = f'on_connect: Got connection ...{str(id(connection))[-5:]}'
+            try:
+                app.state.connections
+            except AttributeError:
+                app.state.connections = set()
+
+            conn_id = str(id(connection))[-5:]
+            msg = f'on_connect: Got connection ...{conn_id}'
+            app.state.connections.add('...' + conn_id)
+            logging.warning(CC.warning(msg))
+            msg = CC.warning(str({'Connections': app.state.connections}))
             logging.warning(CC.warning(msg))
 
         app.state.connection_pool = await create_pool(

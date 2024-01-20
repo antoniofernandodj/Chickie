@@ -12,7 +12,6 @@ from fastapi import (  # noqa
 )
 from src.api.security import oauth2_scheme, AuthService
 from src.domain.models import MetodoDePagamento
-from aiopg import Connection
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 
@@ -24,13 +23,11 @@ router = APIRouter(
 
 @router.get("/")
 async def requisitar_metodos_de_pagamento(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> List[MetodoDePagamento]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(MetodoDePagamento, connection=connection)
     kwargs = {}
@@ -44,13 +41,11 @@ async def requisitar_metodos_de_pagamento(
 
 @router.get("/{uuid}")
 async def requisitar_metodo_de_pagamento(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[
         str, Path(title="O uuid do método de pagamento a fazer get")
     ]
 ) -> MetodoDePagamento:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(MetodoDePagamento, connection=connection)
     result: Optional[MetodoDePagamento] = await repository.find_one(uuid=uuid)
@@ -62,12 +57,11 @@ async def requisitar_metodo_de_pagamento(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_metodos_de_pagamento(
-    request: Request,
+    connection: ConnectionDependency,
     metodo_de_pagamento: MetodoDePagamento,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(MetodoDePagamento, connection=connection)
@@ -81,7 +75,7 @@ async def cadastrar_metodos_de_pagamento(
 
 @router.put("/{uuid}")
 async def atualizar_metodo_de_pagamento_put(
-    request: Request,
+    connection: ConnectionDependency,
     metodo_de_pagamento_data: MetodoDePagamento,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[
@@ -89,7 +83,6 @@ async def atualizar_metodo_de_pagamento_put(
     ],
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(MetodoDePagamento, connection=connection)
@@ -109,7 +102,7 @@ async def atualizar_metodo_de_pagamento_put(
 
 @router.patch("/{uuid}")
 async def atualizar_metodo_de_pagamento_patch(
-    request: Request,
+    connection: ConnectionDependency,
     metodo_de_pagamentoData: MetodoDePagamento,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[
@@ -117,7 +110,6 @@ async def atualizar_metodo_de_pagamento_patch(
     ],
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(MetodoDePagamento, connection=connection)
@@ -137,14 +129,13 @@ async def atualizar_metodo_de_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_metodo_de_pagamento(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
     ],
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(MetodoDePagamento, connection=connection)

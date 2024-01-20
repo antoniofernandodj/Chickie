@@ -9,20 +9,25 @@ from src.exceptions import (
 )
 from fastapi.routing import APIRouter
 from src.dependencies import (
-    oauth2_password_request_form_dependency
+    Oauth2PasswordRequestFormDependency,
+    ConnectionDependency,
+    LojaServiceDependency,
+    AuthServiceDependency,
+    CurrentLojaDependency,
 )
 from fastapi import (
     HTTPException,
     status,
     Path,
     Response,
-    Query,
-    Request,
-    Depends
+    Query
 )
 from typing import Any, Optional, List, Dict, Annotated
 from src.domain.models import (
     Cliente,
+    Usuario,
+    UsuarioGET,
+    EnderecoUsuario,
     UsuarioSignUp,
     LojaSignUp,
     LojaPUT,
@@ -30,6 +35,7 @@ from src.domain.models import (
     LojaAuthData,
     Loja,
     Produto,
+    Produtos,
     Lojas,
     LojaGET,
     ProdutoGET,
@@ -40,12 +46,10 @@ from src.services import (
     ImageUploadService,
     ImageUploadServiceResponse,
 )
-from src.domain.services import ProdutoService, LojaService
-from src.api.security import oauth2_scheme, AuthService
+from src.domain.services import ProdutoService
+from src.api.security import AuthService
 from src import use_cases  # noqa
-from aiopg import Connection
 from src.misc import Paginador  # noqa
-from src.dependencies import ConnectionDependency
 
 
 router = APIRouter(prefix="/loja", tags=["Loja"])
@@ -55,13 +59,11 @@ router = APIRouter(prefix="/loja", tags=["Loja"])
     "/{uuid}"
 )
 async def requisitar_loja(
-    request: Request,
+    connection: ConnectionDependency,
+    service: LojaServiceDependency,
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
 ) -> LojaGET:
 
-    connection: Connection = request.state.connection
-
-    service = LojaService(connection)
     repository = Repository(Loja, connection=connection)
 
     loja: Optional[Loja] = await repository.find_one(uuid=uuid)
@@ -76,14 +78,12 @@ async def requisitar_loja(
     "/"
 )
 async def requisitar_lojas(
-    request: Request,
+    connection: ConnectionDependency,
+    service: LojaServiceDependency,
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> Lojas:
 
-    connection: Connection = request.state.connection
-
-    service = LojaService(connection)
     repository = Repository(Loja, connection=connection)
     result: List[LojaGET] = []
     lojas: List[Loja] = await repository.find_all()
@@ -101,14 +101,11 @@ async def requisitar_lojas(
     response_model=LojaAuthData
 )
 async def login(
-    form_data: oauth2_password_request_form_dependency,
-    connection: Connection = Depends(connection),
+    form_data: Oauth2PasswordRequestFormDependency,
+    auth_service: AuthServiceDependency,
+    service: LojaServiceDependency,
 ) -> Any:
 
-    # connection: Connection = request.state.connection
-
-    service = LojaService(connection)
-    auth_service = AuthService(connection)
     loja = await auth_service.authenticate_company(
         form_data.username, form_data.password
     )
@@ -128,14 +125,11 @@ async def login(
 
 @router.put("/{uuid}", summary='Atualizar dados de cadastro da Loja')
 async def update_loja(
-    request: Request,
+    service: LojaServiceDependency,
     updated_data: LojaPUT,
     uuid: Annotated[str, Path(title="O uuid da loja a ser atualizada")]
 ):
 
-    connection: Connection = request.state.connection
-
-    service = LojaService(connection)
     try:
         await service.update_loja_data(uuid, updated_data)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -151,11 +145,11 @@ async def update_loja(
     tags=["Auth"],
     status_code=status.HTTP_201_CREATED
 )
-async def signup(request: Request, loja: LojaSignUp) -> Any:
+async def signup(
+    service: LojaServiceDependency,
+    loja: LojaSignUp
+) -> Any:
 
-    connection: Connection = request.state.connection
-
-    service = LojaService(connection)
     try:
         loja_cadastrada = await service.registrar(loja_data=loja)
 
@@ -179,12 +173,12 @@ async def signup(request: Request, loja: LojaSignUp) -> Any:
 
 @router.get("/{loja_uuid}/produtos")
 async def requisitar_produtos_de_loja(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: str,
-    categoria_uuid: str
-) -> List[ProdutoGET]:
-
-    connection: Connection = request.state.connection
+    categoria_uuid: str,
+    limit: int = Query(0),
+    offset: int = Query(1),
+) -> Produtos:
 
     loja_repository = Repository(Loja, connection=connection)
     produto_repository = Repository(Produto, connection=connection)
@@ -218,7 +212,10 @@ async def requisitar_produtos_de_loja(
             image_url=image_url
         )
         response.append(response_item)
-    return response
+
+    paginador = Paginador(response, offset, limit)
+
+    return Produtos(**paginador.get_response())
 
 
 @router.post(
@@ -229,15 +226,10 @@ async def requisitar_produtos_de_loja(
     }
 )
 async def atualizar_imagem_de_cadastro(
-    request: Request,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     image: LojaUpdateImageCadastro
 ) -> Dict[str, ImageUploadServiceResponse]:
 
-    connection: Connection = request.state.connection
-
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)
     try:
         image_service = ImageUploadService(loja=loja)
         try:
@@ -269,15 +261,10 @@ async def atualizar_imagem_de_cadastro(
     }
 )
 async def remover_imagem_de_cadastro(
-    request: Request,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     image: LojaUpdateImageCadastro
 ):
 
-    connection: Connection = request.state.connection
-
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)
     try:
         image_service = ImageUploadService(loja=loja)
         image_service.delete_image_cadastro()
@@ -294,12 +281,10 @@ async def remover_imagem_de_cadastro(
     "/ativar_inativar/{uuid}"
 )
 async def ativar_inativar_loja(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ativar/inativar")],
     ativar: bool
 ) -> Any:
-
-    connection: Connection = request.state.connection
 
     loja_repository = Repository(Loja, connection)
     loja: Optional[Loja] = await loja_repository.find_one(uuid=uuid)
@@ -316,7 +301,7 @@ async def ativar_inativar_loja(
     "/{uuid}"
 )
 async def deletar_loja(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ser deletada")]
 ) -> Any:
 
@@ -325,14 +310,10 @@ async def deletar_loja(
 
 @router.post("/cliente", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente(
-    request: Request,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    connection: ConnectionDependency,
+    loja: CurrentLojaDependency,
     usuario: UsuarioFollowEmpresaRequest
 ) -> Any:
-
-    connection: Connection = request.state.connection
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
 
     if usuario.loja_uuid is None:
         raise HTTPException(
@@ -353,15 +334,11 @@ async def cadastrar_cliente(
 
 @router.post("/cliente_v2/{loja_uuid}", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente_v2(
-    request: Request,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    connection: ConnectionDependency,
+    loja: CurrentLojaDependency,
     usuario: UsuarioSignUp,
     loja_uuid: str
 ) -> Any:
-
-    connection: Connection = request.state.connection
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
 
     try:
         usuario_cadastrado = await use_cases.usuarios.registrar(
@@ -395,20 +372,13 @@ async def cadastrar_cliente_v2(
 
 @router.post('/refresh')
 async def refresh(
-    request: Request,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    service: LojaServiceDependency,
+    loja: CurrentLojaDependency,
     complete: str = Query('0')
 ):
 
-    connection: Connection = request.state.connection
-
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)
-    service = LojaService(connection)
     access_token = AuthService.create_access_token({"sub": loja.username})
-
     loja_data = None
-
     if complete == '1':
         loja_data = await service.get_data(loja)
 
@@ -417,3 +387,47 @@ async def refresh(
         token_type='bearer',
         loja=loja_data
     )
+
+
+@router.get("/clientes/")
+async def buscar_clientes(
+    connection: ConnectionDependency,
+    loja: CurrentLojaDependency,
+) -> List[UsuarioGET]:
+
+    response: List[UsuarioGET] = []
+    cliente_repository = Repository(Cliente, connection=connection)
+    user_repository = Repository(Usuario, connection=connection)
+    endereco_repository = Repository(EnderecoUsuario, connection=connection)
+
+    clientes: List[Cliente]
+    clientes = await cliente_repository.find_all(loja_uuid=loja.uuid)
+    for cliente in clientes:
+        cliente_usuario: Optional[Usuario]
+        cliente_usuario = await user_repository.find_one(
+            uuid=cliente.usuario_uuid
+        )
+        if cliente_usuario is None:
+            continue
+
+        del cliente_usuario.password
+        del cliente_usuario.password_hash
+
+        endereco = await endereco_repository.find_one(
+            usuario_uuid=cliente_usuario.uuid
+        )
+        response_item = UsuarioGET(
+            nome=cliente_usuario.nome,
+            username=cliente_usuario.username,
+            email=cliente_usuario.email,
+            celular=cliente_usuario.celular,
+            modo_de_cadastro=cliente_usuario.modo_de_cadastro,
+            telefone=cliente_usuario.telefone,
+            uuid=cliente_usuario.uuid
+        )
+        if endereco:
+            response_item.endereco = endereco
+
+        response.append(response_item)
+
+    return response

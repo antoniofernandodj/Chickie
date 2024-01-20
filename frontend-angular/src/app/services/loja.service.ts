@@ -49,6 +49,16 @@ export class LojaService {
     return observable
   }
 
+  getAllCostumers(companyData: any) {
+    let observable = this.http.get(
+      this.baseUrl.concat(`/clientes/`), {
+        headers: { Authorization: `Bearer ${companyData?.access_token}`
+      }
+    })
+
+    return observable
+  }
+
   atualizarCadastro(body: any, companyData: any) {
 
     if (!companyData) {

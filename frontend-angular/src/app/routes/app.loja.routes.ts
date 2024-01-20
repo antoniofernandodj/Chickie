@@ -12,6 +12,8 @@ import { SignupLojaComponent } from '../pages/loja/signup-loja/signup-loja.compo
 import { PedidoComponent } from '../pages/public/pedido/pedido.component';
 import { HistoricoComponent } from '../pages/loja/historico/historico.component';
 import { CadastroClienteComponent } from '../pages/loja/cadastro-cliente/cadastro-cliente.component';
+import { ClientesComponent } from '../pages/loja/clientes/clientes.component';
+import { CadastrarPedidoComponent } from '../pages/loja/cadastrar-pedido/cadastrar-pedido.component';
 
 
 export const lojaRoutes: Routes = [
@@ -19,6 +21,9 @@ export const lojaRoutes: Routes = [
   { path: 'loja/settings',
     component: LojaSettingsComponent,
     canActivate: [companyAuthGuard] },
+
+  { path: 'loja/cadastrar-pedido',
+    component: CadastrarPedidoComponent },
 
   { path: 'loja/cadastro-cliente',
     component: CadastroClienteComponent,
@@ -63,4 +68,7 @@ export const lojaRoutes: Routes = [
     component: StatusComponent,
     canActivate: [companyAuthGuard] },
 
+  { path: 'loja/clientes',
+    component: ClientesComponent,
+    canActivate: [companyAuthGuard] },
 ];

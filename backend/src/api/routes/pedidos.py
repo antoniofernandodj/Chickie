@@ -18,7 +18,6 @@ from src.domain.models import (
 )
 from src.api.security import oauth2_scheme, AuthService
 from src.domain.services import PedidoService
-from aiopg import Connection
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 
@@ -28,14 +27,12 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 @router.get("/")
 async def requisitar_pedidos(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None),
     usuario_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> Pedidos:
-
-    connection: Connection = request.state.connection
 
     service = PedidoService(connection)
     kwargs = {}
@@ -51,11 +48,9 @@ async def requisitar_pedidos(
 
 @router.get("/{uuid}")
 async def requisitar_pedido(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer get")]
 ) -> PedidoGET:
-
-    connection: Connection = request.state.connection
 
     service = PedidoService(connection)
     pedido = await service.get_pedido(uuid)
@@ -67,11 +62,9 @@ async def requisitar_pedido(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pedidos(
-    request: Request,
+    connection: ConnectionDependency,
     pedido_data: PedidoPOST,
 ) -> Dict[str, Any]:
-
-    connection: Connection = request.state.connection
 
     service = PedidoService(connection)
     try:
@@ -90,13 +83,12 @@ async def cadastrar_pedidos(
 
 @router.patch("/alterar_status_de_pedido/{uuid}")
 async def alterar_status_de_pedido(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     data: AlterarStatusPedidoPATCH,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
 ):
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = PedidoService(connection)
@@ -117,12 +109,12 @@ async def alterar_status_de_pedido(
 
 @router.patch("/concluir_pedido/{uuid}")
 async def concluir_pedido(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     response: Response,
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer patch")],
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = PedidoService(connection)
@@ -140,12 +132,11 @@ async def concluir_pedido(
 
 @router.delete("/{uuid}")
 async def remover_pedido(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = PedidoService(connection)

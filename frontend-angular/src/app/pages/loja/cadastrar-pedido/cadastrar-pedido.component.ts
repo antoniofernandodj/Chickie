@@ -8,12 +8,12 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { CommonModule } from '@angular/common';
 import { ButtonHandler } from '../../../handlers/button';
 
-import {  ProdutoResponse, CategoriaResponse, LojaResponse,
-          ItemPedido, Endereco, User } from '../../../models/models';
+import {  ProdutoResponse, CategoriaResponse, User,
+          ItemPedido, Endereco } from '../../../models/models';
 
 import {  PedidoService, CategoriaService,
-          AuthService, LojaService, AuthData,
-          ProdutoService } from '../../../services/services';
+          AuthService, LojaService,
+          ProdutoService, CompanyAuthData} from '../../../services/services';
 
 
 @Component({
@@ -25,23 +25,23 @@ import {  PedidoService, CategoriaService,
     RouterModule,
     CommonModule
   ],
-  templateUrl: './realizar-pedido.component.html',
-  styleUrl: './realizar-pedido.component.sass'
+  templateUrl: './cadastrar-pedido.component.html',
+  styleUrl: './cadastrar-pedido.component.sass'
 })
-export class RealizarPedidoComponent {
+export class CadastrarPedidoComponent {
 
-  loja: LojaResponse | null
+  clientes = new BehaviorSubject<Array<User>>([])
   companyProducts: BehaviorSubject<Array<ProdutoResponse>>
-  companyData: AuthData | null
+  companyData: CompanyAuthData
   companyCategorias: BehaviorSubject<Array<CategoriaResponse>>
   produtoValue: any
   numeroDeItens: BehaviorSubject<Array<ItemPedido>>
-  userData: AuthData | null
+  userUUID: string | null = null
+  userData: User | null = null
   endereco: Endereco
   celular: string
   observacoes: string
   comentarios: string
-  lojaUUID: string
 
   constructor(
 
@@ -53,12 +53,15 @@ export class RealizarPedidoComponent {
     private pedidoService: PedidoService
 
   ) {
-    this.userData = null
-    this.lojaUUID = ''
+    this.userUUID = null
+    let companyData = this.authService.currentCompany()
+    if (!companyData) {
+      let msg = "Dados de loja não encontrados!"
+      alert(msg); throw new Error(msg)
+    }
+    this.companyData = companyData
     this.observacoes = ''
     this.comentarios = ''
-    this.loja = null
-    this.companyData = null
     this.produtoValue = null
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([]);
     this.companyCategorias = new BehaviorSubject<Array<CategoriaResponse>>([]);
@@ -75,29 +78,50 @@ export class RealizarPedidoComponent {
     }
   }
 
-  ngOnInit(): void {
-    this.userData = this.authService.currentUser()
-    this.celular = this.userData?.celular || ''
-    if (this.userData?.endereco) {
-      this.endereco = this.userData.endereco
+  getClientByUUID(uuid: string | null): User | null {
+
+    for (let cliente of this.clientes.value) {
+      if (cliente.uuid === uuid) {
+        return cliente
+      }
     }
-    this.route.params.subscribe(params => {
-      this.lojaUUID = params['lojaID'];
-      this.fetchLoja(this.lojaUUID);
 
-      this.numeroDeItens = new BehaviorSubject<Array<ItemPedido>>([{
-        quantidade: 1,
-        produto_uuid: '',
-        uuid: uuidv4(),
-        observacoes: '',
-        loja_uuid: this.lojaUUID
-      }]);
+    return null
+  }
 
-      this.fetchProducts(this.lojaUUID)
+  ngOnInit(): void {
+
+    this.numeroDeItens = new BehaviorSubject<Array<ItemPedido>>([{
+      quantidade: 1,
+      produto_uuid: '',
+      uuid: uuidv4(),
+      observacoes: '',
+      loja_uuid: this.companyData.loja.uuid
+    }]);
+    this.fetchProducts(this.companyData.loja.uuid)
+    this.fetchClientes()
+  }
+
+  fetchClientes() {
+    this.lojaService.getAllCostumers(this.companyData).subscribe({
+      next: (result: any) => {
+        let clientes = result.map((data: any) => new User(data))
+        this.clientes.next(clientes)
+        console.log(this.clientes.value)
+      },
+      error: (result) => {
+        console.log(result)
+      }
     })
   }
 
-
+  selectCliente() {
+    this.userData = this.getClientByUUID(this.userUUID)
+    if (this.userData) {
+      this.celular = this.userData.celular
+      this.endereco = this.userData.endereco
+    }
+  }
 
   addItem() {
     const randomUUID: string = uuidv4();
@@ -106,7 +130,7 @@ export class RealizarPedidoComponent {
       produto_uuid: '',
       uuid: randomUUID,
       observacoes: '',
-      loja_uuid: this.lojaUUID
+      loja_uuid: this.companyData.loja.uuid
     })
   }
 
@@ -119,18 +143,6 @@ export class RealizarPedidoComponent {
     let newArr = this.numeroDeItens.getValue()
     newArr = newArr.filter(u => item.uuid != u.uuid)
     this.numeroDeItens.next(newArr)
-  }
-
-  private fetchLoja(companyUUID: string): void {
-    this.lojaService.getOne(companyUUID).subscribe({
-      next: (response: any) => {
-        this.loja = {...response};
-      },
-      error: (response: HttpErrorResponse) => {
-        let msg = '132: Erro na requisição dos dados da loja!';
-        alert(msg); throw new Error(msg);
-      }
-    })
   }
 
   fetchProducts(companyUUID: string) {
@@ -212,11 +224,6 @@ export class RealizarPedidoComponent {
       return
     }
 
-    if (!this.loja) {
-      alert('Loja não encotrada!')
-      return
-    }
-
     let itens = this.numeroDeItens.getValue()
     for (let item of itens) {
       if (!item.produto_uuid) {
@@ -229,13 +236,13 @@ export class RealizarPedidoComponent {
       celular: numeroCelular,
       data_hora: new Date().toISOString(),
       endereco: this.endereco,
-      frete: this.loja.frete || 0,
+      frete: this.companyData.loja.frete || 0,
       itens: itens.map(item => ({
         produto_uuid: item.produto_uuid,
         quantidade: item.quantidade,
         observacoes: item.observacoes
       })),
-      loja_uuid: this.loja.uuid,
+      loja_uuid: this.companyData.loja.uuid,
       comentarios: this.comentarios,
       status_uuid: null,
       usuario_uuid: user_uuid,
@@ -265,6 +272,18 @@ export class RealizarPedidoComponent {
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([]);
     this.companyCategorias = new BehaviorSubject<Array<CategoriaResponse>>([]);
     this.numeroDeItens = new BehaviorSubject<Array<ItemPedido>>([]);
+    this.userData = null
+    this.userUUID = null
+    this.celular = ''
+    this.endereco = {
+      uf: '',
+      cidade: '',
+      logradouro: '',
+      numero: '',
+      bairro: '',
+      cep: '',
+      complemento: '',
+    }
     this.ngOnInit()
   }
 }

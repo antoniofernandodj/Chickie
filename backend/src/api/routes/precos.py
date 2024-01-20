@@ -8,11 +8,9 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
     Depends
 )
 from src.api.security import oauth2_scheme, AuthService
-from aiopg import Connection
 from src.domain.models import Preco
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
@@ -23,13 +21,11 @@ router = APIRouter(prefix="/precos", tags=["Preços"])
 
 @router.get("/")
 async def requisitar_precos(
-    request: Request,
+    connection: ConnectionDependency,
     produto_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> List[Preco]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Preco, connection)
     kwargs = {}
@@ -43,11 +39,9 @@ async def requisitar_precos(
 
 @router.get("/{uuid}")
 async def requisitar_preco(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ) -> Preco:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Preco, connection)
     result: Optional[Preco] = await repository.find_one(uuid=uuid)
@@ -59,12 +53,11 @@ async def requisitar_preco(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_precos(
-    request: Request,
+    connection: ConnectionDependency,
     preco: Preco,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Preco, connection)
@@ -85,11 +78,11 @@ async def cadastrar_precos(
 
 @router.patch("/{uuid}")
 async def atualizar_preco_patch(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     return {}
@@ -97,13 +90,12 @@ async def atualizar_preco_patch(
 
 @router.put("/{uuid}")
 async def atualizar_preco_put(
-    request: Request,
+    connection: ConnectionDependency,
     itemData: Preco,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")]
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Preco, connection)
@@ -120,12 +112,11 @@ async def atualizar_preco_put(
 
 @router.delete("/{uuid}")
 async def remover_preco(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Preco, connection)

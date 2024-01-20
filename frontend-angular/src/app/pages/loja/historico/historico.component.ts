@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 import { FormatDatePipe } from '../../../pipes/format-date.pipe';
+import { CurrencyPipe } from '@angular/common';
 
 import {  CompanyAuthData, AuthService, PedidoService,
           ProdutoService, StatusService } from '../../../services/services';
@@ -20,13 +21,15 @@ import {  CompanyAuthData, AuthService, PedidoService,
     CommonModule,
     RouterModule,
     SpinnerComponent,
-    FormatDatePipe
+    FormatDatePipe,
+    CurrencyPipe
   ],
   templateUrl: './historico.component.html',
   styleUrl: './historico.component.sass'
 })
 export class HistoricoComponent {
 
+  total: number = 0
   pedidoUUID: string
   pedidos: BehaviorSubject<Array<Pedido>>
   companyData: CompanyAuthData | null
@@ -59,9 +62,8 @@ export class HistoricoComponent {
 
     this.statusService.getAll(this.companyData.loja.uuid).subscribe({
       next: (result: any) => {
-        let payload = result.payload
         this.loading = false
-        this.statusList.push(...payload)
+        this.statusList.push(...result)
       },
       error: (result) => {
         throw new Error('Erro na requisição dos dados')
@@ -75,6 +77,13 @@ export class HistoricoComponent {
         this.nenhumEmAndamento.next(
           this.pedidos.value.filter(item => item.concluido).length == 0
         )
+
+          for (let pedido of payload) {
+            for (let item of pedido.itens) {
+              this.total += (item.quantidade * item.valor)
+            }
+          }
+
       },
       error: (result) => {
         let msg = 'Erro na busca do pedido'

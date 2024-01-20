@@ -10,7 +10,6 @@ from fastapi import (  # noqa
     Depends
 )
 from src.api.security import oauth2_scheme
-from aiopg import Connection
 from typing import Optional
 from src.domain.models import Funcionario
 from src.infra.database_postgres.repository import Repository
@@ -24,12 +23,11 @@ router = APIRouter(prefix="/funcionarios", tags=["Funcionários"])
 
 @router.get("/")
 async def requisitar_funcionarios(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ):
-    connection: Connection = request.state.connection
 
     repository = Repository(Funcionario, connection=connection)
     kwargs = {}
@@ -43,10 +41,9 @@ async def requisitar_funcionarios(
 
 @router.get("/{uuid}")
 async def requisitar_funcionario(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do funcionário a fazer get")]
 ):
-    connection: Connection = request.state.connection
 
     repository = Repository(Funcionario, connection=connection)
     result = await repository.find_one(uuid=uuid)
@@ -58,11 +55,11 @@ async def requisitar_funcionario(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_funcionarios(
-    request: Request,
+    connection: ConnectionDependency,
     funcionario: Funcionario,
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
@@ -76,12 +73,12 @@ async def cadastrar_funcionarios(
 
 @router.put("/{uuid}")
 async def atualizar_funcionario_put(
-    request: Request,
+    connection: ConnectionDependency,
     funcionarioData: Funcionario,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer put")]
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
@@ -98,12 +95,12 @@ async def atualizar_funcionario_put(
 
 @router.patch("/{uuid}")
 async def atualizar_funcionario_patch(
-    request: Request,
+    connection: ConnectionDependency,
     funcionarioData: Funcionario,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer patch")],
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
@@ -121,11 +118,11 @@ async def atualizar_funcionario_patch(
 
 @router.delete("/{uuid}")
 async def remover_funcionario(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do funcionario a fazer delete")],
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)

@@ -10,7 +10,6 @@ from fastapi import (  # noqa
     Request,
     Depends
 )
-from aiopg import Connection
 from src.domain.models import Pagamento
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
@@ -21,13 +20,11 @@ router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
 @router.get("/")
 async def requisitar_pagamentos(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> List[Pagamento]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
     kwargs = {}
@@ -41,11 +38,9 @@ async def requisitar_pagamentos(
 
 @router.get("/{uuid}")
 async def requisitar_pagamento(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ) -> Pagamento:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
     result: Optional[Pagamento] = await repository.find_one(uuid=uuid)
@@ -57,11 +52,9 @@ async def requisitar_pagamento(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_pagamentos(
-    request: Request,
+    connection: ConnectionDependency,
     pagamento: Pagamento
 ) -> Dict[str, str]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
     try:
@@ -74,12 +67,10 @@ async def cadastrar_pagamentos(
 
 @router.put("/{uuid}")
 async def atualizar_pagamento_put(
-    request: Request,
+    connection: ConnectionDependency,
     pagamento_Data: Pagamento,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ) -> Dict[str, int]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
@@ -95,12 +86,10 @@ async def atualizar_pagamento_put(
 
 @router.patch("/{uuid}")
 async def atualizar_pagamento_patch(
-    request: Request,
+    connection: ConnectionDependency,
     pagamentoData: Pagamento,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ) -> Dict[str, int]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
@@ -116,11 +105,9 @@ async def atualizar_pagamento_patch(
 
 @router.delete("/{uuid}")
 async def remover_pagamento(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ) -> Dict[str, int]:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(Pagamento, connection=connection)
 

@@ -5,11 +5,9 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
     Depends
 )
 from src.api.security import oauth2_scheme
-from aiopg import Connection
 from typing import Optional
 from src.domain.models import Entregador
 from src.exceptions import NotFoundException
@@ -24,12 +22,11 @@ router = APIRouter(prefix="/entregadores", tags=["Entregadores"])
 
 @router.get("/")
 async def requisitar_entregadores(
-    request: Request,
+    connection: ConnectionDependency,
     loja_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ):
-    connection: Connection = request.state.connection
 
     repository = Repository(Entregador, connection=connection)
     kwargs = {}
@@ -43,10 +40,9 @@ async def requisitar_entregadores(
 
 @router.get("/{uuid}")
 async def requisitar_entregador(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer get")]
 ):
-    connection: Connection = request.state.connection
 
     repository = Repository(Entregador, connection=connection)
     result = await repository.find_one(uuid=uuid)
@@ -58,11 +54,11 @@ async def requisitar_entregador(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_entregadores(
-    request: Request,
+    connection: ConnectionDependency,
     entregador: Entregador,
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
@@ -77,12 +73,12 @@ async def cadastrar_entregadores(
 
 @router.put("/{uuid}")
 async def atualizar_entregador_put(
-    request: Request,
+    connection: ConnectionDependency,
     entregadorData: Entregador,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer put")],
 ):
-    connection: Connection = request.state.connection
+
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Entregador, connection=connection)
@@ -99,13 +95,12 @@ async def atualizar_entregador_put(
 
 @router.patch("/{uuid}")
 async def atualizar_entregador_patch(
-    request: Request,
+    connection: ConnectionDependency,
     entregadorData: Entregador,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer patch")],
 ):
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Entregador, connection=connection)
@@ -123,12 +118,11 @@ async def atualizar_entregador_patch(
 
 @router.delete("/{uuid}")
 async def remover_entregador(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer delete")],
 ):
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Entregador, connection=connection)

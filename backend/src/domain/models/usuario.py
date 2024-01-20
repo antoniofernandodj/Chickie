@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from .endereco import EnderecoUsuario
 import base64
 import bcrypt
 
@@ -41,6 +42,21 @@ class Usuario(BaseModel):
             raise
         hash_bytes = base64.b64decode(self.password_hash.encode("utf-8"))
         return bcrypt.checkpw(senha_usuario.encode("utf-8"), hash_bytes)
+
+
+class UsuarioGET(BaseModel):
+
+    __tablename__ = "usuarios"
+    nome: str
+    username: str
+    email: str
+    celular: str
+
+    modo_de_cadastro: str
+
+    endereco: Optional[EnderecoUsuario] = None
+    telefone: Optional[str] = None
+    uuid: Optional[str] = None
 
 
 class Usuarios(BaseModel):

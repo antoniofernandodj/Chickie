@@ -12,8 +12,7 @@ from fastapi import (  # noqa
     Query
 )
 from src.api.security import oauth2_scheme, AuthService
-from aiopg import Connection
-from src.domain.models import CategoriaProdutos
+from src.domain.models import CategoriaProdutos, CategoriasProdutos
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 
@@ -23,14 +22,12 @@ router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
 @router.get("/")
 async def requisitar_categorias(
-    request: Request,
+    connection: ConnectionDependency,
     nome: Optional[str] = Query(None),
     loja_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
-) -> List[CategoriaProdutos]:
-
-    connection: Connection = request.state.connection
+) -> CategoriasProdutos:
 
     repository = Repository(CategoriaProdutos, connection)
 
@@ -41,18 +38,17 @@ async def requisitar_categorias(
         kwargs["loja_uuid"] = loja_uuid
 
     results: List[CategoriaProdutos] = await repository.find_all(**kwargs)
+    paginate = Paginador(results, offset, limit)
 
-    return results
+    return CategoriasProdutos(**paginate.get_response())
 
 
 @router.get("/{uuid}")
 async def requisitar_categoria(
-    request: Request,
+    connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer get")],
     nome: Optional[str] = Query(None)
 ) -> CategoriaProdutos:
-
-    connection: Connection = request.state.connection
 
     repository = Repository(CategoriaProdutos, connection)
     kwargs = {}
@@ -68,12 +64,11 @@ async def requisitar_categoria(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_categorias(
-    request: Request,
+    connection: ConnectionDependency,
     categoria: CategoriaProdutos,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Dict[str, str]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
@@ -88,11 +83,10 @@ async def cadastrar_categorias(
 
 @router.patch("/{uuid}")
 async def atualizar_categoria_patch(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")],
 ):
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     return {}
@@ -100,13 +94,12 @@ async def atualizar_categoria_patch(
 
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     itemData: CategoriaProdutos,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
@@ -127,12 +120,11 @@ async def atualizar_categoria_put(
 
 @router.delete("/{uuid}")
 async def remover_categoria(
-    request: Request,
+    connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
 ) -> Dict[str, int]:
 
-    connection: Connection = request.state.connection
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(CategoriaProdutos, connection)
