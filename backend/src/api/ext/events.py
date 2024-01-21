@@ -1,7 +1,9 @@
-from config import settings as s
+from config import settings as s  # noqa  # type: ignore
+from infra.database_postgres import DSN  # type: ignore
 from fastapi import FastAPI
 from aiopg import create_pool, Pool, Connection
 from src.misc import ConsoleColors as CC
+import sys
 import logging
 
 
@@ -23,18 +25,29 @@ def init_app(app: FastAPI):
             msg = CC.warning(str({'Connections': app.state.connections}))
             logging.warning(CC.warning(msg))
 
-        app.state.connection_pool = await create_pool(
-            ("dbname={0} user={1} password={2} host={3}".format(
-                s.POSTGRES_DATABASE,
-                s.POSTGRES_USERNAME,
-                s.POSTGRES_PASSWORD,
-                s.POSTGRES_HOST,
-            )),
-            maxsize=5,
-            minsize=5,
-            echo=True,
-            on_connect=on_pool_connect
-        )
+        try:
+            pool = await create_pool(
+                DSN, maxsize=1, minsize=1, echo=True
+            )
+            logging.warn('Cleaning connections...')
+            pool.close()
+            await pool.wait_closed()
+            logging.warn('Connections cleaned.')
+
+            app.state.connection_pool = await create_pool(
+                DSN, maxsize=2, minsize=2,
+                echo=True, on_connect=on_pool_connect
+            )
+        except Exception:
+            try:
+                pool = app.state.connection_pool
+                pool.close()
+                await pool.wait_closed()
+            except Exception:
+                pass
+
+            sys.exit(1)
+
         app.state.connection_pool.echo
         print(f'Created pool {app.state.connection_pool}')
 
