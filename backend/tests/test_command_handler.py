@@ -32,11 +32,11 @@ async def test_command_handler():
 
             command_handler.save([categoria1, categoria2, categoria3])
 
-            assert len(handler.commands) == 3
+            assert len(command_handler.commands) == 3
 
             results = []
             with pytest.raises(psycopg2.errors.ForeignKeyViolation):
-                result = await handler.commit()
+                result = await command_handler.commit()
                 results.extend(result)
 
             assert len(results) == 0
