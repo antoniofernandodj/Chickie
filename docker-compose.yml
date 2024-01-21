@@ -26,80 +26,13 @@ services:
       APP_VERSION: "dev"
     image: antoniofernandodj/chickie:dev
 
-    # depends_on:
-      # - cache
-      # - rabbitmq
-      # - mongodb
-      # - database
-
   client-angular:
     build:
       context: frontend-angular
-      dockerfile: Dockerfile.dev
+      dockerfile: dockerfiles/client.dockerfile
     volumes:
       - ./frontend-angular/src:/usr/app/src
     ports:
       - "4200:4200"
-    stdin_open: true
-    tty: true
-
-  # database:
-  #   image: postgres
-  #   volumes:
-  #     - /var/local/lib/postgresql/volumes/Chickie:/var/lib/postgresql/data
-  #   env_file:
-  #     - infra.secrets.toml
-  #   ports:
-  #     - "5432:5432"
+      - "80:80"
   
-  # cache:
-  #   image: redis
-  #   restart: always
-  #   env_file:
-  #     - infra.secrets.toml
-  #   command: redis-server /usr/local/etc/redis/redis.conf
-  #   volumes:
-  #     - cache:/data
-  #     - ./config/redis.secrets.conf:/usr/local/etc/redis/redis.conf
-  #   ports:
-  #     - "6379:6379"
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    environment:
-      CHICKIE_MYENV: "prod"
-    ports: 
-      - 25672:25672
-      - 15672:15672
-      - 5672:5672
-    volumes:
-      - /docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
-    env_file:
-      - ./infra.secrets.toml
-    restart: always
-
-  mongodb:
-    image: mongo:4.0.8
-    container_name: mongodb
-    restart: unless-stopped
-    command: mongod --auth
-    env_file:
-      - ./backend/config/.secrets.infra.toml
-    ports:
-      - '27017:27017'
-    volumes:
-      - mongodbdata:/data/db
-
-  # mq-worker:
-  
-  # frontend:
-
-  # backend:
-
-
-
-volumes:
-  cache:
-  postgres-data:
-  mongodbdata:
