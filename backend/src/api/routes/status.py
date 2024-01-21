@@ -14,7 +14,7 @@ from fastapi import (  # noqa
 from src.api.security import oauth2_scheme, AuthService
 from src.misc import Paginador  # noqa
 from src.domain.models import Status
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.dependencies import ConnectionDependency
 
 
@@ -27,7 +27,7 @@ async def requisitar_varios_status(
     loja_uuid: Optional[str] = Query(None)
 ) -> List[Status]:
 
-    repository = Repository(Status, connection)
+    repository = QueryHandler(Status, connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -43,7 +43,7 @@ async def requisitar_status(
     uuid: Annotated[str, Path(title="O uuid do status a fazer get")]
 ) -> Status:
 
-    repository = Repository(Status, connection)
+    repository = QueryHandler(Status, connection)
     result: Optional[Status] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Status não encontrado")
@@ -61,7 +61,7 @@ async def cadastrar_status(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    repository = Repository(Status, connection)
+    repository = QueryHandler(Status, connection)
     query = await repository.find_one(nome=status.nome)
     if query:
         raise ConflictException('Status Já cadastrado!')
@@ -88,7 +88,7 @@ async def atualizar_status_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Status, connection)
+    repository = QueryHandler(Status, connection)
     status = await repository.find_one(uuid=uuid)
     if status is None:
         raise NotFoundException("Status não encontrado")
@@ -118,7 +118,7 @@ async def remover_status(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Status, connection)
+    repository = QueryHandler(Status, connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

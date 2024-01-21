@@ -1,5 +1,5 @@
 from typing import Annotated, Optional, List, Dict
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.exceptions import (
     NotFoundException,
     ConflictException,
@@ -30,7 +30,7 @@ async def requisitar_precos(
     offset: int = Query(1),
 ) -> List[Preco]:
 
-    repository = Repository(Preco, connection)
+    repository = QueryHandler(Preco, connection)
     kwargs = {}
     if produto_uuid is not None:
         kwargs["produto_uuid"] = produto_uuid
@@ -46,7 +46,7 @@ async def requisitar_preco(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ) -> Preco:
 
-    repository = Repository(Preco, connection)
+    repository = QueryHandler(Preco, connection)
     result: Optional[Preco] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Preço não encontrado")
@@ -64,7 +64,7 @@ async def cadastrar_precos(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    repository = Repository(Preco, connection)
+    repository = QueryHandler(Preco, connection)
     command_handler = CommandHandler(Preco, connection)
 
     query = await repository.find_one(
@@ -106,7 +106,7 @@ async def atualizar_preco_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Preco, connection)
+    repository = QueryHandler(Preco, connection)
     preco = await repository.find_one(uuid=uuid)
     if preco is None:
         raise NotFoundException("Preço não encontrado")
@@ -127,7 +127,7 @@ async def remover_preco(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Preco, connection)
+    repository = QueryHandler(Preco, connection)
 
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)

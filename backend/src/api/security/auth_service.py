@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
 from config import settings as s
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import QueryHandler
 from src.domain.models import Loja, Usuario
 from src.domain.services import LojaService
 from aiopg import Connection
@@ -20,8 +20,8 @@ class AuthService:
     def __init__(self, connection: Connection):
         self.connection = connection
         self.loja_service = LojaService(self.connection)
-        self.loja_repo = Repository(Loja, connection=self.connection)
-        self.user_repo = Repository(Usuario, connection=self.connection)
+        self.loja_repo = QueryHandler(Loja, connection=self.connection)
+        self.user_repo = QueryHandler(Usuario, connection=self.connection)
 
     async def authenticate_company(
         self,

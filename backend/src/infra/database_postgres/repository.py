@@ -8,12 +8,27 @@ import enum
 
 
 class CommandTypes(enum.Enum):
+    """Enumeration to represent command types.
+
+    Attributes:
+        save: Command type for 'save' operations.
+        update: Command type for 'update' operations.
+        delete: Command type for 'delete' operations.
+    """
     save = 'save'
     update = 'update'
     delete = 'delete'
 
 
 class CommandDict(TypedDict):
+    """Type definition for a dictionary representing a command.
+
+    Attributes:
+        command: The SQL command to be executed.
+        command_type: The type of command being represented.
+        values: The values to be used with the SQL command.
+        uuid: A unique identifier for the command.
+    """
     command: str
     command_type: CommandTypes
     values: Sequence[Any]
@@ -21,29 +36,35 @@ class CommandDict(TypedDict):
 
 
 class CommandResult(TypedDict):
+    """Type definition for a dictionary representing a command result.
+
+    Attributes:
+        uuid: A unique identifier for the command.
+        command_type: The type of command that was executed.
+    """
     uuid: str
     command_type: CommandTypes
 
 
-class Repository:
-    """A generic repository class to interact with a database table
-    for a Pydantic model."""
+class QueryHandler:
+    """Handles database queries for a specific model.
+
+    Attributes:
+        lock: An asyncio Lock object to ensure thread-safe database access.
+        model: The model class associated with this query handler.
+        connection: The aiopg Connection object for database interaction.
+        columns: A list of column names for the model.
+        tablename: The table name for the model.
+    """
 
     def __init__(self, model: Any, connection: Connection):
-        """Initialize the repository.
+        """Initializes the QueryHandler with a model and database connection.
 
         Args:
-            model (Any): The Pydantic model representing the database table.
-            connection (Connection): The aiopg database connection.
-        Example:
-            repository = Repository(Endereco, connection=connection)
-            try:
-                itens_removed = await repository.delete_from_uuid(
-                    uuid=uuid
-                )
-            except Exception as error:
-                raise HTTPException(status_code=500, detail=str(error))
+            model: The model class associated with this query handler.
+            connection: The aiopg Connection object for database interaction.
         """
+
         self.lock = Lock()
         self.model = model
         self.connection = connection
@@ -51,14 +72,14 @@ class Repository:
         self.tablename: str = model.__tablename__  # type: ignore
 
     async def find_one(self, **kwargs) -> Optional[Any]:
-        """Find a single row in the database table based on given criteria.
+        """Retrieves a single record from the database matching the criteria.
 
         Args:
-            **kwargs: Keyword arguments representing the filtering criteria.
+            **kwargs: Field-value pairs to filter the query.
 
         Returns:
-            Optional[Any]: The Pydantic model instance
-            representing the row if found, None otherwise.
+            An instance of the model with the retrieved data,
+            or None if no match is found.
         """
         values = None
         result = None
@@ -97,14 +118,13 @@ class Repository:
         return None
 
     async def find_all(self, **kwargs) -> List[Any]:
-        """Find all rows in the database table based on given criteria.
+        """Retrieves all records from the database matching the criteria.
 
         Args:
-            **kwargs: Keyword arguments representing the filtering criteria.
+            **kwargs: Field-value pairs to filter the query.
 
         Returns:
-            List[Any]: A list of Pydantic model instances
-            representing the rows.
+            A list of model instances with the retrieved data.
         """
         values = None
         if kwargs:
@@ -144,14 +164,18 @@ class Repository:
         return response
 
     async def find_all_cointaining(self, **kwargs) -> List[Any]:
-        """Find all rows in the database table containing the given values.
+        """Retrieves all records containing the specified values in
+        their fields.
 
         Args:
-            **kwargs: Keyword arguments representing the values to be searched.
+            **kwargs: Field-value pairs to filter the query
+            using LIKE operator.
 
         Returns:
-            List[Any]: A list of Pydantic model instances
-            representing the rows.
+            A list of model instances with the retrieved data.
+
+        Raises:
+            KeyError: If no search keys are provided.
         """
         if kwargs == {}:
             raise KeyError("Method must have at least one key to search")
@@ -187,132 +211,17 @@ class Repository:
         cursor.close()
         return response
 
-    async def save(self, model: Any, uuid_str: Optional[str] = None) -> str:
-        """Save a new row in the database table.
-
-        Args:
-            model (Any): The Pydantic model instance
-                representing the row to be saved.
-
-        Returns:
-            str: The UUID of the saved row.
-        """
-        kwargs = model.model_dump()  # type: ignore
-        if uuid_str is None:
-            kwargs["uuid"] = str(uuid.uuid1())
-        else:
-            kwargs['uuid'] = uuid_str
-
-        columns = list(kwargs.keys())
-        values = list(kwargs.values())
-
-        column_clause = ", ".join(columns)
-        value_placeholder = ", ".join(["%s"] * len(columns))
-
-        command = "INSERT INTO {} ({}) VALUES ({});".format(
-            self.tablename, column_clause, value_placeholder
-        )
-
-        async with self.lock:
-            cursor = await self.connection.cursor()
-            await cursor.execute(command, values)
-
-        cursor.close()
-
-        logging.debug(
-            ConsoleColors.okgreen(
-                f"\n\nCommand: {command} Values: {values}\n\n"
-            )
-        )
-        return kwargs["uuid"]
-
-    async def update(self, item: Any, data: dict = {}) -> int:
-        """Update an existing row in the database table.
-
-        Args:
-            item (Any): The Pydantic model instance
-                representing the row to be updated.
-
-            data (dict, optional): The data to be updated.
-                Defaults to an empty dictionary.
-
-        Returns:
-            int: The number of rows affected by the update operation.
-        """
-        values = list(data.values())
-
-        set_clause = ", ".join([f"{column} = %s" for column in data.keys()])
-        command = "UPDATE {} SET {} WHERE uuid = '{}';".format(
-            self.tablename, set_clause, item.uuid
-        )
-        async with self.lock:
-            cursor = await self.connection.cursor()
-            await cursor.execute(command, values)
-
-        num_rows_affected = cursor.rowcount
-
-        cursor.close()
-        logging.debug(
-            ConsoleColors.okgreen(
-                f"\n\nCommand: {command} Values: {values}\n\n"
-            )
-        )
-        return num_rows_affected
-
-    async def delete(self, item: Any) -> int:
-        """Delete an existing row from the database table.
-
-        Args:
-            item (Any): The Pydantic model instance
-            representing the row to be deleted.
-
-        Returns:
-            int: The number of rows affected by the delete operation.
-        """
-        uuid = item.uuid
-        command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
-
-        async with self.lock:
-            cursor = await self.connection.cursor()
-            await cursor.execute(command, (uuid,))
-
-        num_rows_affected = cursor.rowcount
-
-        cursor.close()
-        logging.debug(
-            ConsoleColors.fail(
-                f"\n\nCommand: {command} uuid = {uuid}\n\n"
-            )
-        )
-        return num_rows_affected
-
-    async def delete_from_uuid(self, uuid) -> int:
-        """Delete an existing row from the database table based on its UUID.
-
-        Args:
-            uuid: The UUID of the row to be deleted.
-
-        Returns:
-            int: The number of rows affected by the delete operation.
-        """
-        command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
-
-        async with self.lock:
-            cursor = await self.connection.cursor()
-            await cursor.execute(command, (uuid,))
-
-        num_rows_affected = cursor.rowcount
-
-        cursor.close()
-        logging.debug(
-            ConsoleColors.fail(
-                f"\n\nCommand: {command} uuid = {uuid}\n\n"
-            )
-        )
-        return num_rows_affected
-
     async def execute_and_fetch_one(self, query: str, params: tuple):
-        """ """
+        """Executes a given SQL query and fetches a single result.
+
+        Args:
+            query: The SQL query to execute.
+            params: A tuple of parameters to use with the query.
+
+        Returns:
+            A dictionary representing the fetched row, or None if
+            no row is fetched.
+        """
         logging.debug(
             ConsoleColors.okblue(
                 f"\n\nCommand: {query}\n\n"
@@ -344,7 +253,15 @@ class Repository:
         return None
 
     async def execute_and_fetch_all(self, query: str, params: tuple):
-        """ """
+        """Executes a given SQL query and fetches all results.
+
+        Args:
+            query: The SQL query to execute.
+            params: A tuple of parameters to use with the query.
+
+        Returns:
+            A list of dictionaries representing the fetched rows.
+        """
         logging.debug(
             ConsoleColors.okblue(
                 f"Query: {query}"
@@ -372,9 +289,22 @@ class Repository:
 
 
 class CommandHandler:
+    """Handles database commands for a specific model.
 
+    Attributes:
+        lock: An asyncio Lock object to ensure thread-safe database access.
+        model: The model class associated with this command handler.
+        connection: The aiopg Connection object for database interaction.
+        tablename: The table name for the model.
+        commands: A list of CommandDict representing pending database commands.
+    """
     def __init__(self, model: Any, connection: Connection):
+        """Initializes the CommandHandler with a model and database connection.
 
+        Args:
+            model: The model class associated with this command handler.
+            connection: The aiopg Connection object for database interaction.
+        """
         self.lock = Lock()
         self.model = model
         self.connection = connection
@@ -382,7 +312,13 @@ class CommandHandler:
         self.commands: List[CommandDict] = []
 
     def save(self, data: Any, uuid_str: Optional[str] = None) -> None:
+        """Prepares a 'save' command to insert data into the database.
 
+        Args:
+            data: The data to be saved, can be a single model instance or
+            a list of instances.
+            uuid_str: An optional UUID string to use for the record(s).
+        """
         def save_one(model: Any, uuid_str: Optional[str] = None):
 
             kwargs = model.model_dump()
@@ -414,7 +350,12 @@ class CommandHandler:
             save_one(data, uuid_str)
 
     def update(self, item: Any, data: dict = {}) -> None:
+        """Prepares an 'update' command to update data in the database.
 
+        Args:
+            item: The model instance to be updated.
+            data: A dictionary of field-value pairs to update.
+        """
         values = list(data.values())
 
         set_clause = ", ".join(
@@ -433,6 +374,13 @@ class CommandHandler:
         })
 
     def delete(self, data: Any) -> None:
+        """Prepares a 'delete' command to remove data from the database.
+
+        Args:
+            data: The data to be deleted, can be a single model
+            instance or a list of instances.
+        """
+
         def delete_one(item):
             uuid = item.uuid
             command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
@@ -450,6 +398,13 @@ class CommandHandler:
             delete_one(data)
 
     def delete_from_uuid(self, uuid) -> None:
+        """Prepares a 'delete' command to remove a record from the
+        database by UUID.
+
+        Args:
+            uuid: The UUID string of the record to be deleted.
+        """
+
         command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
 
         self.commands.append({
@@ -460,6 +415,13 @@ class CommandHandler:
         })
 
     async def commit(self) -> List[CommandResult]:
+        """Executes all pending database commands and commits the transaction.
+
+        Returns:
+            A list of CommandResult indicating the results of the executed
+            commands.
+        """
+
         results: List[CommandResult] = []
         try:
             async with self.lock:

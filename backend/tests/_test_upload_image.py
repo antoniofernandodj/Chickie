@@ -1,5 +1,5 @@
 import asyncio
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import QueryHandler
 from src.infra.database_postgres import DSN
 import aiopg
 from src.domain.models import Loja, Produto
@@ -23,8 +23,8 @@ async def get_image():
 async def main() -> None:
     async with aiopg.create_pool(DSN) as pool:
         async with pool.acquire() as connection:
-            loja_repository = Repository(Loja, connection)
-            produto_repository = Repository(Produto, connection)
+            loja_repository = QueryHandler(Loja, connection)
+            produto_repository = QueryHandler(Produto, connection)
             lojas = await loja_repository.find_all()
             loja = lojas[0]
 

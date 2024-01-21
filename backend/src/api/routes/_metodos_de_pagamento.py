@@ -1,5 +1,5 @@
 from typing import Annotated, List, Dict, Optional
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -29,7 +29,7 @@ async def requisitar_metodos_de_pagamento(
     offset: int = Query(1),
 ) -> List[MetodoDePagamento]:
 
-    repository = Repository(MetodoDePagamento, connection=connection)
+    repository = QueryHandler(MetodoDePagamento, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -47,7 +47,7 @@ async def requisitar_metodo_de_pagamento(
     ]
 ) -> MetodoDePagamento:
 
-    repository = Repository(MetodoDePagamento, connection=connection)
+    repository = QueryHandler(MetodoDePagamento, connection=connection)
     result: Optional[MetodoDePagamento] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
@@ -65,7 +65,7 @@ async def cadastrar_metodos_de_pagamento(
     auth_service = AuthService(connection)
 
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(MetodoDePagamento, connection=connection)
+    repository = QueryHandler(MetodoDePagamento, connection=connection)
     query = await repository.find_one(nome=status.nome)
     if query:
         raise Exception
@@ -95,7 +95,7 @@ async def atualizar_metodo_de_pagamento_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(MetodoDePagamento, connection=connection)
+    repository = QueryHandler(MetodoDePagamento, connection=connection)
     metodo_de_pagamento: Optional[MetodoDePagamento] = await repository \
         .find_one(uuid=uuid)
 
@@ -122,7 +122,7 @@ async def atualizar_metodo_de_pagamento_patch(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(MetodoDePagamento, connection=connection)
+    repository = QueryHandler(MetodoDePagamento, connection=connection)
     metodo_de_pagamento: Optional[MetodoDePagamento] = await repository \
         .find_one(uuid=uuid)
 
@@ -148,7 +148,7 @@ async def remover_metodo_de_pagamento(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(MetodoDePagamento, connection=connection)
+    repository = QueryHandler(MetodoDePagamento, connection=connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

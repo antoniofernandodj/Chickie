@@ -1,5 +1,5 @@
 # from src.presenters import controllers
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.exceptions import (
     UnauthorizedException,
     NotFoundException,
@@ -64,7 +64,7 @@ async def requisitar_loja(
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
 ) -> LojaGET:
 
-    repository = Repository(Loja, connection=connection)
+    repository = QueryHandler(Loja, connection=connection)
 
     loja: Optional[Loja] = await repository.find_one(uuid=uuid)
     if loja is None:
@@ -84,7 +84,7 @@ async def requisitar_lojas(
     offset: int = Query(1),
 ) -> Lojas:
 
-    repository = Repository(Loja, connection=connection)
+    repository = QueryHandler(Loja, connection=connection)
     result: List[LojaGET] = []
     lojas: List[Loja] = await repository.find_all()
     for loja in lojas:
@@ -180,8 +180,8 @@ async def requisitar_produtos_de_loja(
     offset: int = Query(1),
 ) -> Produtos:
 
-    loja_repository = Repository(Loja, connection=connection)
-    produto_repository = Repository(Produto, connection=connection)
+    loja_repository = QueryHandler(Loja, connection=connection)
+    produto_repository = QueryHandler(Produto, connection=connection)
     loja: Optional[Loja] = await loja_repository.find_one(
         uuid=loja_uuid
     )
@@ -286,7 +286,7 @@ async def ativar_inativar_loja(
     ativar: bool
 ) -> Any:
 
-    loja_repository = Repository(Loja, connection)
+    loja_repository = QueryHandler(Loja, connection)
     loja: Optional[Loja] = await loja_repository.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
@@ -404,9 +404,9 @@ async def buscar_clientes(
 ) -> List[UsuarioGET]:
 
     response: List[UsuarioGET] = []
-    cliente_repository = Repository(Cliente, connection=connection)
-    user_repository = Repository(Usuario, connection=connection)
-    endereco_repository = Repository(EnderecoUsuario, connection=connection)
+    cliente_repository = QueryHandler(Cliente, connection=connection)
+    user_repository = QueryHandler(Usuario, connection=connection)
+    endereco_repository = QueryHandler(EnderecoUsuario, connection=connection)
 
     clientes: List[Cliente]
     clientes = await cliente_repository.find_all(loja_uuid=loja.uuid)

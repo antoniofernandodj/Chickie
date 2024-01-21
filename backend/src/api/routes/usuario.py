@@ -14,7 +14,7 @@ from src.misc import Paginador  # noqa
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from src.infra.database_postgres.repository import (
-    Repository, CommandHandler, CommandTypes
+    QueryHandler, CommandHandler, CommandTypes
 )
 from src.api.security import AuthService, oauth2_scheme
 from src.domain.models import (
@@ -38,7 +38,7 @@ async def login_post(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Any:
 
-    endereco_repository = Repository(Endereco, connection=connection)
+    endereco_repository = QueryHandler(Endereco, connection=connection)
     auth_service = AuthService(connection)
 
     user = await auth_service.authenticate_user(
@@ -98,10 +98,10 @@ async def update_user(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    endereco_repository = Repository(Endereco, connection)
+    endereco_repository = QueryHandler(Endereco, connection)
     endereco_command_handler = CommandHandler(Endereco, connection)
 
-    user_repository = Repository(Endereco, connection)
+    user_repository = QueryHandler(Endereco, connection)
 
     usuario: Optional[Usuario] = await user_repository.find_one(uuid=uuid)
     if usuario is None or usuario.uuid is None:
@@ -188,7 +188,7 @@ async def seguir_loja(
         loja_uuid=follow_request_data.loja_uuid
     )
 
-    cliente_repository = Repository(Cliente, connection=connection)
+    cliente_repository = QueryHandler(Cliente, connection=connection)
     cliente_cmd_handler = CommandHandler(Cliente, connection)
 
     if follow_request_data.follow:
@@ -227,7 +227,7 @@ async def segue_loja(
             detail='Usuario sem uuid'
         )
 
-    cliente_repository = Repository(Cliente, connection=connection)
+    cliente_repository = QueryHandler(Cliente, connection=connection)
     follows: Optional[Cliente] = await cliente_repository.find_one(
         usuario_uuid=current_user.uuid,
         loja_uuid=uuid

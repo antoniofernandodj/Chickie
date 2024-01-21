@@ -1,5 +1,5 @@
 from typing import Annotated, List, Dict, Optional
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -28,7 +28,7 @@ async def requisitar_avaliacoes(
     offset: int = Query(1),
 ) -> List[AvaliacaoDeProduto]:
 
-    repository = Repository(AvaliacaoDeProduto, connection)
+    repository = QueryHandler(AvaliacaoDeProduto, connection)
     results: List[AvaliacaoDeProduto] = await repository.find_all()
 
     return results
@@ -40,7 +40,7 @@ async def requisitar_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
 ) -> AvaliacaoDeProduto:
 
-    repository = Repository(AvaliacaoDeProduto, connection)
+    repository = QueryHandler(AvaliacaoDeProduto, connection)
 
     result: Optional[AvaliacaoDeProduto] = await repository.find_one(uuid=uuid)
     if result is None:
@@ -73,7 +73,7 @@ async def atualizar_avaliacao_put(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
 ) -> Dict[str, int]:
 
-    repository = Repository(AvaliacaoDeProduto, connection)
+    repository = QueryHandler(AvaliacaoDeProduto, connection)
     avaliacao = await repository.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
@@ -92,7 +92,7 @@ async def atualizar_avaliacao_patch(
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
 ) -> Dict[str, int]:
 
-    repository = Repository(AvaliacaoDeProduto, connection)
+    repository = QueryHandler(AvaliacaoDeProduto, connection)
     avaliacao = await repository.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
@@ -111,7 +111,7 @@ async def remover_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ) -> Dict[str, int]:
 
-    repository = Repository(AvaliacaoDeProduto, connection)
+    repository = QueryHandler(AvaliacaoDeProduto, connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

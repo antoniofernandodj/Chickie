@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import QueryHandler
 from src.domain.models import (
     Preco,
     Loja,
@@ -26,16 +26,16 @@ class AvaliacaoDeLojaService(BaseService):
     ):
         self.model = AvaliacaoDeLoja
         self.connection = connection
-        self.repo = Repository(
+        self.repo = QueryHandler(
             model=self.model, connection=self.connection
         )
-        self.user_repo = Repository(
+        self.user_repo = QueryHandler(
             model=Usuario, connection=self.connection
         )
-        self.preco_repo = Repository(
+        self.preco_repo = QueryHandler(
             model=Preco, connection=self.connection
         )
-        self.loja_repo = Repository(
+        self.loja_repo = QueryHandler(
             model=Loja, connection=self.connection
         )
         self.loja = loja

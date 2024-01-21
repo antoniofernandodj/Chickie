@@ -1,10 +1,10 @@
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import QueryHandler
 from typing import List, Any, Optional
 
 
 class BaseService:
 
-    repo: Repository
+    repo: QueryHandler
 
     async def get(self, uuid: str) -> Optional[Any]:
         return await self.repo.find_one(uuid=uuid)

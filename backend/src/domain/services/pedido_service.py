@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 import datetime
 from src.domain.models import (
     Produto,
@@ -24,28 +24,28 @@ class PedidoService(BaseService):
     ):
         self.model = Pedido
         self.connection = connection
-        self.repo = Repository(
+        self.repo = QueryHandler(
             model=self.model, connection=self.connection
         )
-        self.user_repo = Repository(
+        self.user_repo = QueryHandler(
             model=Usuario, connection=self.connection
         )
-        self.preco_repo = Repository(
+        self.preco_repo = QueryHandler(
             model=Preco, connection=self.connection
         )
-        self.produto_repo = Repository(
+        self.produto_repo = QueryHandler(
             model=Produto, connection=self.connection
         )
-        self.loja_repo = Repository(
+        self.loja_repo = QueryHandler(
             model=Loja, connection=self.connection
         )
-        self.endereco_repo = Repository(
+        self.endereco_repo = QueryHandler(
             model=EnderecoEntrega, connection=connection
         )
-        self.itens_pedido_repo = Repository(
+        self.itens_pedido_repo = QueryHandler(
             model=ItemPedido, connection=connection
         )
-        self.status_repo = Repository(
+        self.status_repo = QueryHandler(
             model=Status, connection=connection
         )
         self.pedido_cmd_handler = CommandHandler(

@@ -12,7 +12,7 @@ from fastapi import (  # noqa
 from src.api.security import oauth2_scheme
 from typing import Optional
 from src.domain.models import Funcionario
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.api.security import AuthService
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
@@ -29,7 +29,7 @@ async def requisitar_funcionarios(
     offset: int = Query(1),
 ):
 
-    repository = Repository(Funcionario, connection=connection)
+    repository = QueryHandler(Funcionario, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -45,7 +45,7 @@ async def requisitar_funcionario(
     uuid: Annotated[str, Path(title="O uuid do funcionário a fazer get")]
 ):
 
-    repository = Repository(Funcionario, connection=connection)
+    repository = QueryHandler(Funcionario, connection=connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -62,7 +62,7 @@ async def cadastrar_funcionarios(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Funcionario, connection=connection)
+    repository = QueryHandler(Funcionario, connection=connection)
 
     q1 = await repository.find_one(nome=funcionario.nome)
     q2 = await repository.find_one(username=funcionario.username)
@@ -93,7 +93,7 @@ async def atualizar_funcionario_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Funcionario, connection=connection)
+    repository = QueryHandler(Funcionario, connection=connection)
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
         raise NotFoundException("Funcionario não encontrado")
@@ -115,7 +115,7 @@ async def atualizar_funcionario_patch(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Funcionario, connection=connection)
+    repository = QueryHandler(Funcionario, connection=connection)
 
     funcionario = await repository.find_one(uuid=uuid)
     if funcionario is None:
@@ -137,7 +137,7 @@ async def remover_funcionario(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(Funcionario, connection=connection)
+    repository = QueryHandler(Funcionario, connection=connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

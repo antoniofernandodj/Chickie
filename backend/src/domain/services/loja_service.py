@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.domain.models import (
     Loja,
     LojaSignUp,
@@ -26,16 +26,16 @@ class LojaService(BaseService):
     ):
         self.model = Loja
         self.connection = connection
-        self.repo = Repository(
+        self.repo = QueryHandler(
             model=self.model, connection=self.connection
         )
-        self.endereco_repo = Repository(
+        self.endereco_repo = QueryHandler(
             model=EnderecoLoja, connection=connection
         )
-        self.cliente_repo = Repository(
+        self.cliente_repo = QueryHandler(
             model=Cliente, connection=self.connection
         )
-        self.usuario_repo = Repository(
+        self.usuario_repo = QueryHandler(
             model=Usuario, connection=self.connection
         )
         self.cmd_handler = CommandHandler(

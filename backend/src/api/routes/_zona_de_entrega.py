@@ -8,7 +8,7 @@ from fastapi import (  # noqa
 )
 from src.misc import Paginador  # noqa
 from src.domain.models import ZonaDeEntrega
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.dependencies import ConnectionDependency
 
 
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 @router.get("/")
 async def requisitar_zonas_de_entrega(connection: ConnectionDependency):
 
-    repository = Repository(ZonaDeEntrega, connection)
+    repository = QueryHandler(ZonaDeEntrega, connection)
     results = await repository.find_all()
 
     return results
@@ -30,7 +30,7 @@ async def requisitar_zona_de_entrega(
     uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
 
-    repository = Repository(ZonaDeEntrega, connection)
+    repository = QueryHandler(ZonaDeEntrega, connection)
     result = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Zona de entrega não encontrada")
@@ -44,7 +44,7 @@ async def cadastrar_zonas_de_entrega(
     zona_de_entrega: ZonaDeEntrega
 ):
 
-    repository = Repository(ZonaDeEntrega, connection)
+    repository = QueryHandler(ZonaDeEntrega, connection)
 
     query = await repository.find_one(
         cidade=zona_de_entrega.cidade,
@@ -74,7 +74,7 @@ async def atualizar_zona_de_entrega_put(
     ],
 ):
 
-    repository = Repository(ZonaDeEntrega, connection)
+    repository = QueryHandler(ZonaDeEntrega, connection)
     zona_de_entrega = await repository.find_one(uuid=uuid)
     if zona_de_entrega is None:
         raise NotFoundException("Zona de entrega não encontrada")
@@ -95,7 +95,7 @@ async def atualizar_zona_de_entrega_patch(
     ],
 ):
 
-    repository = Repository(ZonaDeEntrega, connection)
+    repository = QueryHandler(ZonaDeEntrega, connection)
     zona_de_entrega = await repository.find_one(uuid=uuid)
     if zona_de_entrega is None:
         raise NotFoundException("Zona de entrega não encontrada")
@@ -115,7 +115,7 @@ async def remover_zona_de_entrega(
     ]
 ):
 
-    repository = Repository(ZonaDeEntrega, connection)
+    repository = QueryHandler(ZonaDeEntrega, connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:

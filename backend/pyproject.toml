@@ -61,6 +61,7 @@ anyio = "^4.2.0"
 pytest-tornasync = "^0.6.0.post2"
 pytest-twisted = "^1.14.0"
 twisted = "^23.10.0"
+sphinx = "^7.2.6"
 
 
 [build-system]

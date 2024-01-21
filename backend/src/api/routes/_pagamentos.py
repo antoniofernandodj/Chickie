@@ -1,5 +1,5 @@
 from typing import Annotated, List, Dict, Optional
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -26,7 +26,7 @@ async def requisitar_pagamentos(
     offset: int = Query(1),
 ) -> List[Pagamento]:
 
-    repository = Repository(Pagamento, connection=connection)
+    repository = QueryHandler(Pagamento, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -42,7 +42,7 @@ async def requisitar_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ) -> Pagamento:
 
-    repository = Repository(Pagamento, connection=connection)
+    repository = QueryHandler(Pagamento, connection=connection)
     result: Optional[Pagamento] = await repository.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -74,7 +74,7 @@ async def atualizar_pagamento_put(
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ) -> Dict[str, int]:
 
-    repository = Repository(Pagamento, connection=connection)
+    repository = QueryHandler(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -93,7 +93,7 @@ async def atualizar_pagamento_patch(
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ) -> Dict[str, int]:
 
-    repository = Repository(Pagamento, connection=connection)
+    repository = QueryHandler(Pagamento, connection=connection)
     pagamento = await repository.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -111,7 +111,7 @@ async def remover_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ) -> Dict[str, int]:
 
-    repository = Repository(Pagamento, connection=connection)
+    repository = QueryHandler(Pagamento, connection=connection)
 
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)

@@ -1,5 +1,5 @@
 from typing import Annotated, Optional, Dict, List
-from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.infra.database_postgres.repository import QueryHandler, CommandHandler
 from src.exceptions import (
     NotFoundException,
     ConflictException,
@@ -32,7 +32,7 @@ async def requisitar_categorias(
     offset: int = Query(1),
 ) -> CategoriasProdutos:
 
-    repository = Repository(CategoriaProdutos, connection)
+    repository = QueryHandler(CategoriaProdutos, connection)
 
     kwargs = {}
     if nome is not None:
@@ -53,7 +53,7 @@ async def requisitar_categoria(
     nome: Optional[str] = Query(None)
 ) -> CategoriaProdutos:
 
-    repository = Repository(CategoriaProdutos, connection)
+    repository = QueryHandler(CategoriaProdutos, connection)
     kwargs = {}
     if nome is not None:
         kwargs["nome"] = nome
@@ -75,7 +75,7 @@ async def cadastrar_categorias(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    repository = Repository(CategoriaProdutos, connection)
+    repository = QueryHandler(CategoriaProdutos, connection)
     query = await repository.find_one(nome=categoria.nome)
     if query:
         raise ConflictException('Categoria já cadastrada!')
@@ -113,7 +113,7 @@ async def atualizar_categoria_put(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    repository = Repository(CategoriaProdutos, connection)
+    repository = QueryHandler(CategoriaProdutos, connection)
     try:
         categoria = await repository.find_one(uuid=uuid)
     except Exception as error:
@@ -137,7 +137,7 @@ async def remover_categoria(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = Repository(CategoriaProdutos, connection)
+    repository = QueryHandler(CategoriaProdutos, connection)
     try:
         itens_removed = await repository.delete_from_uuid(uuid=uuid)
     except Exception as error:
