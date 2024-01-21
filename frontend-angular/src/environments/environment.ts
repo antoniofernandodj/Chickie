@@ -1,3 +1,3 @@
 export const environment = {
-  host: 'http://localhost'
+  host: 'https://chiquitos.onrender.com'
 };

@@ -41,20 +41,20 @@ export type UserSignUpRequest = {
 @Injectable({ providedIn: 'root' })
 export class SignupService {
 
-  private companySignupUrl: string
-  private userSignupUrl: string
+  companySignupUrl: string  = `${environment.host}/loja/signup`
+  userSignupUrl: string  = `${environment.host}/user/signup`
 
   constructor(private http: HttpClient) {
-    this.companySignupUrl = `${environment.host}/loja/signup`
-    this.userSignupUrl = `${environment.host}/user/signup`
   }
 
   doCompanySignUp(body: EmpresaSignUpRequest) {
+    console.log({'this.companySignupUrl': this.companySignupUrl})
     let obs = this.http.post(this.companySignupUrl, body)
     return obs
   }
 
   doUserSignUp(body: UserSignUpRequest) {
+    console.log({'this.userSignupUrl': this.userSignupUrl})
     let obs = this.http.post(this.userSignupUrl, body)
     return obs
   }

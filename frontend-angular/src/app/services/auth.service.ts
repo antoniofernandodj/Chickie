@@ -79,6 +79,10 @@ export class AuthData {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
+  companyUrlLogin = `${environment.host}/loja/login`;
+  userUrlLogin = `${environment.host}/user/login`;
+
   companyIsLoggedIn: BehaviorSubject<boolean>;
   userIsLoggedIn: BehaviorSubject<boolean>;
   isLoginPage: BehaviorSubject<boolean>;
@@ -119,8 +123,6 @@ export class AuthService {
   }
 
   doCompanyLogin(loginValue: string, passwordValue: string): Observable<Object> {
-    const urlLogin = `${environment.host}/loja/login`;
-
     const body = new HttpParams()
       .set('username', loginValue)
       .set('password', passwordValue);
@@ -131,12 +133,10 @@ export class AuthService {
       }),
     };
 
-    return this.http.post(urlLogin, body.toString(), httpOptions);
+    return this.http.post(this.companyUrlLogin, body.toString(), httpOptions);
   }
 
   doUserLogin(loginValue: string, passwordValue: string): Observable<Object> {
-    const urlLogin = `${environment.host}/user/login`;
-
     const body = new HttpParams()
       .set('username', loginValue)
       .set('password', passwordValue);
@@ -144,7 +144,7 @@ export class AuthService {
     const headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     const httpOptions = { headers: headers };
 
-    return this.http.post(urlLogin, body.toString(), httpOptions);
+    return this.http.post(this.userUrlLogin, body.toString(), httpOptions);
   }
 
   doLogout() {
