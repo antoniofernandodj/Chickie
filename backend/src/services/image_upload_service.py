@@ -233,7 +233,7 @@ class ImageUploadCadastroService(ImageUploadServiceBase):
 
     def __get_cloud_filename(self, filename: str) -> str:
         name, ext = os.path.splitext(filename)  # type: ignore
-        uuid_part = str(uuid.uuid4())
+        uuid_part = str(uuid.uuid1())
         new_filename = f"{name}_{self.loja.uuid or uuid_part}"
 
         web_safe_name = re.sub(
