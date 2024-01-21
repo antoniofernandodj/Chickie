@@ -1,5 +1,7 @@
 from typing import Annotated, Dict, Optional, Any
-from src.exceptions import NotFoundException
+from src.exceptions import (
+    NotFoundException
+)
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,

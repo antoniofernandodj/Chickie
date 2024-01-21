@@ -1,6 +1,9 @@
 from typing import Annotated, Optional, List, Dict
-from src.infra.database_postgres.repository import Repository
-from src.exceptions import NotFoundException, ConflictException
+from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.exceptions import (
+    NotFoundException,
+    ConflictException,
+)
 from starlette import status
 from fastapi import (  # noqa
     APIRouter,
@@ -60,7 +63,10 @@ async def cadastrar_precos(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
+
     repository = Repository(Preco, connection)
+    command_handler = CommandHandler(Preco, connection)
+
     query = await repository.find_one(
         dia_da_semana=preco.dia_da_semana,
         produto_uuid=preco.produto_uuid
@@ -69,7 +75,9 @@ async def cadastrar_precos(
         raise ConflictException('Preço já cadastrado para este '
                                 'produto e para este dia da semana!')
     try:
-        uuid = await repository.save(preco)
+        command_handler.save(preco)
+        results = await command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

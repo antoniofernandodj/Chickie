@@ -12,7 +12,7 @@ from typing import Optional
 from src.domain.models import Entregador
 from src.exceptions import NotFoundException
 from src.api.security import AuthService
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 
@@ -62,9 +62,11 @@ async def cadastrar_entregadores(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    repository = Repository(Entregador, connection=connection)
+    command_handler = CommandHandler(Entregador, connection)
     try:
-        uuid = await repository.save(entregador)
+        command_handler.save(entregador)
+        results = await command_handler.commit()
+        uuid = results[0]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

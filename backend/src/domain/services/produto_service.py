@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.domain.models import (
     Produto,
     Preco,
@@ -31,6 +31,12 @@ class ProdutoService(BaseService):
         self.avaliacao_repo = Repository(
             model=AvaliacaoDeProduto, connection=connection
         )
+        self.avaliacao_cmd_handler = CommandHandler(
+            model=AvaliacaoDeProduto, connection=connection
+        )
+        self.produto_cmd_handler = CommandHandler(
+            model=Produto, connection=self.connection
+        )
 
         self.pedido_service = PedidoService(connection=connection)
 
@@ -48,7 +54,10 @@ class ProdutoService(BaseService):
             loja_uuid=produto_data.loja_uuid
         )
 
-        produto.uuid = await self.repo.save(produto)
+        self.produto_cmd_handler.save(produto)
+        results = await self.produto_cmd_handler.commit()
+        produto.uuid = results[0]['uuid']
+
         loja = await self.get_loja_from_produto(produto=produto)
         if loja is None:
             raise Exception('Loja não encontrada!')
@@ -138,14 +147,17 @@ class ProdutoService(BaseService):
                 descricao=avaliacao_data.descricao,
                 produto_uuid=produto.uuid
             )
+            self.avaliacao_cmd_handler.save(avaliacao)
+            results = await self.avaliacao_cmd_handler.commit()
+            uuid = results[0]['uuid']
 
-            uuid = await self.avaliacao_repo.save(avaliacao)
             return uuid
 
         else:
-            await self.avaliacao_repo.update(
+            self.avaliacao_cmd_handler.update(
                 avaliacao, avaliacao_data.model_dump()
             )
+            await self.avaliacao_cmd_handler.commit()
 
             return avaliacao.uuid
 

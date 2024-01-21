@@ -1,5 +1,5 @@
 from datetime import timedelta
-from celery import Celery
+from celery import Celery  # type: ignore
 
 
 def init_app(app: Celery):

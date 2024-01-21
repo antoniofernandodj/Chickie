@@ -1,5 +1,8 @@
 from typing import Annotated, Optional, Dict, List
-from src.exceptions import NotFoundException
+from src.exceptions import (
+    NotFoundException,
+    ConflictException
+)
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -11,7 +14,7 @@ from fastapi import (  # noqa
 from src.api.security import oauth2_scheme, AuthService
 from src.misc import Paginador  # noqa
 from src.domain.models import Status
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.dependencies import ConnectionDependency
 
 
@@ -57,9 +60,18 @@ async def cadastrar_status(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
+
     repository = Repository(Status, connection)
+    query = await repository.find_one(nome=status.nome)
+    if query:
+        raise ConflictException('Status Já cadastrado!')
+
+    command_handler = CommandHandler(Status, connection)
+
     try:
-        uuid = await repository.save(status)
+        command_handler.save(status)
+        results = await command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

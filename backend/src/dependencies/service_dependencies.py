@@ -1,5 +1,10 @@
 from typing import Annotated
-from src.domain.services import LojaService, ProdutoService, PedidoService
+from src.domain.services import (
+    LojaService,
+    ProdutoService,
+    PedidoService,
+    UserService
+)
 from src.api.security import AuthService
 from fastapi import Depends
 
@@ -19,12 +24,20 @@ def get_produto_service(connection: ConnectionDependency):
     return ProdutoService(connection)
 
 
+def get_user_service(connection: ConnectionDependency):
+    return UserService(connection)
+
+
 def get_pedido_service(connection: ConnectionDependency):
     return PedidoService(connection)
 
 
 AuthServiceDependency = Annotated[
     AuthService, Depends(get_auth_service)
+]
+
+UserServiceDependency = Annotated[
+    UserService, Depends(get_user_service)
 ]
 
 PedidoServiceDependency = Annotated[

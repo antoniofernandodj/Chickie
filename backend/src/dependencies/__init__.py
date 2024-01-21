@@ -4,10 +4,11 @@ from .service_dependencies import (  # noqa
     AuthServiceDependency,  # noqa
     PedidoServiceDependency,
     ProdutoServiceDependency,
-    LojaServiceDependency
+    LojaServiceDependency,
+    UserServiceDependency
 )
 from .token_dependency import TokenDependency  # noqa
 from .oauth2_password_request_form_dependency import (  # noqa
     Oauth2PasswordRequestFormDependency  # noqa
 )
-from .current_loja_dependency import CurrentLojaDependency
+from .current_loja_dependency import CurrentLojaDependency  # noqa

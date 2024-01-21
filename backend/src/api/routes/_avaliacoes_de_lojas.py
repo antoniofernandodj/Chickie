@@ -9,7 +9,7 @@ from fastapi import (  # noqa
     Query
 )
 from src.domain.models import AvaliacaoDeLoja
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 
@@ -50,9 +50,11 @@ async def cadastrar_avaliacao_loja(
     avaliacao: AvaliacaoDeLoja,
 ):
 
-    repository = Repository(AvaliacaoDeLoja, connection=connection)
+    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
     try:
-        uuid = await repository.save(avaliacao)
+        command_handler.save(avaliacao)
+        results = await command_handler.commit()
+        uuid = results[0]['uuid']
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

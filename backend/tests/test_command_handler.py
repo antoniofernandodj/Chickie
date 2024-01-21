@@ -13,7 +13,7 @@ async def test_command_handler():
     async with aiopg.create_pool(DSN) as pool:
         async with pool.acquire() as connection:
 
-            handler = CommandHandler(CategoriaProdutos, connection)
+            command_handler = CommandHandler(CategoriaProdutos, connection)
 
             categoria1 = CategoriaProdutos(
                 nome='cat1', descricao='desc',
@@ -30,7 +30,7 @@ async def test_command_handler():
                 loja_uuid=''  # raises HERE!
             )
 
-            handler.save([categoria1, categoria2, categoria3])
+            command_handler.save([categoria1, categoria2, categoria3])
 
             assert len(handler.commands) == 3
 

@@ -1,4 +1,4 @@
-import pika
+import pika  # type: ignore
 import pickle
 from config import settings as s
 from typing import Callable, Optional
@@ -7,6 +7,13 @@ from typing import Callable, Optional
 # from contextlib import suppress
 from typing import Any
 import logging
+
+from config import settings as s  # noqa
+from typing import Callable  # noqa
+from typing import Any  # noqa
+import asyncio  # noqa
+import aioamqp  # type: ignore  # noqa
+import pickle  # noqa
 
 
 class RabbitMQPublisher:
@@ -144,17 +151,12 @@ class RabbitMQConsumer:
         return channel
 
     def start(self):
-        self._logger.info(
-            f"RabbitMQ escutando em {self.__host}:{self.__port}..."
-        )
-        self.__channel.start_consuming()
+        if self._logger:
+            self._logger.info(
+                f"RabbitMQ escutando em {self.__host}:{self.__port}..."
+            )
 
-from config import settings as s
-from typing import Callable
-from typing import Any
-import asyncio
-import aioamqp
-import pickle
+        self.__channel.start_consuming()
 
 
 class RMQService:

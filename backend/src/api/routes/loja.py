@@ -1,5 +1,5 @@
 # from src.presenters import controllers
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.exceptions import (
     UnauthorizedException,
     NotFoundException,
@@ -14,6 +14,7 @@ from src.dependencies import (
     LojaServiceDependency,
     AuthServiceDependency,
     CurrentLojaDependency,
+    UserServiceDependency,
 )
 from fastapi import (
     HTTPException,
@@ -48,7 +49,6 @@ from src.services import (
 )
 from src.domain.services import ProdutoService
 from src.api.security import AuthService
-from src import use_cases  # noqa
 from src.misc import Paginador  # noqa
 
 
@@ -326,8 +326,12 @@ async def cadastrar_cliente(
         loja_uuid=usuario.loja_uuid
     )
 
-    cliente_repository = Repository(Cliente, connection=connection)
-    cliente_uuid = await cliente_repository.save(cliente)
+    cliente_command_handler = CommandHandler(Cliente, connection)
+    cliente_command_handler.save(cliente)
+
+    results = await cliente_command_handler.commit()
+
+    cliente_uuid = results[0]["uuid"]
 
     return {"uuid": cliente_uuid}
 
@@ -337,14 +341,15 @@ async def cadastrar_cliente_v2(
     connection: ConnectionDependency,
     loja: CurrentLojaDependency,
     usuario: UsuarioSignUp,
+    user_service: UserServiceDependency,
     loja_uuid: str
 ) -> Any:
 
     try:
-        usuario_cadastrado = await use_cases.usuarios.registrar(
-            user_data=usuario, connection=connection
+        usuario_cadastrado = await user_service.registrar(
+            user_data=usuario
         )
-    except use_cases.usuarios.InvalidPasswordException:
+    except InvalidPasswordException:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Senha inválida! A senha deve ser maior que 5"
@@ -361,8 +366,11 @@ async def cadastrar_cliente_v2(
         loja_uuid=loja_uuid
     )
 
-    cliente_repository = Repository(Cliente, connection=connection)
-    cliente_uuid = await cliente_repository.save(cliente)
+    cliente_command_handler = CommandHandler(Cliente, connection)
+
+    cliente_command_handler.save(cliente)
+    results = await cliente_command_handler.commit()
+    cliente_uuid = results[0]["uuid"]
 
     return {
         "usuario_uuid": usuario_cadastrado.uuid,

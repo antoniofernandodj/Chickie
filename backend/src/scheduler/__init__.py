@@ -1,1 +1,1 @@
-from src.scheduler import celerybeat_scheduler  # noqa
+from src.scheduler import celerybeat_scheduler  # noqa  # type: ignore

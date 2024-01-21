@@ -1,5 +1,9 @@
 from typing import Any, Annotated, Optional
-from src.exceptions import UnauthorizedException
+from src.exceptions import (
+    UnauthorizedException,
+    NotFoundException,
+    InvalidPasswordException
+)
 from fastapi import (
     HTTPException,
     status,
@@ -9,8 +13,9 @@ from fastapi import (
 from src.misc import Paginador  # noqa
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from src.exceptions import NotFoundException
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import (
+    Repository, CommandHandler, CommandTypes
+)
 from src.api.security import AuthService, oauth2_scheme
 from src.domain.models import (
     UsuarioFollowEmpresaRequest,
@@ -21,8 +26,7 @@ from src.domain.models import (
     ClientePOST,
     UserAuthData,
 )
-from src import use_cases
-from src.dependencies import ConnectionDependency
+from src.dependencies import ConnectionDependency, UserServiceDependency
 
 
 router = APIRouter(prefix="/user", tags=["Usuario"])
@@ -68,15 +72,13 @@ async def login_post(
 @router.post("/signup", status_code=status.HTTP_201_CREATED, tags=["Auth"])
 async def signup(
     connection: ConnectionDependency,
+    service: UserServiceDependency,
     usuario: UsuarioSignUp
 ) -> Any:
 
     try:
-        usuario_uuid = await use_cases.usuarios.registrar(
-            user_data=usuario,
-            connection=connection
-        )
-    except use_cases.usuarios.InvalidPasswordException:
+        usuario_uuid = await service.registrar(user_data=usuario)
+    except InvalidPasswordException:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Senha inválida! A senha deve ser maior que 5"
@@ -91,10 +93,14 @@ async def update_user(
     uuid: str,
     user_data: UsuarioSignUp,
     token: Annotated[str, Depends(oauth2_scheme)],
+    response: Response
 ) -> Any:
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
+
     endereco_repository = Repository(Endereco, connection)
+    endereco_command_handler = CommandHandler(Endereco, connection)
+
     user_repository = Repository(Endereco, connection)
 
     usuario: Optional[Usuario] = await user_repository.find_one(uuid=uuid)
@@ -134,12 +140,27 @@ async def update_user(
             usuario_uuid=usuario.uuid
         )
         if endereco:
-            await endereco_repository.delete(endereco)
+            endereco_command_handler.delete(endereco)
 
-        endereco_uuid = await endereco_repository.save(novo_endereco)
+        endereco_command_handler.save(novo_endereco)
+
+        endereco_uuid: Optional[str] = None
+        results = await endereco_command_handler.commit()
+        for result in results:
+            if result["command_type"] == CommandTypes.save:
+                endereco_uuid = result["uuid"]
+
+        if endereco_uuid is None:
+            message = (
+                "Usuario atualizado com sucesso, mas houve erro "
+                "na atualização do endereço"
+            )
+
+        else:
+            message = "Usuario atualizado com sucesso!"
 
         return {
-            "message": "Usuario atualizado com sucesso!",
+            "message": message,
             "uuid": usuario.uuid,
             'endereco_uuid': endereco_uuid,
             "success": success
@@ -168,10 +189,14 @@ async def seguir_loja(
     )
 
     cliente_repository = Repository(Cliente, connection=connection)
+    cliente_cmd_handler = CommandHandler(Cliente, connection)
 
     if follow_request_data.follow:
         response.status_code = 201
-        result = await cliente_repository.save(cliente)
+
+        cliente_cmd_handler.save(cliente)
+        results = await cliente_cmd_handler.commit()
+        result = results[0]["uuid"]
         return {"result": result, 'follow': follow_request_data.follow}
 
     else:

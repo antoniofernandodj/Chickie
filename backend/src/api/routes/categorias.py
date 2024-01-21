@@ -1,6 +1,9 @@
 from typing import Annotated, Optional, Dict, List
-from src.infra.database_postgres.repository import Repository
-from src.exceptions import NotFoundException
+from src.infra.database_postgres.repository import Repository, CommandHandler
+from src.exceptions import (
+    NotFoundException,
+    ConflictException,
+)
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
@@ -73,8 +76,15 @@ async def cadastrar_categorias(
     loja = await auth_service.current_company(token)  # noqa
 
     repository = Repository(CategoriaProdutos, connection)
+    query = await repository.find_one(nome=categoria.nome)
+    if query:
+        raise ConflictException('Categoria já cadastrada!')
+
+    command_handler = CommandHandler(CategoriaProdutos, connection)
     try:
-        uuid = await repository.save(categoria)
+        command_handler.save(categoria)
+        results = await command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

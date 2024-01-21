@@ -1,5 +1,5 @@
 from typing import Annotated, List, Dict, Optional
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -56,9 +56,11 @@ async def cadastrar_pagamentos(
     pagamento: Pagamento
 ) -> Dict[str, str]:
 
-    repository = Repository(Pagamento, connection=connection)
+    pagamentos_command_handler = CommandHandler(Pagamento, connection)
     try:
-        uuid = await repository.save(pagamento)
+        pagamentos_command_handler.save(pagamento)
+        results = await pagamentos_command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.domain.models import (
     Loja,
     LojaSignUp,
@@ -36,6 +36,12 @@ class LojaService(BaseService):
             model=Cliente, connection=self.connection
         )
         self.usuario_repo = Repository(
+            model=Usuario, connection=self.connection
+        )
+        self.cmd_handler = CommandHandler(
+            model=Usuario, connection=self.connection
+        )
+        self.endereco_cmd_handler = CommandHandler(
             model=Usuario, connection=self.connection
         )
 
@@ -142,7 +148,12 @@ class LojaService(BaseService):
             horarios_de_funcionamento=loja_data.horarios_de_funcionamento
         )
         del loja.password
-        loja.uuid = await self.repo.save(model=loja)
+
+        self.cmd_handler.save(loja)
+        results = await self.cmd_handler.commit()
+
+        loja.uuid = results[0]['uuid']
+
         endereco = EnderecoLoja(
             uf=loja_data.uf,
             cep=loja_data.cep,
@@ -153,7 +164,9 @@ class LojaService(BaseService):
             complemento=loja_data.complemento,
             loja_uuid=loja.uuid
         )
-        await self.endereco_repo.save(endereco)
+
+        self.endereco_cmd_handler.save(endereco)
+        await self.endereco_cmd_handler.commit()
 
         try:
             if loja_data.image_bytes and loja_data.image_filename:

@@ -12,7 +12,7 @@ from fastapi import (  # noqa
 from src.api.security import oauth2_scheme
 from typing import Optional
 from src.domain.models import Funcionario
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.api.security import AuthService
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
@@ -63,8 +63,20 @@ async def cadastrar_funcionarios(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     repository = Repository(Funcionario, connection=connection)
+
+    q1 = await repository.find_one(nome=funcionario.nome)
+    q2 = await repository.find_one(username=funcionario.username)
+    q3 = await repository.find_one(email=funcionario.email)
+    q4 = await repository.find_one(celular=funcionario.celular)
+
+    if q1 or q2 or q3 or q4:
+        raise Exception
+
+    command_handler = CommandHandler(Funcionario, connection)
     try:
-        uuid = await repository.save(funcionario)
+        command_handler.save(funcionario)
+        results = await command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

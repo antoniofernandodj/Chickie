@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 import datetime
 from src.domain.models import (
     Produto,
@@ -47,6 +47,15 @@ class PedidoService(BaseService):
         )
         self.status_repo = Repository(
             model=Status, connection=connection
+        )
+        self.pedido_cmd_handler = CommandHandler(
+            model=Pedido, connection=self.connection
+        )
+        self.itens_pedido_cmd_handler = CommandHandler(
+            model=ItemPedido, connection=self.connection
+        )
+        self.endereco_cmd_handler = CommandHandler(
+            model=EnderecoEntrega, connection=connection
         )
 
     async def get_all_pedidos(self, **kwargs) -> List[PedidoGET]:
@@ -203,7 +212,10 @@ class PedidoService(BaseService):
             usuario_uuid=pedido_data.usuario_uuid
         )
 
-        pedido.uuid = await self.repo.save(pedido)
+        self.pedido_cmd_handler.save(pedido)
+        results = await self.pedido_cmd_handler.commit()
+
+        pedido.uuid = results[0]['uuid']
 
         itens_uuid = await self.save_itens_for_pedido(
             itens=pedido_data.itens, pedido=pedido
@@ -244,7 +256,11 @@ class PedidoService(BaseService):
                 loja_uuid=pedido.loja_uuid
             )
 
-            item_uuid = await self.itens_pedido_repo.save(item_pedido)
+            self.itens_pedido_cmd_handler.save(item_pedido)
+            results = await self.itens_pedido_cmd_handler.commit()
+
+            item_uuid = results[0]['uuid']
+
             itens_uuid.append(item_uuid)
 
         return itens_uuid
@@ -252,7 +268,9 @@ class PedidoService(BaseService):
     async def save_endereco_for_pedido(
         self, pedido_data: PedidoPOST
     ):
-        uuid = await self.endereco_repo.save(pedido_data.endereco)
+        self.endereco_cmd_handler.save(pedido_data.endereco)
+        results = await self.endereco_cmd_handler.commit()
+        uuid = results[0]['uuid']
         return uuid
 
     async def listar_pedidos_de_usuario(self) -> None:

@@ -4,18 +4,25 @@ import uuid
 from typing import List, Optional, Any, TypedDict, Sequence
 from asyncio import Lock
 from src.misc import ConsoleColors
+import enum
+
+
+class CommandTypes(enum.Enum):
+    save = 'save'
+    update = 'update'
+    delete = 'delete'
 
 
 class CommandDict(TypedDict):
     command: str
-    command_type: str
+    command_type: CommandTypes
     values: Sequence[Any]
     uuid: str
 
 
 class CommandResult(TypedDict):
     uuid: str
-    command_type: str
+    command_type: CommandTypes
 
 
 class Repository:
@@ -180,7 +187,7 @@ class Repository:
         cursor.close()
         return response
 
-    async def save(self, model: Any) -> str:
+    async def save(self, model: Any, uuid_str: Optional[str] = None) -> str:
         """Save a new row in the database table.
 
         Args:
@@ -191,7 +198,10 @@ class Repository:
             str: The UUID of the saved row.
         """
         kwargs = model.model_dump()  # type: ignore
-        kwargs["uuid"] = str(uuid.uuid1())
+        if uuid_str is None:
+            kwargs["uuid"] = str(uuid.uuid1())
+        else:
+            kwargs['uuid'] = uuid_str
 
         columns = list(kwargs.keys())
         values = list(kwargs.values())
@@ -371,12 +381,17 @@ class CommandHandler:
         self.tablename: str = model.__tablename__
         self.commands: List[CommandDict] = []
 
-    def save(self, data: Any) -> None:
+    def save(self, data: Any, uuid_str: Optional[str] = None) -> None:
 
-        def save_one(model):
+        def save_one(model: Any, uuid_str: Optional[str] = None):
 
             kwargs = model.model_dump()
-            kwargs["uuid"] = str(uuid.uuid1())
+
+            if uuid_str is None:
+                kwargs["uuid"] = str(uuid.uuid1())
+            else:
+                kwargs["uuid"] = uuid_str
+
             columns = list(kwargs.keys())
             values = list(kwargs.values())
             column_clause = ", ".join(columns)
@@ -387,16 +402,16 @@ class CommandHandler:
 
             self.commands.append({
                 'command': command,
-                'command_type': 'SAVE',
+                'command_type': CommandTypes.save,
                 'values': values,
                 'uuid': kwargs["uuid"]
             })
 
         if isinstance(data, list):
             for model in data:
-                save_one(model)
+                save_one(model, uuid_str)
         else:
-            save_one(data)
+            save_one(data, uuid_str)
 
     def update(self, item: Any, data: dict = {}) -> None:
 
@@ -412,7 +427,7 @@ class CommandHandler:
 
         self.commands.append({
             'command': command,
-            'command_type': 'UPDATE',
+            'command_type': CommandTypes.update,
             'values': values,
             'uuid': item.uuid
         })
@@ -423,7 +438,7 @@ class CommandHandler:
             command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
             self.commands.append({
                 'command': command,
-                'command_type': 'DELETE',
+                'command_type': CommandTypes.delete,
                 'values': [uuid],
                 'uuid': uuid
             })
@@ -439,7 +454,7 @@ class CommandHandler:
 
         self.commands.append({
             'command': command,
-            'command_type': 'DELETE',
+            'command_type': CommandTypes.delete,
             'values': [uuid],
             'uuid': uuid
         })

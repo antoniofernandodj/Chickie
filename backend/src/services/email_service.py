@@ -1,5 +1,4 @@
 import smtplib
-from src.lib.relatorios import render_report, render_template
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -22,6 +21,7 @@ class EmailService:
         tls: bool,
         ssl: bool,
     ):
+
         self.from_email = from_email
         self.sender_password = senha
         self.porta = porta
@@ -46,6 +46,12 @@ class EmailService:
 
         if self.tls:
             self.server.starttls()
+
+    def render_template(self, arg1, arg2, **kwargs):
+        raise
+
+    def render_report(self, **kwargs):
+        raise
 
     def set_subject(self, msg: MIMEMultipart, subject: str, to: str):
         msg.set_charset("utf-8")
@@ -78,8 +84,10 @@ class EmailService:
         msg = MIMEMultipart("alternative")
         msg = self.set_subject(msg=msg, subject=subject, to=to)
 
-        html = render_template(
-            template_name=template_name, dir="email", **contexto
+        html = self.render_template(
+            template_name=template_name,
+            dir="email",
+            **contexto
         )
         part1 = MIMEText(subject, "plain")
         part2 = MIMEText(html, "html")
@@ -111,9 +119,15 @@ class EmailService:
         msg = MIMEMultipart("mixed")
         msg = self.set_subject(msg=msg, subject=subject, to=to)
 
-        html = render_template(template_name=template, dir="email", **contexto)
-        pdf_bytes = render_report(
-            template_name=anexo_template, contexto=contexto, path="email"
+        html = self.render_template(
+            template_name=template,
+            dir="email", **contexto
+        )
+
+        pdf_bytes = self.render_report(
+            template_name=anexo_template,
+            contexto=contexto,
+            path="email"
         )
 
         corpo = MIMEText(html, "html")

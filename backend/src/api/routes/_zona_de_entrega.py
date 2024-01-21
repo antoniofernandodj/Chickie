@@ -8,7 +8,7 @@ from fastapi import (  # noqa
 )
 from src.misc import Paginador  # noqa
 from src.domain.models import ZonaDeEntrega
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.dependencies import ConnectionDependency
 
 
@@ -45,8 +45,20 @@ async def cadastrar_zonas_de_entrega(
 ):
 
     repository = Repository(ZonaDeEntrega, connection)
+
+    query = await repository.find_one(
+        cidade=zona_de_entrega.cidade,
+        uf=zona_de_entrega.uf,
+        bairro=zona_de_entrega.bairro
+    )
+    if query:
+        raise Exception
+
+    command_handler = CommandHandler(ZonaDeEntrega, connection)
     try:
-        uuid = await repository.save(zona_de_entrega)
+        command_handler.save(zona_de_entrega)
+        results = await command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

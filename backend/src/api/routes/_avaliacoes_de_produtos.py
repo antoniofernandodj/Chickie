@@ -1,5 +1,5 @@
 from typing import Annotated, List, Dict, Optional
-from src.infra.database_postgres.repository import Repository
+from src.infra.database_postgres.repository import Repository, CommandHandler
 from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
@@ -55,9 +55,11 @@ async def cadastrar_avaliacoes(
     avaliacao: AvaliacaoDeProduto
 ) -> Dict[str, str]:
 
-    repository = Repository(AvaliacaoDeProduto, connection)
+    command_handler = CommandHandler(AvaliacaoDeProduto, connection)
     try:
-        uuid = await repository.save(avaliacao)
+        command_handler.save(avaliacao)
+        results = await command_handler.commit()
+        uuid = results[0]["uuid"]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

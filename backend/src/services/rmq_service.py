@@ -2,7 +2,7 @@ from config import settings as s
 from typing import Callable
 from typing import Any
 import asyncio
-import aioamqp
+import aioamqp  # type: ignore
 import pickle
 
 
