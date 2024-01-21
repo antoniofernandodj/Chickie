@@ -1,9 +1,21 @@
 from aiopg import Connection
 import logging
-from uuid import uuid4
-from typing import List, Optional, Any
+import uuid
+from typing import List, Optional, Any, TypedDict, Sequence
 from asyncio import Lock
 from src.misc import ConsoleColors
+
+
+class CommandDict(TypedDict):
+    command: str
+    command_type: str
+    values: Sequence[Any]
+    uuid: str
+
+
+class CommandResult(TypedDict):
+    uuid: str
+    command_type: str
 
 
 class Repository:
@@ -179,7 +191,7 @@ class Repository:
             str: The UUID of the saved row.
         """
         kwargs = model.model_dump()  # type: ignore
-        kwargs["uuid"] = str(uuid4())
+        kwargs["uuid"] = str(uuid.uuid1())
 
         columns = list(kwargs.keys())
         values = list(kwargs.values())
@@ -347,3 +359,112 @@ class Repository:
 
         cursor.close()
         return response_dicts
+
+
+class CommandHandler:
+
+    def __init__(self, model: Any, connection: Connection):
+
+        self.lock = Lock()
+        self.model = model
+        self.connection = connection
+        self.tablename: str = model.__tablename__
+        self.commands: List[CommandDict] = []
+
+    def save(self, data: Any) -> None:
+
+        def save_one(model):
+
+            kwargs = model.model_dump()
+            kwargs["uuid"] = str(uuid.uuid1())
+            columns = list(kwargs.keys())
+            values = list(kwargs.values())
+            column_clause = ", ".join(columns)
+            value_placeholder = ", ".join(["%s"] * len(columns))
+            command = "INSERT INTO {} ({}) VALUES ({})".format(
+                self.tablename, column_clause, value_placeholder
+            )
+
+            self.commands.append({
+                'command': command,
+                'command_type': 'SAVE',
+                'values': values,
+                'uuid': kwargs["uuid"]
+            })
+
+        if isinstance(data, list):
+            for model in data:
+                save_one(model)
+        else:
+            save_one(data)
+
+    def update(self, item: Any, data: dict = {}) -> None:
+
+        values = list(data.values())
+
+        set_clause = ", ".join(
+            [f"{column} = %s" for column in data.keys()]
+        )
+
+        command = "UPDATE {} SET {} WHERE uuid = '{}';".format(
+            self.tablename, set_clause, item.uuid
+        )
+
+        self.commands.append({
+            'command': command,
+            'command_type': 'UPDATE',
+            'values': values,
+            'uuid': item.uuid
+        })
+
+    def delete(self, data: Any) -> None:
+        def delete_one(item):
+            uuid = item.uuid
+            command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
+            self.commands.append({
+                'command': command,
+                'command_type': 'DELETE',
+                'values': [uuid],
+                'uuid': uuid
+            })
+
+        if isinstance(data, list):
+            for item in data:
+                delete_one(item)
+        else:
+            delete_one(data)
+
+    def delete_from_uuid(self, uuid) -> None:
+        command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
+
+        self.commands.append({
+            'command': command,
+            'command_type': 'DELETE',
+            'values': [uuid],
+            'uuid': uuid
+        })
+
+    async def commit(self) -> List[CommandResult]:
+        results: List[CommandResult] = []
+        try:
+            async with self.lock:
+                async with self.connection.cursor() as cursor:
+                    async with cursor.begin():
+
+                        for command_dict in self.commands:
+
+                            uuid = command_dict['uuid']
+                            command = command_dict["command"]
+                            values = command_dict["values"]
+                            command_type = command_dict['command_type']
+
+                            await cursor.execute(command, values)
+
+                            results.append({
+                                'command_type': command_type,
+                                'uuid': uuid
+                            })
+
+                        return results
+        finally:
+            self.commands = []
