@@ -1,4 +1,4 @@
-from uuid import uuid4
+import uuid
 from typing import List, Optional, Any
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticCursor
@@ -117,7 +117,7 @@ class Repository:
         else:
             kwargs = model.model_dump()  # Convert Pydantic model
 
-        kwargs["_id"] = str(uuid4())
+        kwargs["_id"] = str(uuid.uuid1())
         result: InsertOneResult = await self.collection.insert_one(kwargs)
         return result.inserted_id
 
