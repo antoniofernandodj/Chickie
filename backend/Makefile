@@ -4,3 +4,7 @@ reset_schema:
 
 dev:
 	poetry run uvicorn asgi:app --reload --host 0.0.0.0 --port 8010
+
+build:
+	docker build -t antoniofernandodj/chickie:${v} -f ./dockerfiles/api.dockerfile .
+	docker push antoniofernandodj/chickie:${v}
