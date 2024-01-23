@@ -6,5 +6,5 @@ tests/
 .vscode
 alembic.ini
 migrations/
-init_database.py
-.venv/
+scripts/
+# .venv/

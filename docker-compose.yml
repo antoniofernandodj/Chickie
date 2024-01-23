@@ -9,14 +9,17 @@ services:
 
   api-dev:
     container_name: api-dev
+    build:
+      context: backend
+      dockerfile: dockerfiles/Dockerfile.dev
     ports:
-      - "8000:8000"
+      - "8010:8010"
     volumes:
       - ./backend/src:/usr/app/src
     command: bash -c "
       uvicorn asgi:app \
         --host 0.0.0.0 \
-        --port 8000 \
+        --port 8010 \
         --reload"
     restart: "on-failure"
     env_file:
@@ -24,15 +27,23 @@ services:
     environment:
       CHICKIE_MYENV: prod
       APP_VERSION: "dev"
-    image: antoniofernandodj/chickie:dev
 
-  client-angular:
+  # client-angular-prod:
+  #   build:
+  #     context: frontend-angular
+  #     dockerfile: dockerfiles/Dockerfile.prod
+  #   volumes:
+  #     - ./frontend-angular/:/usr/app/
+  #   ports:
+  #     - "4200:4200"
+  #     - "80:80"
+
+  client-angular-dev:
     build:
       context: frontend-angular
-      dockerfile: dockerfiles/client.dockerfile
+      dockerfile: dockerfiles/Dockerfile.dev
     volumes:
-      - ./frontend-angular/src:/usr/app/src
+      - ./frontend-angular/:/usr/app/
     ports:
       - "4200:4200"
-      - "80:80"
-  
+
