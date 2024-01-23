@@ -80,20 +80,30 @@
       <input type="password" [(ngModel)]="senha2Value">
     </div>
 
-    <div>
-      <button (click)="doSignUp($event)">Cadastrar</button>
-    </div>
-
     <form [formGroup]="imageForm">
-      <input type="file" (change)="onFileSelected($event)" accept="image/*">
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="image/*">
     </form>
 
     <div>
       @if (selectedImage) {
         <hr>
         <p>Imagem Selecionada</p>
-        <img [src]="selectedImage" alt="Imagem selecionada">
+        <img
+          [src]="selectedImage"
+          alt="Imagem selecionada"
+          [width]="500">
       }
     </div>
+
+    <hr>
+    <hr>
+
+    <div>
+      <button (click)="doSignUp($event)">Cadastrar</button>
+    </div>
+
 
 </div>

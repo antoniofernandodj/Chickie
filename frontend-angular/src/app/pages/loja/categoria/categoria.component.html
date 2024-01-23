@@ -5,17 +5,6 @@
 
 <div>
 
-  Descricao
-  <input
-    type="text"
-    name="descricao"
-    id="descricao-input"
-    (keyup.enter)="cadastrarProduto($event)"
-    [(ngModel)]="descricaoValue"
-  />
-
-  <br />
-
   Nome
   <input
     type="text"
@@ -27,7 +16,18 @@
 
   <br />
 
-  preco
+  Descrição
+  <input
+    type="text"
+    name="descricao"
+    id="descricao-input"
+    (keyup.enter)="cadastrarProduto($event)"
+    [(ngModel)]="descricaoValue"
+  />
+
+  <br />
+
+  Preço
   <input
     type="number"
     name="preco"
@@ -38,7 +38,7 @@
 
   <br />
 
-  imagem
+  Imagem
   <input
     type="file"
     name="image"
