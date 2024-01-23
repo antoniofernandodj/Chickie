@@ -121,7 +121,7 @@ class LojaService(BaseService):
         return loja_data
 
     async def registrar(self, loja_data: LojaSignUp) -> Loja:
-        from src.api.security import HashService
+        from src.api.security.hash_service import HashService
         from src.services import ImageUploadService
 
         valid = self.validate_password(loja_data.password)
