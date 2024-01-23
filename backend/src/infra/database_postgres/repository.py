@@ -1,7 +1,8 @@
 from aiopg import Connection
 import logging
 import uuid
-from typing import List, Optional, Any, TypedDict, Sequence
+from typing import List, Optional, Any, Sequence
+from pydantic import BaseModel
 from asyncio import Lock
 from src.misc import ConsoleColors
 import enum
@@ -20,7 +21,7 @@ class CommandTypes(enum.Enum):
     delete = 'delete'
 
 
-class CommandDict(TypedDict):
+class CommandGroup(BaseModel):
     """Type definition for a dictionary representing a command.
 
     Attributes:
@@ -35,7 +36,7 @@ class CommandDict(TypedDict):
     uuid: str
 
 
-class CommandResult(TypedDict):
+class CommandResult(BaseModel):
     """Type definition for a dictionary representing a command result.
 
     Attributes:
@@ -309,7 +310,7 @@ class CommandHandler:
         self.model = model
         self.connection = connection
         self.tablename: str = model.__tablename__
-        self.commands: List[CommandDict] = []
+        self.commands: List[CommandGroup] = []
 
     def save(self, data: Any, uuid_str: Optional[str] = None) -> None:
         """Prepares a 'save' command to insert data into the database.
@@ -336,12 +337,12 @@ class CommandHandler:
                 self.tablename, column_clause, value_placeholder
             )
 
-            self.commands.append({
-                'command': command,
-                'command_type': CommandTypes.save,
-                'values': values,
-                'uuid': kwargs["uuid"]
-            })
+            self.commands.append(CommandGroup(
+                command=command,
+                command_type=CommandTypes.save,
+                values=values,
+                uuid=kwargs["uuid"]
+            ))
 
         if isinstance(data, list):
             for model in data:
@@ -366,12 +367,12 @@ class CommandHandler:
             self.tablename, set_clause, item.uuid
         )
 
-        self.commands.append({
-            'command': command,
-            'command_type': CommandTypes.update,
-            'values': values,
-            'uuid': item.uuid
-        })
+        self.commands.append(CommandGroup(
+            command=command,
+            command_type=CommandTypes.update,
+            values=values,
+            uuid=item.uuid
+        ))
 
     def delete(self, data: Any) -> None:
         """Prepares a 'delete' command to remove data from the database.
@@ -384,12 +385,12 @@ class CommandHandler:
         def delete_one(item):
             uuid = item.uuid
             command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
-            self.commands.append({
-                'command': command,
-                'command_type': CommandTypes.delete,
-                'values': [uuid],
-                'uuid': uuid
-            })
+            self.commands.append(CommandGroup(
+                command=command,
+                command_type=CommandTypes.delete,
+                values=[uuid],
+                uuid=uuid
+            ))
 
         if isinstance(data, list):
             for item in data:
@@ -407,12 +408,12 @@ class CommandHandler:
 
         command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
 
-        self.commands.append({
-            'command': command,
-            'command_type': CommandTypes.delete,
-            'values': [uuid],
-            'uuid': uuid
-        })
+        self.commands.append(CommandGroup(
+            command=command,
+            command_type=CommandTypes.delete,
+            values=[uuid],
+            uuid=uuid
+        ))
 
     async def commit(self) -> List[CommandResult]:
         """Executes all pending database commands and commits the transaction.
@@ -430,17 +431,17 @@ class CommandHandler:
 
                         for command_dict in self.commands:
 
-                            uuid = command_dict['uuid']
-                            command = command_dict["command"]
-                            values = command_dict["values"]
-                            command_type = command_dict['command_type']
+                            uuid = command_dict.uuid
+                            command = command_dict.command
+                            values = command_dict.values
+                            command_type = command_dict.command_type
 
                             await cursor.execute(command, values)
 
-                            results.append({
-                                'command_type': command_type,
-                                'uuid': uuid
-                            })
+                            results.append(CommandResult(
+                                command_type=command_type,
+                                uuid=uuid
+                            ))
 
                         return results
         finally:

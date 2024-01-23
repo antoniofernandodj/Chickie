@@ -64,9 +64,9 @@ async def requisitar_loja(
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
 ) -> LojaGET:
 
-    repository = QueryHandler(Loja, connection=connection)
+    loja_query_handler = QueryHandler(Loja, connection=connection)
 
-    loja: Optional[Loja] = await repository.find_one(uuid=uuid)
+    loja: Optional[Loja] = await loja_query_handler.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
 
@@ -84,9 +84,9 @@ async def requisitar_lojas(
     offset: int = Query(1),
 ) -> Lojas:
 
-    repository = QueryHandler(Loja, connection=connection)
+    loja_query_handler = QueryHandler(Loja, connection=connection)
     result: List[LojaGET] = []
-    lojas: List[Loja] = await repository.find_all()
+    lojas: List[Loja] = await loja_query_handler.find_all()
     for loja in lojas:
         loja_data = await service.get_data(loja)
         result.append(loja_data)
@@ -180,9 +180,9 @@ async def requisitar_produtos_de_loja(
     offset: int = Query(1),
 ) -> Produtos:
 
-    loja_repository = QueryHandler(Loja, connection=connection)
-    produto_repository = QueryHandler(Produto, connection=connection)
-    loja: Optional[Loja] = await loja_repository.find_one(
+    loja_query_handler = QueryHandler(Loja, connection=connection)
+    produto_query_handler = QueryHandler(Produto, connection=connection)
+    loja: Optional[Loja] = await loja_query_handler.find_one(
         uuid=loja_uuid
     )
     if loja is None:
@@ -194,7 +194,7 @@ async def requisitar_produtos_de_loja(
         kwargs["categoria_uuid"] = categoria_uuid
 
     response = []
-    produtos: List[Produto] = await produto_repository.find_all(**kwargs)
+    produtos: List[Produto] = await produto_query_handler.find_all(**kwargs)
     for produto in produtos:
         precos = await produto_service.get_precos(produto)
         try:
@@ -286,12 +286,15 @@ async def ativar_inativar_loja(
     ativar: bool
 ) -> Any:
 
-    loja_repository = QueryHandler(Loja, connection)
-    loja: Optional[Loja] = await loja_repository.find_one(uuid=uuid)
+    loja_query_handler = QueryHandler(Loja, connection)
+    loja_cmd_handler = CommandHandler(Loja, connection)
+
+    loja: Optional[Loja] = await loja_query_handler.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
 
-    await loja_repository.update(loja, {'ativo': ativar})
+    loja_cmd_handler.update(loja, {'ativo': ativar})
+    await loja_cmd_handler.commit()
 
     status_msg = "ativada" if ativar is True else "inativada"
     return {"message": f"Loja {status_msg} com sucesso!"}
@@ -331,7 +334,7 @@ async def cadastrar_cliente(
 
     results = await cliente_command_handler.commit()
 
-    cliente_uuid = results[0]["uuid"]
+    cliente_uuid = results[0].uuid
 
     return {"uuid": cliente_uuid}
 
@@ -370,7 +373,7 @@ async def cadastrar_cliente_v2(
 
     cliente_command_handler.save(cliente)
     results = await cliente_command_handler.commit()
-    cliente_uuid = results[0]["uuid"]
+    cliente_uuid = results[0].uuid
 
     return {
         "usuario_uuid": usuario_cadastrado.uuid,
@@ -404,15 +407,18 @@ async def buscar_clientes(
 ) -> List[UsuarioGET]:
 
     response: List[UsuarioGET] = []
-    cliente_repository = QueryHandler(Cliente, connection=connection)
-    user_repository = QueryHandler(Usuario, connection=connection)
-    endereco_repository = QueryHandler(EnderecoUsuario, connection=connection)
+
+    cliente_query_handler = QueryHandler(Cliente, connection=connection)
+    user_query_handler = QueryHandler(Usuario, connection=connection)
+    endereco_query_handler = QueryHandler(
+        EnderecoUsuario, connection=connection
+    )
 
     clientes: List[Cliente]
-    clientes = await cliente_repository.find_all(loja_uuid=loja.uuid)
+    clientes = await cliente_query_handler.find_all(loja_uuid=loja.uuid)
     for cliente in clientes:
         cliente_usuario: Optional[Usuario]
-        cliente_usuario = await user_repository.find_one(
+        cliente_usuario = await user_query_handler.find_one(
             uuid=cliente.usuario_uuid
         )
         if cliente_usuario is None:
@@ -421,7 +427,7 @@ async def buscar_clientes(
         del cliente_usuario.password
         del cliente_usuario.password_hash
 
-        endereco = await endereco_repository.find_one(
+        endereco = await endereco_query_handler.find_one(
             usuario_uuid=cliente_usuario.uuid
         )
         response_item = UsuarioGET(

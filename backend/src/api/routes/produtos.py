@@ -11,7 +11,6 @@ from fastapi import (  # noqa
     Response,
     Depends
 )
-from src.api.security import oauth2_scheme, AuthService
 from src.domain.services import ProdutoService
 from src.misc import Paginador  # noqa
 from src.services import (
@@ -25,7 +24,7 @@ from src.domain.models import (
     LojaUpdateImageCadastro,
     Produtos
 )
-from src.dependencies import ConnectionDependency
+from src.dependencies import ConnectionDependency, CurrentLojaDependency
 
 
 router = APIRouter(prefix="/produtos", tags=["Produto"])
@@ -70,10 +69,9 @@ async def requisitar_produto(
 async def cadastrar_produto(
     connection: ConnectionDependency,
     produto_data: ProdutoPOST,
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> Dict[str, str]:
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
+    loja: CurrentLojaDependency,
+):
+
     service = ProdutoService(connection)
     try:
         response = await service.save_produto(produto_data)
@@ -95,12 +93,10 @@ async def cadastrar_produto(
 async def atualizar_produto_put(
     connection: ConnectionDependency,
     produto_data: ProdutoPUT,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
 ):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
     service = ProdutoService(connection)
     try:
         await service.atualizar_produto(
@@ -125,12 +121,10 @@ async def atualizar_produto_put(
 async def atualizar_imagem_de_produto(
     connection: ConnectionDependency,
     uuid: str,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     image: LojaUpdateImageCadastro,
 ) -> Dict[str, ImageUploadServiceResponse]:
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)
     service = ProdutoService(connection)
     produto = await service.get(uuid)
     if produto is None:
@@ -168,11 +162,9 @@ async def atualizar_imagem_de_produto(
 async def remover_imagem_de_produto(
     connection: ConnectionDependency,
     uuid: str,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
 ):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)
     service = ProdutoService(connection)
     produto = await service.get(uuid)
     if produto is None:
@@ -195,12 +187,10 @@ async def remover_imagem_de_produto(
 @router.delete("/{uuid}")
 async def remover_produto(
     connection: ConnectionDependency,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
 ):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
     service = ProdutoService(connection)
     try:
         await service.remove_produto(uuid=uuid)

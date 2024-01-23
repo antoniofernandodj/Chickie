@@ -11,12 +11,12 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Depends
+    Depends,
+    Response
 )
-from src.api.security import oauth2_scheme, AuthService
 from src.domain.models import Preco
 from src.misc import Paginador  # noqa
-from src.dependencies import ConnectionDependency
+from src.dependencies import ConnectionDependency, LojaServiceDependency
 
 
 router = APIRouter(prefix="/precos", tags=["Preços"])
@@ -30,12 +30,12 @@ async def requisitar_precos(
     offset: int = Query(1),
 ) -> List[Preco]:
 
-    repository = QueryHandler(Preco, connection)
+    query_handler = QueryHandler(Preco, connection)
     kwargs = {}
     if produto_uuid is not None:
         kwargs["produto_uuid"] = produto_uuid
 
-    results: List[Preco] = await repository.find_all(**kwargs)
+    results: List[Preco] = await query_handler.find_all(**kwargs)
 
     return results
 
@@ -46,8 +46,8 @@ async def requisitar_preco(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer get")]
 ) -> Preco:
 
-    repository = QueryHandler(Preco, connection)
-    result: Optional[Preco] = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Preco, connection)
+    result: Optional[Preco] = await query_handler.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Preço não encontrado")
 
@@ -58,16 +58,13 @@ async def requisitar_preco(
 async def cadastrar_precos(
     connection: ConnectionDependency,
     preco: Preco,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: LojaServiceDependency,
 ) -> Dict[str, str]:
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
-
-    repository = QueryHandler(Preco, connection)
+    query_handler = QueryHandler(Preco, connection)
     command_handler = CommandHandler(Preco, connection)
 
-    query = await repository.find_one(
+    query = await query_handler.find_one(
         dia_da_semana=preco.dia_da_semana,
         produto_uuid=preco.produto_uuid
     )
@@ -77,7 +74,7 @@ async def cadastrar_precos(
     try:
         command_handler.save(preco)
         results = await command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -87,12 +84,10 @@ async def cadastrar_precos(
 @router.patch("/{uuid}")
 async def atualizar_preco_patch(
     connection: ConnectionDependency,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: LojaServiceDependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
 ):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
     return {}
 
 
@@ -100,38 +95,34 @@ async def atualizar_preco_patch(
 async def atualizar_preco_put(
     connection: ConnectionDependency,
     itemData: Preco,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: LojaServiceDependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer put")]
-) -> Dict[str, int]:
+):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Preco, connection)
-    preco = await repository.find_one(uuid=uuid)
+    preco_query_handler = QueryHandler(Preco, connection)
+    preco_cmd_handler = CommandHandler(Preco, connection)
+    preco = await preco_query_handler.find_one(uuid=uuid)
     if preco is None:
         raise NotFoundException("Preço não encontrado")
 
-    num_rows_affected = await repository.update(
-        preco, itemData.model_dump()  # type: ignore
-    )
+    preco_cmd_handler.update(preco, itemData.model_dump())
+    await preco_cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
 async def remover_preco(
     connection: ConnectionDependency,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: LojaServiceDependency,
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
-) -> Dict[str, int]:
+):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Preco, connection)
-
+    preco_cmd_handler = CommandHandler(Preco, connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        preco_cmd_handler.delete_from_uuid(uuid=uuid)
+        await preco_cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

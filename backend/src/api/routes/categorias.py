@@ -12,12 +12,11 @@ from fastapi import (  # noqa
     Query,
     Request,
     Depends,
-    Query
+    Response
 )
-from src.api.security import oauth2_scheme, AuthService
 from src.domain.models import CategoriaProdutos, CategoriasProdutos
 from src.misc import Paginador  # noqa
-from src.dependencies import ConnectionDependency
+from src.dependencies import ConnectionDependency, CurrentLojaDependency
 
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
@@ -32,7 +31,7 @@ async def requisitar_categorias(
     offset: int = Query(1),
 ) -> CategoriasProdutos:
 
-    repository = QueryHandler(CategoriaProdutos, connection)
+    categorias_query_handler = QueryHandler(CategoriaProdutos, connection)
 
     kwargs = {}
     if nome is not None:
@@ -40,7 +39,9 @@ async def requisitar_categorias(
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results: List[CategoriaProdutos] = await repository.find_all(**kwargs)
+    results: List[CategoriaProdutos] = (
+        await categorias_query_handler.find_all(**kwargs)
+    )
     paginate = Paginador(results, offset, limit)
 
     return CategoriasProdutos(**paginate.get_response())
@@ -53,12 +54,14 @@ async def requisitar_categoria(
     nome: Optional[str] = Query(None)
 ) -> CategoriaProdutos:
 
-    repository = QueryHandler(CategoriaProdutos, connection)
+    categorias_query_handler = QueryHandler(CategoriaProdutos, connection)
     kwargs = {}
     if nome is not None:
         kwargs["nome"] = nome
 
-    result: Optional[CategoriaProdutos] = await repository.find_one(uuid=uuid)
+    result: Optional[CategoriaProdutos] = (
+        await categorias_query_handler.find_one(uuid=uuid)
+    )
     if result is None:
         raise NotFoundException("Categoria não encontrada")
 
@@ -69,14 +72,11 @@ async def requisitar_categoria(
 async def cadastrar_categorias(
     connection: ConnectionDependency,
     categoria: CategoriaProdutos,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
 ) -> Dict[str, str]:
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
-
-    repository = QueryHandler(CategoriaProdutos, connection)
-    query = await repository.find_one(nome=categoria.nome)
+    categorias_query_handler = QueryHandler(CategoriaProdutos, connection)
+    query = await categorias_query_handler.find_one(nome=categoria.nome)
     if query:
         raise ConflictException('Categoria já cadastrada!')
 
@@ -84,7 +84,7 @@ async def cadastrar_categorias(
     try:
         command_handler.save(categoria)
         results = await command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -94,53 +94,51 @@ async def cadastrar_categorias(
 @router.patch("/{uuid}")
 async def atualizar_categoria_patch(
     connection: ConnectionDependency,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer patch")],
 ):
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
+
     return {}
 
 
 @router.put("/{uuid}")
 async def atualizar_categoria_put(
     connection: ConnectionDependency,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     itemData: CategoriaProdutos,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer put")],
-) -> Dict[str, int]:
+):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
-
-    repository = QueryHandler(CategoriaProdutos, connection)
+    categorias_query_handler = QueryHandler(CategoriaProdutos, connection)
+    categorias_cmd_handler = CommandHandler(CategoriaProdutos, connection)
     try:
-        categoria = await repository.find_one(uuid=uuid)
+        categoria = await categorias_query_handler.find_one(uuid=uuid)
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
     if categoria is None:
         raise NotFoundException("Categoria não encontrada")
 
-    num_rows_affected = await repository.update(
+    categorias_cmd_handler.update(
         categoria, itemData.model_dump()  # type: ignore
     )
+    await categorias_cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
 async def remover_categoria(
     connection: ConnectionDependency,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    loja: CurrentLojaDependency,
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
-) -> Dict[str, int]:
+):
 
-    auth_service = AuthService(connection)
-    loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(CategoriaProdutos, connection)
+    categorias_cmd_handler = CommandHandler(CategoriaProdutos, connection)
+
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        categorias_cmd_handler.delete_from_uuid(uuid=uuid)
+        await categorias_cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

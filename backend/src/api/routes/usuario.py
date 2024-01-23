@@ -38,7 +38,7 @@ async def login_post(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Any:
 
-    endereco_repository = QueryHandler(Endereco, connection=connection)
+    endereco_query_handler = QueryHandler(Endereco, connection=connection)
     auth_service = AuthService(connection)
 
     user = await auth_service.authenticate_user(
@@ -49,7 +49,7 @@ async def login_post(
         raise UnauthorizedException("Credenciais Inválidas!")
 
     access_token = AuthService.create_access_token({"sub": user.username})
-    endereco: Optional[Endereco] = await endereco_repository.find_one(
+    endereco: Optional[Endereco] = await endereco_query_handler.find_one(
         usuario_uuid=user.uuid
     )
 
@@ -98,12 +98,13 @@ async def update_user(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    endereco_repository = QueryHandler(Endereco, connection)
+    endereco_query_handler = QueryHandler(Endereco, connection)
     endereco_command_handler = CommandHandler(Endereco, connection)
 
-    user_repository = QueryHandler(Endereco, connection)
+    user_query_handler = QueryHandler(Endereco, connection)
+    user_command_handler = CommandHandler(Endereco, connection)
 
-    usuario: Optional[Usuario] = await user_repository.find_one(uuid=uuid)
+    usuario: Optional[Usuario] = await user_query_handler.find_one(uuid=uuid)
     if usuario is None or usuario.uuid is None:
         raise NotFoundException('Usuario não encontrado')
 
@@ -123,9 +124,11 @@ async def update_user(
             password_hash=usuario.password_hash,
         )
 
-        success = await user_repository.update(
+        user_command_handler.update(
             usuario, usuario_updated_data
         )
+
+        await user_command_handler.commit()
 
         novo_endereco = Endereco(
             uf=user_data.uf,
@@ -136,7 +139,7 @@ async def update_user(
             complemento=user_data.complemento,
             usuario_uuid=usuario.uuid
         )
-        endereco: Optional[Endereco] = await endereco_repository.find_one(
+        endereco: Optional[Endereco] = await endereco_query_handler.find_one(
             usuario_uuid=usuario.uuid
         )
         if endereco:
@@ -147,8 +150,8 @@ async def update_user(
         endereco_uuid: Optional[str] = None
         results = await endereco_command_handler.commit()
         for result in results:
-            if result["command_type"] == CommandTypes.save:
-                endereco_uuid = result["uuid"]
+            if result.command_type == CommandTypes.save:
+                endereco_uuid = result.uuid
 
         if endereco_uuid is None:
             message = (
@@ -162,8 +165,7 @@ async def update_user(
         return {
             "message": message,
             "uuid": usuario.uuid,
-            'endereco_uuid': endereco_uuid,
-            "success": success
+            'endereco_uuid': endereco_uuid
         }
 
     except Exception as error:
@@ -188,7 +190,7 @@ async def seguir_loja(
         loja_uuid=follow_request_data.loja_uuid
     )
 
-    cliente_repository = QueryHandler(Cliente, connection=connection)
+    cliente_query_handler = QueryHandler(Cliente, connection=connection)
     cliente_cmd_handler = CommandHandler(Cliente, connection)
 
     if follow_request_data.follow:
@@ -196,20 +198,21 @@ async def seguir_loja(
 
         cliente_cmd_handler.save(cliente)
         results = await cliente_cmd_handler.commit()
-        result = results[0]["uuid"]
+        result = results[0].uuid
         return {"result": result, 'follow': follow_request_data.follow}
 
     else:
-        relationship: Optional[Cliente] = await cliente_repository.find_one(
+        relationship: Optional[Cliente] = await cliente_query_handler.find_one(
             usuario_uuid=follow_request_data.usuario_uuid,
             loja_uuid=follow_request_data.loja_uuid
         )
 
         if relationship:
-            result = await cliente_repository.delete(relationship)
-            return {'result': result, 'follow': follow_request_data.follow}
+            cliente_cmd_handler.delete(relationship)
+            await cliente_cmd_handler.commit()
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-    return {'result': None, 'follow': follow_request_data.follow}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/segue-loja/{uuid}")
@@ -227,13 +230,13 @@ async def segue_loja(
             detail='Usuario sem uuid'
         )
 
-    cliente_repository = QueryHandler(Cliente, connection=connection)
-    follows: Optional[Cliente] = await cliente_repository.find_one(
+    cliente_query_handler = QueryHandler(Cliente, connection=connection)
+    follows: Optional[Cliente] = await cliente_query_handler.find_one(
         usuario_uuid=current_user.uuid,
         loja_uuid=uuid
     )
     if follows:
-        return {'result': True}
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     else:
-        return {'result': False}
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
