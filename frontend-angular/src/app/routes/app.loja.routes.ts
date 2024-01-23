@@ -33,9 +33,6 @@ export const lojaRoutes: Routes = [
     component: PedidoComponent,
     canActivate: [companyAuthGuard] },
 
-  { path: 'signup/loja',
-    component: SignupLojaComponent },
-
   { path: 'loja/home',
     component: LojaHomeComponent,
     canActivate: [companyAuthGuard] },
@@ -60,7 +57,7 @@ export const lojaRoutes: Routes = [
     component: PedidosComponent,
     canActivate: [companyAuthGuard] },
 
-    { path: 'loja/historico',
+  { path: 'loja/historico',
     component: HistoricoComponent,
     canActivate: [companyAuthGuard] },
 
@@ -71,4 +68,7 @@ export const lojaRoutes: Routes = [
   { path: 'loja/clientes',
     component: ClientesComponent,
     canActivate: [companyAuthGuard] },
+
+  { path: 'signup/loja',
+    component: SignupLojaComponent },
 ];
