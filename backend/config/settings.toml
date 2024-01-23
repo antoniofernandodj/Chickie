@@ -1,6 +1,5 @@
 [default]
 CACHE_DEFAULT_TIMEOUT = 1800
-MODE = 'LOCAL'
 
 LOJA_NOME = "Loja Chickie"
 LOJA_USERNAME = "chickie"
@@ -10,9 +9,7 @@ LOJA_SENHA = "123123"
 LOJA_EMAIL = "loja@chickie.com"
 
 [dev]
-MODE = 'DEV'
 LOG_LEVEL = "DEBUG"
 
 [prod]
-MODE = 'PROD'
 LOG_LEVEL = "INFO"

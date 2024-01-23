@@ -4,7 +4,7 @@ RUN useradd -ms /bin/bash chickie
 
 RUN pip install --upgrade pip && pip install --upgrade setuptools
 
-WORKDIR /home/chickie/chickie
+WORKDIR /home/chickie/backend
 
 USER chickie
 
@@ -17,10 +17,10 @@ ENV PATH="/home/chickie/.local/bin:${PATH}"
 COPY ./config/.secrets.toml ./config/.secrets.toml
 COPY ./config/settings.toml ./config/settings.toml
 
-COPY . .    
+COPY . .
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONBREAKPOINT 0
 ENV TERM xterm-256color
 
-CMD [ "uvicorn", "asgi:app", "--reload", "--host", "0.0.0.0" ]
+CMD [ "uvicorn", "asgi:app", "--reload", "--reload-dir", "src", "--host", "0.0.0.0" ]

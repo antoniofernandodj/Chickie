@@ -10,7 +10,7 @@ settings_files = [s1, s2]
 
 settings = Dynaconf(
     envvar_prefix="CHICKIE",
-    # env_switcher='CHICKIE_ENV',
+    env_switcher='CHICKIE_ENV',
     environments=["local", "development", "production"],
     settings_files=settings_files,
 )
