@@ -35,7 +35,7 @@ def init_app(app: FastAPI):
             logging.warn('Connections cleaned.')
 
             app.state.connection_pool = await create_pool(
-                DSN, maxsize=2, minsize=2,
+                DSN, maxsize=5, minsize=5,
                 echo=True, on_connect=on_pool_connect
             )
         except Exception:
