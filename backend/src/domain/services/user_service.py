@@ -5,7 +5,7 @@ from src.domain.models import (
     EnderecoUsuario as Endereco
 )
 from aiopg import Connection
-from src.api.security import HashService
+from src.api.security.hash_service import HashService
 from src.exceptions import InvalidPasswordException
 from typing import Optional
 
