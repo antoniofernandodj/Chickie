@@ -7,7 +7,7 @@ parent = str(Path(os.path.dirname(__file__)).parent)
 
 sys.path.append(parent)
 
-from src.infra.database_postgres import DSN # noqa
+from src.infra.database_postgres import DSN  # type: ignore # noqa 
 
 
 async def remover_schema(schema: str) -> None:
