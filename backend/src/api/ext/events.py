@@ -1,5 +1,5 @@
 from config import settings as s  # noqa  # type: ignore
-from infra.database_postgres import DSN  # type: ignore
+from src.infra.database_postgres import DSN  # type: ignore
 from fastapi import FastAPI
 from aiopg import create_pool, Pool, Connection
 from src.misc import ConsoleColors as CC
