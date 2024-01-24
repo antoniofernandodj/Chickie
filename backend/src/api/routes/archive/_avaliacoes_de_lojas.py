@@ -6,6 +6,7 @@ from fastapi import (  # noqa
     status,
     Path,
     Request,
+    Response,
     Query
 )
 from src.domain.models import AvaliacaoDeLoja
@@ -24,8 +25,8 @@ async def requisitar_avaliacoes_loja(
     offset: int = Query(1),
 ):
 
-    repository = QueryHandler(AvaliacaoDeLoja, connection=connection)
-    results = await repository.find_all()
+    query_handler = QueryHandler(AvaliacaoDeLoja, connection=connection)
+    results = await query_handler.find_all()
 
     return results
 
@@ -36,8 +37,8 @@ async def requisitar_avaliacao_loja(
     uuid: Annotated[str, Path(title="O uuid da avaliação fazer get")]
 ):
 
-    repository = QueryHandler(AvaliacaoDeLoja, connection=connection)
-    result = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(AvaliacaoDeLoja, connection=connection)
+    result = await query_handler.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("avaliacoes_lojanão encontrado")
 
@@ -54,7 +55,7 @@ async def cadastrar_avaliacao_loja(
     try:
         command_handler.save(avaliacao)
         results = await command_handler.commit()
-        uuid = results[0]['uuid']
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -68,16 +69,18 @@ async def atualizar_avaliacao_loja_put(
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer put")],
 ):
 
-    repository = QueryHandler(AvaliacaoDeLoja, connection=connection)
-    avaliacao = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(AvaliacaoDeLoja, connection=connection)
+    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
+    avaliacao = await query_handler.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliacao de Loja não encontrada")
 
-    num_rows_affected = await repository.update(
+    command_handler.update(
         avaliacao, avaliacao_loja_data.model_dump()  # type: ignore
     )
+    await command_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -87,16 +90,18 @@ async def atualizar_avaliacoes_loja_patch(
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer patch")],
 ):
 
-    repository = QueryHandler(AvaliacaoDeLoja, connection=connection)
-    avaliacao = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(AvaliacaoDeLoja, connection=connection)
+    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
+    avaliacao = await query_handler.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação encontrada")
 
-    num_rows_affected = await repository.update(
+    command_handler.update(
         avaliacao, avaliacoes_loja_data.model_dump()  # type: ignore
     )
+    await command_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
@@ -105,10 +110,11 @@ async def remover_avaliacoes_loja(
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer delete")]
 ):
 
-    repository = QueryHandler(AvaliacaoDeLoja, connection=connection)
+    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        command_handler.delete_from_uuid(uuid=uuid)
+        await command_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

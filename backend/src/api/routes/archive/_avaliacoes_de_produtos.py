@@ -28,8 +28,8 @@ async def requisitar_avaliacoes(
     offset: int = Query(1),
 ) -> List[AvaliacaoDeProduto]:
 
-    repository = QueryHandler(AvaliacaoDeProduto, connection)
-    results: List[AvaliacaoDeProduto] = await repository.find_all()
+    query_handler = QueryHandler(AvaliacaoDeProduto, connection)
+    results: List[AvaliacaoDeProduto] = await query_handler.find_all()
 
     return results
 
@@ -40,9 +40,11 @@ async def requisitar_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer get")]
 ) -> AvaliacaoDeProduto:
 
-    repository = QueryHandler(AvaliacaoDeProduto, connection)
+    query_handler = QueryHandler(AvaliacaoDeProduto, connection)
 
-    result: Optional[AvaliacaoDeProduto] = await repository.find_one(uuid=uuid)
+    result: Optional[AvaliacaoDeProduto] = await query_handler.find_one(
+        uuid=uuid
+    )
     if result is None:
         raise NotFoundException("Avaliação não encontrada")
 
@@ -59,7 +61,7 @@ async def cadastrar_avaliacoes(
     try:
         command_handler.save(avaliacao)
         results = await command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -73,16 +75,18 @@ async def atualizar_avaliacao_put(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
 ) -> Dict[str, int]:
 
-    repository = QueryHandler(AvaliacaoDeProduto, connection)
-    avaliacao = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(AvaliacaoDeProduto, connection)
+    avaliacao = await query_handler.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
 
-    num_rows_affected = await repository.update(
+    cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
+    cmd_handler.update(
         avaliacao, avaliacaoData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.patch("/{uuid}")
@@ -92,17 +96,19 @@ async def atualizar_avaliacao_patch(
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
 ) -> Dict[str, int]:
 
-    repository = QueryHandler(AvaliacaoDeProduto, connection)
-    avaliacao = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(AvaliacaoDeProduto, connection)
+    avaliacao = await query_handler.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
 
-    num_rows_affected = await repository.update(
+    cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
+    cmd_handler.update(
         avaliacao,
         avaliacaoData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {'num_rows_affected': num_rows_affected}
+    return {}
 
 
 @router.delete("/{uuid}")
@@ -111,10 +117,11 @@ async def remover_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ) -> Dict[str, int]:
 
-    repository = QueryHandler(AvaliacaoDeProduto, connection)
+    cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return {}

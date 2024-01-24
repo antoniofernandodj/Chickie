@@ -29,12 +29,12 @@ async def requisitar_metodos_de_pagamento(
     offset: int = Query(1),
 ) -> List[MetodoDePagamento]:
 
-    repository = QueryHandler(MetodoDePagamento, connection=connection)
+    query_handler = QueryHandler(MetodoDePagamento, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results: List[MetodoDePagamento] = await repository.find_all(**kwargs)
+    results: List[MetodoDePagamento] = await query_handler.find_all(**kwargs)
 
     return results
 
@@ -47,8 +47,10 @@ async def requisitar_metodo_de_pagamento(
     ]
 ) -> MetodoDePagamento:
 
-    repository = QueryHandler(MetodoDePagamento, connection=connection)
-    result: Optional[MetodoDePagamento] = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(MetodoDePagamento, connection=connection)
+    result: Optional[MetodoDePagamento] = await query_handler.find_one(
+        uuid=uuid
+    )
     if result is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
 
@@ -65,8 +67,8 @@ async def cadastrar_metodos_de_pagamento(
     auth_service = AuthService(connection)
 
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(MetodoDePagamento, connection=connection)
-    query = await repository.find_one(nome=status.nome)
+    query_handler = QueryHandler(MetodoDePagamento, connection=connection)
+    query = await query_handler.find_one(nome=status.nome)
     if query:
         raise Exception
 
@@ -76,7 +78,7 @@ async def cadastrar_metodos_de_pagamento(
     try:
         metodo_pagamento_command_handler.save(metodo_de_pagamento)
         results = await metodo_pagamento_command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -95,19 +97,23 @@ async def atualizar_metodo_de_pagamento_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(MetodoDePagamento, connection=connection)
-    metodo_de_pagamento: Optional[MetodoDePagamento] = await repository \
-        .find_one(uuid=uuid)
+    query_handler = QueryHandler(MetodoDePagamento, connection=connection)
+    cmd_handler = CommandHandler(MetodoDePagamento, connection=connection)
+
+    metodo_de_pagamento: Optional[MetodoDePagamento] = (
+        await query_handler.find_one(uuid=uuid)
+    )
 
     if metodo_de_pagamento is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         metodo_de_pagamento,
         metodo_de_pagamento_data.model_dump(),
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.patch("/{uuid}")
@@ -122,19 +128,22 @@ async def atualizar_metodo_de_pagamento_patch(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(MetodoDePagamento, connection=connection)
-    metodo_de_pagamento: Optional[MetodoDePagamento] = await repository \
+    query_handler = QueryHandler(MetodoDePagamento, connection=connection)
+    cmd_handler = CommandHandler(MetodoDePagamento, connection=connection)
+
+    metodo_de_pagamento: Optional[MetodoDePagamento] = await query_handler \
         .find_one(uuid=uuid)
 
     if metodo_de_pagamento is None:
         raise NotFoundException("Metodo de pagamento não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         metodo_de_pagamento,
         metodo_de_pagamentoData.model_dump(),  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.delete("/{uuid}")
@@ -148,10 +157,11 @@ async def remover_metodo_de_pagamento(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(MetodoDePagamento, connection=connection)
+    cmd_handler = CommandHandler(MetodoDePagamento, connection=connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return {}

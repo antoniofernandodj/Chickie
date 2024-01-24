@@ -29,12 +29,12 @@ async def requisitar_funcionarios(
     offset: int = Query(1),
 ):
 
-    repository = QueryHandler(Funcionario, connection=connection)
+    query_handler = QueryHandler(Funcionario, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results = await repository.find_all(**kwargs)
+    results = await query_handler.find_all(**kwargs)
 
     return results
 
@@ -45,8 +45,8 @@ async def requisitar_funcionario(
     uuid: Annotated[str, Path(title="O uuid do funcionário a fazer get")]
 ):
 
-    repository = QueryHandler(Funcionario, connection=connection)
-    result = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Funcionario, connection=connection)
+    result = await query_handler.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Funcionario não encontrado")
 
@@ -62,12 +62,12 @@ async def cadastrar_funcionarios(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Funcionario, connection=connection)
+    query_handler = QueryHandler(Funcionario, connection=connection)
 
-    q1 = await repository.find_one(nome=funcionario.nome)
-    q2 = await repository.find_one(username=funcionario.username)
-    q3 = await repository.find_one(email=funcionario.email)
-    q4 = await repository.find_one(celular=funcionario.celular)
+    q1 = await query_handler.find_one(nome=funcionario.nome)
+    q2 = await query_handler.find_one(username=funcionario.username)
+    q3 = await query_handler.find_one(email=funcionario.email)
+    q4 = await query_handler.find_one(celular=funcionario.celular)
 
     if q1 or q2 or q3 or q4:
         raise Exception
@@ -76,7 +76,7 @@ async def cadastrar_funcionarios(
     try:
         command_handler.save(funcionario)
         results = await command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -93,16 +93,19 @@ async def atualizar_funcionario_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Funcionario, connection=connection)
-    funcionario = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Funcionario, connection=connection)
+    cmd_handler = CommandHandler(Funcionario, connection=connection)
+
+    funcionario = await query_handler.find_one(uuid=uuid)
     if funcionario is None:
         raise NotFoundException("Funcionario não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         funcionario, funcionarioData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.patch("/{uuid}")
@@ -115,17 +118,19 @@ async def atualizar_funcionario_patch(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Funcionario, connection=connection)
+    query_handler = QueryHandler(Funcionario, connection=connection)
+    cmd_handler = CommandHandler(Funcionario, connection=connection)
 
-    funcionario = await repository.find_one(uuid=uuid)
+    funcionario = await query_handler.find_one(uuid=uuid)
     if funcionario is None:
         raise NotFoundException("Funcionario não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         funcionario, funcionarioData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.delete("/{uuid}")
@@ -137,10 +142,11 @@ async def remover_funcionario(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Funcionario, connection=connection)
+    cmd_handler = CommandHandler(Funcionario, connection=connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return {}

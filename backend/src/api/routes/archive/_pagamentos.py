@@ -26,12 +26,12 @@ async def requisitar_pagamentos(
     offset: int = Query(1),
 ) -> List[Pagamento]:
 
-    repository = QueryHandler(Pagamento, connection=connection)
+    query_handler = QueryHandler(Pagamento, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results: List[Pagamento] = await repository.find_all(**kwargs)
+    results: List[Pagamento] = await query_handler.find_all(**kwargs)
 
     return results
 
@@ -42,8 +42,8 @@ async def requisitar_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer get")]
 ) -> Pagamento:
 
-    repository = QueryHandler(Pagamento, connection=connection)
-    result: Optional[Pagamento] = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Pagamento, connection=connection)
+    result: Optional[Pagamento] = await query_handler.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Pagamento não encontrado")
 
@@ -60,7 +60,7 @@ async def cadastrar_pagamentos(
     try:
         pagamentos_command_handler.save(pagamento)
         results = await pagamentos_command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -74,16 +74,19 @@ async def atualizar_pagamento_put(
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
 ) -> Dict[str, int]:
 
-    repository = QueryHandler(Pagamento, connection=connection)
-    pagamento = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Pagamento, connection=connection)
+    cmd_handler = CommandHandler(Pagamento, connection=connection)
+
+    pagamento = await query_handler.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         pagamento, pagamento_Data.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.patch("/{uuid}")
@@ -93,16 +96,18 @@ async def atualizar_pagamento_patch(
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
 ) -> Dict[str, int]:
 
-    repository = QueryHandler(Pagamento, connection=connection)
-    pagamento = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Pagamento, connection=connection)
+    cmd_handler = CommandHandler(Pagamento, connection=connection)
+    pagamento = await query_handler.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         pagamento, pagamentoData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.delete("/{uuid}")
@@ -111,11 +116,11 @@ async def remover_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ) -> Dict[str, int]:
 
-    repository = QueryHandler(Pagamento, connection=connection)
-
+    cmd_handler = CommandHandler(Pagamento, connection=connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return {}

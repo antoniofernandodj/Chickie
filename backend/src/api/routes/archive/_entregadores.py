@@ -28,12 +28,12 @@ async def requisitar_entregadores(
     offset: int = Query(1),
 ):
 
-    repository = QueryHandler(Entregador, connection=connection)
+    query_handler = QueryHandler(Entregador, connection=connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
 
-    results = await repository.find_all(**kwargs)
+    results = await query_handler.find_all(**kwargs)
 
     return results
 
@@ -44,8 +44,8 @@ async def requisitar_entregador(
     uuid: Annotated[str, Path(title="O uuid do entregador a fazer get")]
 ):
 
-    repository = QueryHandler(Entregador, connection=connection)
-    result = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Entregador, connection=connection)
+    result = await query_handler.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Entregador não encontrado")
 
@@ -83,16 +83,18 @@ async def atualizar_entregador_put(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Entregador, connection=connection)
-    entregador = await repository.find_one(uuid=uuid)
+    query_handler = QueryHandler(Entregador, connection=connection)
+    entregador = await query_handler.find_one(uuid=uuid)
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler = CommandHandler(Entregador, connection)
+    cmd_handler.update(
         entregador, entregadorData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.patch("/{uuid}")
@@ -105,17 +107,19 @@ async def atualizar_entregador_patch(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Entregador, connection=connection)
+    query_handler = QueryHandler(Entregador, connection=connection)
 
-    entregador = await repository.find_one(uuid=uuid)
+    cmd_handler = CommandHandler(Entregador, connection)
+    entregador = await query_handler.find_one(uuid=uuid)
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
 
-    num_rows_affected = await repository.update(
+    cmd_handler.update(
         entregador, entregadorData.model_dump()  # type: ignore
     )
+    await cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return {}
 
 
 @router.delete("/{uuid}")
@@ -127,10 +131,12 @@ async def remover_entregador(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    repository = QueryHandler(Entregador, connection=connection)
+
+    cmd_handler = CommandHandler(Entregador, connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return {}
