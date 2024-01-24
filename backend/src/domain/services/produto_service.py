@@ -221,7 +221,7 @@ class ProdutoService(BaseService):
         )
 
     async def atualizar_produto(self, uuid: str, produto_data: ProdutoPUT):
-        produto = await self.repo.find_one(uuid=uuid)
+        produto = await self.query_handler.find_one(uuid=uuid)
         if produto is None:
             raise ValueError("Produto não encontrado")
 

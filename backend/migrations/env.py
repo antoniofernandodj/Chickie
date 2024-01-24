@@ -1,32 +1,22 @@
+from alembic import context
+from src.infra.database_postgres.entities import Base
 from logging.config import fileConfig
 from config import settings
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from alembic import context
-
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
+MIGRATION_MODE = 'DEV'
+
+if MIGRATION_MODE == 'DEV':
+    from src.infra.database_postgres.config import engine_dev as engine
+elif MIGRATION_MODE == 'PROD':
+    from src.infra.database_postgres.config import engine_prod as engine
+else:
+    from src.infra.database_postgres.config import engine
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-from src.infra.database_postgres.entities import Base
-from src.infra.database_postgres.config import engine
 target_metadata = Base.metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:

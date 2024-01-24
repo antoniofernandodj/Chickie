@@ -26,7 +26,7 @@ class LojaService(BaseService):
     ):
         self.model = Loja
         self.connection = connection
-        self.repo = QueryHandler(
+        self.query_handler = QueryHandler(
             model=self.model, connection=self.connection
         )
         self.endereco_repo = QueryHandler(
@@ -39,14 +39,17 @@ class LojaService(BaseService):
             model=Usuario, connection=self.connection
         )
         self.cmd_handler = CommandHandler(
+            model=Loja, connection=self.connection
+        )
+        self.endereco_usuario_cmd_handler = CommandHandler(
             model=Usuario, connection=self.connection
         )
-        self.endereco_cmd_handler = CommandHandler(
-            model=Usuario, connection=self.connection
+        self.endereco_loja_cmd_handler = CommandHandler(
+            model=EnderecoLoja, connection=self.connection
         )
 
     async def update_loja_data(self, uuid: str, data: LojaPUT):
-        loja: Optional[Loja] = await self.repo.find_one(uuid=uuid)
+        loja: Optional[Loja] = await self.query_handler.find_one(uuid=uuid)
         if loja is None:
             raise ValueError('Loja não encontrada')
 
@@ -81,9 +84,12 @@ class LojaService(BaseService):
             cep=only_numbers(data.cep),
             complemento=data.complemento
         )
+        if endereco:
+            self.endereco_loja_cmd_handler.update(endereco, endereco_data)
+        else:
+            pass
 
-        self.endereco_cmd_handler.update(endereco, endereco_data)
-        await self.endereco_cmd_handler.commit()
+        await self.endereco_loja_cmd_handler.commit()
 
     async def get_data(self, loja: Loja):
 
@@ -126,14 +132,15 @@ class LojaService(BaseService):
         if not valid:
             raise InvalidPasswordException
 
-        q1 = await self.repo.find_one(username=loja_data.username)
-        q2 = await self.repo.find_one(email=loja_data.email)
+        q1 = await self.query_handler.find_one(username=loja_data.username)
+        q2 = await self.query_handler.find_one(email=loja_data.email)
 
         if q1 or q2:
             raise LojaJaCadastradaException
 
         def only_numbers(string: str) -> str:
             return ''.join([n for n in string if n.isdecimal()])
+
         loja = Loja(
             nome=loja_data.nome,
             username=loja_data.username,
@@ -163,8 +170,8 @@ class LojaService(BaseService):
             loja_uuid=loja.uuid
         )
 
-        self.endereco_cmd_handler.save(endereco)
-        await self.endereco_cmd_handler.commit()
+        self.endereco_loja_cmd_handler.save(endereco)
+        await self.endereco_loja_cmd_handler.commit()
 
         try:
             if loja_data.image_bytes and loja_data.image_filename:

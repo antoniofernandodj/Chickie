@@ -1,11 +1,19 @@
 from aiopg import Connection
 import logging
 import uuid
-from typing import List, Optional, Any, Sequence
+from typing import List, Optional, Any, Sequence, Protocol
 from pydantic import BaseModel
 from asyncio import Lock
 from src.misc import ConsoleColors
 import enum
+
+
+class Entity(Protocol):
+    uuid: str | None
+    __tablename__: str
+
+    def model_dump(self):
+        raise NotImplementedError
 
 
 class CommandTypes(enum.Enum):
@@ -312,7 +320,11 @@ class CommandHandler:
         self.tablename: str = model.__tablename__
         self.commands: List[CommandGroup] = []
 
-    def save(self, data: Any, uuid_str: Optional[str] = None) -> None:
+    def save(
+        self, data: Entity | List[Entity],
+        uuid_str: Optional[str] = None
+    ) -> None:
+
         """Prepares a 'save' command to insert data into the database.
 
         Args:
@@ -320,7 +332,7 @@ class CommandHandler:
             a list of instances.
             uuid_str: An optional UUID string to use for the record(s).
         """
-        def save_one(model: Any, uuid_str: Optional[str] = None):
+        def save_one(model: Entity, uuid_str: Optional[str] = None):
 
             kwargs = model.model_dump()
 
@@ -350,7 +362,11 @@ class CommandHandler:
         else:
             save_one(data, uuid_str)
 
-    def update(self, item: Any, data: dict = {}) -> None:
+    def update(
+        self, item: Entity,
+        data: dict = {}
+    ) -> None:
+
         """Prepares an 'update' command to update data in the database.
 
         Args:
@@ -367,6 +383,9 @@ class CommandHandler:
             self.tablename, set_clause, item.uuid
         )
 
+        if item.uuid is None:
+            raise
+
         self.commands.append(CommandGroup(
             command=command,
             command_type=CommandTypes.update,
@@ -374,7 +393,7 @@ class CommandHandler:
             uuid=item.uuid
         ))
 
-    def delete(self, data: Any) -> None:
+    def delete(self, data: Entity | List[Entity]) -> None:
         """Prepares a 'delete' command to remove data from the database.
 
         Args:
@@ -382,8 +401,11 @@ class CommandHandler:
             instance or a list of instances.
         """
 
-        def delete_one(item):
+        def delete_one(item: Entity):
             uuid = item.uuid
+            if uuid is None:
+                raise
+
             command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
             self.commands.append(CommandGroup(
                 command=command,
@@ -398,7 +420,7 @@ class CommandHandler:
         else:
             delete_one(data)
 
-    def delete_from_uuid(self, uuid) -> None:
+    def delete_from_uuid(self, uuid: str) -> None:
         """Prepares a 'delete' command to remove a record from the
         database by UUID.
 

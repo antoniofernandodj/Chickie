@@ -23,7 +23,6 @@ from src.domain.models import (
     EnderecoUsuario as Endereco,
     Usuario,
     Cliente,
-    ClientePOST,
     UserAuthData,
 )
 from src.dependencies import ConnectionDependency, UserServiceDependency
@@ -185,7 +184,7 @@ async def seguir_loja(
     result: str | int
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    cliente = ClientePOST(
+    cliente = Cliente(
         usuario_uuid=follow_request_data.usuario_uuid,
         loja_uuid=follow_request_data.loja_uuid
     )

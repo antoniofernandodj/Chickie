@@ -4,10 +4,10 @@ from typing import List, Any, Optional
 
 class BaseService:
 
-    repo: QueryHandler
+    query_handler: QueryHandler
 
     async def get(self, uuid: str) -> Optional[Any]:
-        return await self.repo.find_one(uuid=uuid)
+        return await self.query_handler.find_one(uuid=uuid)
 
     async def get_all(self, **kwargs) -> List[Any]:
-        return await self.repo.find_all(**kwargs)
+        return await self.query_handler.find_all(**kwargs)

@@ -4,9 +4,10 @@ from pathlib import Path
 
 PROJECT_PATH = str(Path(join(dirname(__file__))).parent.absolute())
 
-s1 = join(PROJECT_PATH, "config", "settings.toml")
-s2 = join(PROJECT_PATH, "config", ".secrets.toml")
-settings_files = [s1, s2]
+settings_files = [
+    join(PROJECT_PATH, "config", "settings.toml"),
+    join(PROJECT_PATH, "config", ".secrets.toml")
+]
 
 settings = Dynaconf(
     envvar_prefix="CHICKIE",

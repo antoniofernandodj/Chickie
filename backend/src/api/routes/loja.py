@@ -88,7 +88,11 @@ async def requisitar_lojas(
     result: List[LojaGET] = []
     lojas: List[Loja] = await loja_query_handler.find_all()
     for loja in lojas:
-        loja_data = await service.get_data(loja)
+        try:
+            loja_data = await service.get_data(loja)
+        except ValueError:  # endereço com defeito
+            continue
+
         result.append(loja_data)
 
     paginate = Paginador(result, offset, limit)
@@ -160,9 +164,13 @@ async def signup(
         )
 
     except LojaJaCadastradaException:
+        import traceback
+        traceback.print_exc()
         raise ConflictException(detail="Credenciais inválidas!")
 
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erro no cadastro da loja! detail: {error}"
