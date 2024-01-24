@@ -137,13 +137,13 @@ async def remover_pedido(
     connection: ConnectionDependency,
     token: Annotated[str, Depends(oauth2_scheme)],
     uuid: Annotated[str, Path(title="O uuid do pedido a fazer delete")]
-) -> Dict[str, int]:
+):
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     service = PedidoService(connection)
     try:
-        response = await service.remover_pedido(uuid=uuid)
-        return response
+        await service.remover_pedido(uuid=uuid)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))

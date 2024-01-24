@@ -1,5 +1,5 @@
 # from src.presenters import controllers
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.exceptions import (
     UnauthorizedException,
     NotFoundException,

@@ -12,7 +12,7 @@ from typing import Optional
 from src.domain.models import Entregador
 from src.exceptions import NotFoundException
 from src.api.security import AuthService
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 

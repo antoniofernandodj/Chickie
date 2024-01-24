@@ -13,7 +13,7 @@ from fastapi import (
 from src.misc import Paginador  # noqa
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from src.infra.database_postgres.repository import (
+from src.infra.database_postgres.handlers import (
     QueryHandler, CommandHandler, CommandTypes
 )
 from src.api.security import AuthService, oauth2_scheme

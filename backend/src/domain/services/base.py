@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import QueryHandler
+from src.infra.database_postgres.handlers import QueryHandler
 from typing import List, Any, Optional
 
 

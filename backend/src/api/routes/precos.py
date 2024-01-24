@@ -1,5 +1,5 @@
 from typing import Annotated, Optional, List, Dict
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.exceptions import (
     NotFoundException,
     ConflictException,
@@ -11,7 +11,6 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Depends,
     Response
 )
 from src.domain.models import Preco

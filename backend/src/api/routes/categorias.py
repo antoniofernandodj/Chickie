@@ -1,5 +1,5 @@
 from typing import Annotated, Optional, Dict, List
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.exceptions import (
     NotFoundException,
     ConflictException,
@@ -10,8 +10,6 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
-    Depends,
     Response
 )
 from src.domain.models import CategoriaProdutos, CategoriasProdutos

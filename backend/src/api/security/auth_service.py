@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
 from config import settings as s
-from src.infra.database_postgres.repository import QueryHandler
+from src.infra.database_postgres.handlers import QueryHandler
 from src.domain.models import Loja, Usuario
 from src.domain.services import LojaService
 from aiopg import Connection

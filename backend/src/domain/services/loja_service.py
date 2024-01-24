@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.domain.models import (
     Loja,
     LojaSignUp,
@@ -65,9 +65,8 @@ class LojaService(BaseService):
             horarios_de_funcionamento=data.horarios_de_funcionamento
         )
 
-        await self.repo.update(
-            loja, loja_data
-        )
+        self.cmd_handler.update(loja, loja_data)
+        await self.cmd_handler.commit()
 
         endereco = await self.endereco_repo.find_one(
             loja_uuid=loja.uuid
@@ -83,9 +82,8 @@ class LojaService(BaseService):
             complemento=data.complemento
         )
 
-        await self.endereco_repo.update(
-            endereco, endereco_data
-        )
+        self.endereco_cmd_handler.update(endereco, endereco_data)
+        await self.endereco_cmd_handler.commit()
 
     async def get_data(self, loja: Loja):
 
@@ -152,7 +150,7 @@ class LojaService(BaseService):
         self.cmd_handler.save(loja)
         results = await self.cmd_handler.commit()
 
-        loja.uuid = results[0]['uuid']
+        loja.uuid = results[0].uuid
 
         endereco = EnderecoLoja(
             uf=loja_data.uf,

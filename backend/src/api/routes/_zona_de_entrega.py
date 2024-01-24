@@ -3,12 +3,13 @@ from src.exceptions import NotFoundException
 from fastapi import (  # noqa
     APIRouter,
     HTTPException,
+    Response,
     status,
     Path
 )
 from src.misc import Paginador  # noqa
 from src.domain.models import ZonaDeEntrega
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.dependencies import ConnectionDependency
 
 
@@ -18,8 +19,8 @@ router = APIRouter(prefix="/zonas-de-entrega", tags=["Zonas de entrega"])
 @router.get("/")
 async def requisitar_zonas_de_entrega(connection: ConnectionDependency):
 
-    repository = QueryHandler(ZonaDeEntrega, connection)
-    results = await repository.find_all()
+    zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
+    results = await zonas_query_handler.find_all()
 
     return results
 
@@ -30,8 +31,8 @@ async def requisitar_zona_de_entrega(
     uuid: Annotated[str, Path(title="O uuid da zona de entrega a fazer get")]
 ):
 
-    repository = QueryHandler(ZonaDeEntrega, connection)
-    result = await repository.find_one(uuid=uuid)
+    zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
+    result = await zonas_query_handler.find_one(uuid=uuid)
     if result is None:
         raise NotFoundException("Zona de entrega não encontrada")
 
@@ -44,9 +45,9 @@ async def cadastrar_zonas_de_entrega(
     zona_de_entrega: ZonaDeEntrega
 ):
 
-    repository = QueryHandler(ZonaDeEntrega, connection)
+    zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
 
-    query = await repository.find_one(
+    query = await zonas_query_handler.find_one(
         cidade=zona_de_entrega.cidade,
         uf=zona_de_entrega.uf,
         bairro=zona_de_entrega.bairro
@@ -58,7 +59,7 @@ async def cadastrar_zonas_de_entrega(
     try:
         command_handler.save(zona_de_entrega)
         results = await command_handler.commit()
-        uuid = results[0]["uuid"]
+        uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
@@ -74,16 +75,19 @@ async def atualizar_zona_de_entrega_put(
     ],
 ):
 
-    repository = QueryHandler(ZonaDeEntrega, connection)
-    zona_de_entrega = await repository.find_one(uuid=uuid)
+    zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
+    zonas_cmd_handler = CommandHandler(ZonaDeEntrega, connection)
+
+    zona_de_entrega = await zonas_query_handler.find_one(uuid=uuid)
     if zona_de_entrega is None:
         raise NotFoundException("Zona de entrega não encontrada")
 
-    num_rows_affected = await repository.update(
+    zonas_cmd_handler.update(
         zona_de_entrega, zona_de_entrega_Data.model_dump()  # type: ignore
     )
+    await zonas_cmd_handler.commit()
 
-    return {"num_rows_affected": num_rows_affected}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -95,16 +99,20 @@ async def atualizar_zona_de_entrega_patch(
     ],
 ):
 
-    repository = QueryHandler(ZonaDeEntrega, connection)
-    zona_de_entrega = await repository.find_one(uuid=uuid)
+    zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
+    zonas_cmd_handler = CommandHandler(ZonaDeEntrega, connection)
+
+    zona_de_entrega = await zonas_query_handler.find_one(uuid=uuid)
     if zona_de_entrega is None:
         raise NotFoundException("Zona de entrega não encontrada")
 
-    num_rows_affected = await repository.update(
+    zonas_cmd_handler.update(
         zona_de_entrega, zona_de_entregaData.model_dump()  # type: ignore
     )
 
-    return {"num_rows_affected": num_rows_affected}
+    await zonas_cmd_handler.commit()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
@@ -115,10 +123,11 @@ async def remover_zona_de_entrega(
     ]
 ):
 
-    repository = QueryHandler(ZonaDeEntrega, connection)
+    zonas_cmd_handler = CommandHandler(ZonaDeEntrega, connection)
     try:
-        itens_removed = await repository.delete_from_uuid(uuid=uuid)
+        zonas_cmd_handler.delete_from_uuid(uuid=uuid)
+        await zonas_cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {"itens_removed": itens_removed}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

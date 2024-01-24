@@ -9,7 +9,7 @@ from fastapi import (  # noqa
     Query
 )
 from src.domain.models import AvaliacaoDeLoja
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency
 

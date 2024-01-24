@@ -12,7 +12,7 @@ from fastapi import (  # noqa
 from src.api.security import oauth2_scheme
 from typing import Optional
 from src.domain.models import Funcionario
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.api.security import AuthService
 from src.misc import Paginador  # noqa
 from src.dependencies import ConnectionDependency

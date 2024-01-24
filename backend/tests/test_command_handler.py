@@ -1,5 +1,5 @@
 from src.infra.database_postgres import DSN
-from src.infra.database_postgres.repository import CommandHandler
+from src.infra.database_postgres.handlers import CommandHandler
 from src.domain.models import CategoriaProdutos
 import aiopg
 import psycopg2

@@ -14,7 +14,7 @@ from fastapi import (  # noqa
 )
 from src.misc import Paginador  # noqa
 from src.domain.models import Status
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 from src.dependencies import ConnectionDependency, CurrentLojaDependency
 
 

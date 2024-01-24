@@ -1,5 +1,5 @@
 import asyncio
-from src.infra.database_postgres.repository import QueryHandler
+from src.infra.database_postgres.handlers import QueryHandler
 from src.infra.database_postgres import DSN
 import aiopg
 from src.domain.models import Loja, Produto
@@ -23,9 +23,9 @@ async def get_image():
 async def main() -> None:
     async with aiopg.create_pool(DSN) as pool:
         async with pool.acquire() as connection:
-            loja_repository = QueryHandler(Loja, connection)
-            produto_repository = QueryHandler(Produto, connection)
-            lojas = await loja_repository.find_all()
+            loja_query_handler = QueryHandler(Loja, connection)
+            produto_query_handler = QueryHandler(Produto, connection)
+            lojas = await loja_query_handler.find_all()
             loja = lojas[0]
 
             service = ImageUploadService(loja)
@@ -33,7 +33,7 @@ async def main() -> None:
 
             service.upload_image_cadastro(data)
 
-            produtos = await produto_repository.find_all(
+            produtos = await produto_query_handler.find_all(
                 loja_uuid=loja.uuid
             )
 

@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import CommandHandler
+from src.infra.database_postgres.handlers import CommandHandler
 from src.domain.models import (
     Usuario,
     UsuarioSignUp,
@@ -41,7 +41,7 @@ class UserService:
 
         self.user_cmd_handler.save(user)
         results = await self.user_cmd_handler.commit()
-        user.uuid = results[0]['uuid']
+        user.uuid = results[0].uuid
 
         endereco = Endereco(
             uf=user_data.uf,

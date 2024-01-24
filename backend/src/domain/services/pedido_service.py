@@ -1,4 +1,4 @@
-from src.infra.database_postgres.repository import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
 import datetime
 from src.domain.models import (
     Produto,
@@ -27,6 +27,9 @@ class PedidoService(BaseService):
         self.repo = QueryHandler(
             model=self.model, connection=self.connection
         )
+        self.cmd_handler = CommandHandler(
+            model=self.model, connection=self.connection
+        )
         self.user_repo = QueryHandler(
             model=Usuario, connection=self.connection
         )
@@ -43,6 +46,9 @@ class PedidoService(BaseService):
             model=EnderecoEntrega, connection=connection
         )
         self.itens_pedido_repo = QueryHandler(
+            model=ItemPedido, connection=connection
+        )
+        self.itens_pedido_cmd = CommandHandler(
             model=ItemPedido, connection=connection
         )
         self.status_repo = QueryHandler(
@@ -215,7 +221,7 @@ class PedidoService(BaseService):
         self.pedido_cmd_handler.save(pedido)
         results = await self.pedido_cmd_handler.commit()
 
-        pedido.uuid = results[0]['uuid']
+        pedido.uuid = results[0].uuid
 
         itens_uuid = await self.save_itens_for_pedido(
             itens=pedido_data.itens, pedido=pedido
@@ -259,7 +265,7 @@ class PedidoService(BaseService):
             self.itens_pedido_cmd_handler.save(item_pedido)
             results = await self.itens_pedido_cmd_handler.commit()
 
-            item_uuid = results[0]['uuid']
+            item_uuid = results[0].uuid
 
             itens_uuid.append(item_uuid)
 
@@ -270,7 +276,7 @@ class PedidoService(BaseService):
     ):
         self.endereco_cmd_handler.save(pedido_data.endereco)
         results = await self.endereco_cmd_handler.commit()
-        uuid = results[0]['uuid']
+        uuid = results[0].uuid
         return uuid
 
     async def listar_pedidos_de_usuario(self) -> None:
@@ -299,10 +305,7 @@ class PedidoService(BaseService):
 
         return None
 
-    async def remover_pedido(self, uuid: str) -> Dict[str, int]:
-        itens_removed = 0
-        pedidos_removed = 0
-
+    async def remover_pedido(self, uuid: str) -> None:
         itens_pedido: List[ItemPedido] = (
             await self.itens_pedido_repo.find_all(
                 pedido_uuid=uuid
@@ -312,18 +315,18 @@ class PedidoService(BaseService):
         for item in itens_pedido:
             if item.uuid is None:
                 continue
-            i = await self.itens_pedido_repo.delete_from_uuid(
+
+            self.itens_pedido_cmd.delete_from_uuid(
                 uuid=item.uuid
             )
-            itens_removed += i
-        pedidos_removed = await self.repo.delete_from_uuid(
+            await self.itens_pedido_cmd.commit()
+
+        self.cmd_handler.delete_from_uuid(
             uuid=uuid
         )
+        await self.cmd_handler.commit()
 
-        return {
-            "pedidos_removed": pedidos_removed,
-            'itens_removed': itens_removed
-        }
+        return None
 
     async def alterar_status_de_pedido(
         self, pedido_uuid: str, status_uuid: str
@@ -337,7 +340,8 @@ class PedidoService(BaseService):
         if novo_status is None:
             raise ValueError("Novo status não encontrado")
 
-        await self.repo.update(pedido, {'status_uuid': novo_status.uuid})
+        self.cmd_handler.update(pedido, {'status_uuid': novo_status.uuid})
+        await self.cmd_handler.commit()
 
     async def concluir_pedido(
         self,
@@ -348,4 +352,5 @@ class PedidoService(BaseService):
         if pedido is None:
             raise ValueError("Pedido não encontrado")
 
-        await self.repo.update(pedido, {'concluido': True})
+        self.cmd_handler.update(pedido, {'concluido': True})
+        await self.cmd_handler.commit()
