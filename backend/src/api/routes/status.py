@@ -9,7 +9,7 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Depends,
+    Response,
     Response
 )
 from src.misc import Paginador  # noqa
@@ -102,8 +102,8 @@ async def atualizar_status_patch(
     connection: ConnectionDependency,
     statusData: Status,
     uuid: Annotated[str, Path(title="O uuid do Status a fazer patch")],
-) -> Dict:
-    return {}
+):
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")

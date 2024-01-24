@@ -7,7 +7,7 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
+    Response,
     Depends
 )
 from src.api.security import oauth2_scheme, AuthService
@@ -93,7 +93,7 @@ async def atualizar_metodo_de_pagamento_put(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer put")
     ],
-) -> Dict[str, int]:
+):
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
@@ -113,7 +113,7 @@ async def atualizar_metodo_de_pagamento_put(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -124,7 +124,7 @@ async def atualizar_metodo_de_pagamento_patch(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer patch")
     ],
-) -> Dict[str, int]:
+):
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
@@ -143,7 +143,7 @@ async def atualizar_metodo_de_pagamento_patch(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
@@ -153,7 +153,7 @@ async def remover_metodo_de_pagamento(
     uuid: Annotated[
         str, Path(title="O uuid do método de pagemento a fazer delete")
     ],
-) -> Dict[str, int]:
+):
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
@@ -164,4 +164,4 @@ async def remover_metodo_de_pagamento(
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

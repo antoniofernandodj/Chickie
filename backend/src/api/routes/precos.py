@@ -87,7 +87,7 @@ async def atualizar_preco_patch(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer patch")]
 ):
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/{uuid}")

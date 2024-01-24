@@ -6,9 +6,8 @@ from fastapi import (  # noqa
     HTTPException,
     status,
     Path,
-    Request,
-    Query,
-    Depends
+    Response,
+    Query
 )
 from src.domain.models import AvaliacaoDeProduto
 from src.misc import Paginador  # noqa
@@ -73,7 +72,7 @@ async def atualizar_avaliacao_put(
     connection: ConnectionDependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer put")],
-) -> Dict[str, int]:
+):
 
     query_handler = QueryHandler(AvaliacaoDeProduto, connection)
     avaliacao = await query_handler.find_one(uuid=uuid)
@@ -86,7 +85,7 @@ async def atualizar_avaliacao_put(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -94,7 +93,7 @@ async def atualizar_avaliacao_patch(
     connection: ConnectionDependency,
     avaliacaoData: AvaliacaoDeProduto,
     uuid: Annotated[str, Path(title="O uuid do avaliação a fazer patch")]
-) -> Dict[str, int]:
+):
 
     query_handler = QueryHandler(AvaliacaoDeProduto, connection)
     avaliacao = await query_handler.find_one(uuid=uuid)
@@ -108,14 +107,14 @@ async def atualizar_avaliacao_patch(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
 async def remover_avaliacao(
     connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
-) -> Dict[str, int]:
+):
 
     cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
     try:
@@ -124,4 +123,4 @@ async def remover_avaliacao(
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

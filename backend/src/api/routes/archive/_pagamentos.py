@@ -7,8 +7,7 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
-    Depends
+    Response
 )
 from src.domain.models import Pagamento
 from src.misc import Paginador  # noqa
@@ -72,7 +71,7 @@ async def atualizar_pagamento_put(
     connection: ConnectionDependency,
     pagamento_Data: Pagamento,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer put")],
-) -> Dict[str, int]:
+):
 
     query_handler = QueryHandler(Pagamento, connection=connection)
     cmd_handler = CommandHandler(Pagamento, connection=connection)
@@ -86,7 +85,7 @@ async def atualizar_pagamento_put(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -94,7 +93,7 @@ async def atualizar_pagamento_patch(
     connection: ConnectionDependency,
     pagamentoData: Pagamento,
     uuid: Annotated[str, Path(title="O uuid do pagamento a fazer patch")],
-) -> Dict[str, int]:
+):
 
     query_handler = QueryHandler(Pagamento, connection=connection)
     cmd_handler = CommandHandler(Pagamento, connection=connection)
@@ -107,14 +106,14 @@ async def atualizar_pagamento_patch(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
 async def remover_pagamento(
     connection: ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
-) -> Dict[str, int]:
+):
 
     cmd_handler = CommandHandler(Pagamento, connection=connection)
     try:
@@ -123,4 +122,4 @@ async def remover_pagamento(
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

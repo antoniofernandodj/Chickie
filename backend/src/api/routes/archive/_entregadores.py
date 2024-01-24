@@ -5,7 +5,8 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Depends
+    Depends,
+    Response
 )
 from src.api.security import oauth2_scheme
 from typing import Optional
@@ -94,7 +95,7 @@ async def atualizar_entregador_put(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -119,7 +120,7 @@ async def atualizar_entregador_patch(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
@@ -139,4 +140,4 @@ async def remover_entregador(
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

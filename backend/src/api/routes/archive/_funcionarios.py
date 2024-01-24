@@ -6,7 +6,7 @@ from fastapi import (  # noqa
     status,
     Path,
     Query,
-    Request,
+    Response,
     Depends
 )
 from src.api.security import oauth2_scheme
@@ -105,7 +105,7 @@ async def atualizar_funcionario_put(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch("/{uuid}")
@@ -130,7 +130,7 @@ async def atualizar_funcionario_patch(
     )
     await cmd_handler.commit()
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{uuid}")
@@ -149,4 +149,4 @@ async def remover_funcionario(
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
