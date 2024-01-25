@@ -1,4 +1,4 @@
-from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler
 from src.domain.models import (
     Loja,
     LojaSignUp,
@@ -8,6 +8,7 @@ from src.domain.models import (
     Cliente,
     Usuario
 )
+import uuid
 from src.exceptions import (
     LojaJaCadastradaException,
     InvalidPasswordException
@@ -21,32 +22,16 @@ from aiopg.connection import Connection
 
 
 class LojaService(BaseService):
-    def __init__(
-        self, connection: Connection
-    ):
-        self.model = Loja
-        self.connection = connection
-        self.query_handler = QueryHandler(
-            model=self.model, connection=self.connection
-        )
-        self.endereco_repo = QueryHandler(
-            model=EnderecoLoja, connection=connection
-        )
-        self.cliente_repo = QueryHandler(
-            model=Cliente, connection=self.connection
-        )
-        self.usuario_repo = QueryHandler(
-            model=Usuario, connection=self.connection
-        )
-        self.cmd_handler = CommandHandler(
-            model=Loja, connection=self.connection
-        )
-        self.endereco_usuario_cmd_handler = CommandHandler(
-            model=Usuario, connection=self.connection
-        )
-        self.endereco_loja_cmd_handler = CommandHandler(
-            model=EnderecoLoja, connection=self.connection
-        )
+
+    model = Loja
+
+    def __init__(self, connection: Connection):
+        super().__init__(connection)
+        conn = connection
+
+        self.endereco_query_handler = QueryHandler(EnderecoLoja, conn)
+        self.cliente_query_handler = QueryHandler(Cliente, conn)
+        self.usuario_query_handler = QueryHandler(Usuario, conn)
 
     async def update_loja_data(self, uuid: str, data: LojaPUT):
         loja: Optional[Loja] = await self.query_handler.find_one(uuid=uuid)
@@ -68,10 +53,9 @@ class LojaService(BaseService):
             horarios_de_funcionamento=data.horarios_de_funcionamento
         )
 
-        self.cmd_handler.update(loja, loja_data)
-        await self.cmd_handler.commit()
+        self.cmd_handler.update(loja, loja_data)  # COMMAND!
 
-        endereco = await self.endereco_repo.find_one(
+        endereco = await self.endereco_query_handler.find_one(
             loja_uuid=loja.uuid
         )
 
@@ -85,18 +69,20 @@ class LojaService(BaseService):
             complemento=data.complemento
         )
         if endereco:
-            self.endereco_loja_cmd_handler.update(endereco, endereco_data)
+            self.cmd_handler.update(endereco, endereco_data)  # COMMAND!
         else:
             pass
 
-        await self.endereco_loja_cmd_handler.commit()
+        await self.cmd_handler.commit()  # COMMIT!
 
     async def get_data(self, loja: Loja):
 
         from src.services import ImageUploadService
 
-        endereco: Optional[EnderecoLoja] = await self.endereco_repo.find_one(
-            loja_uuid=loja.uuid
+        endereco: Optional[EnderecoLoja] = await (
+            self.endereco_query_handler.find_one(
+                loja_uuid=loja.uuid
+            )
         )
 
         if endereco is None:
@@ -141,6 +127,8 @@ class LojaService(BaseService):
         def only_numbers(string: str) -> str:
             return ''.join([n for n in string if n.isdecimal()])
 
+        loja_uuid = str(uuid.uuid1())
+
         loja = Loja(
             nome=loja_data.nome,
             username=loja_data.username,
@@ -154,10 +142,8 @@ class LojaService(BaseService):
         )
         del loja.password
 
-        self.cmd_handler.save(loja)
-        results = await self.cmd_handler.commit()
-
-        loja.uuid = results[0].uuid
+        self.cmd_handler.save(loja, loja_uuid)  # COMMAND!
+        loja.uuid = loja_uuid
 
         endereco = EnderecoLoja(
             uf=loja_data.uf,
@@ -170,8 +156,8 @@ class LojaService(BaseService):
             loja_uuid=loja.uuid
         )
 
-        self.endereco_loja_cmd_handler.save(endereco)
-        await self.endereco_loja_cmd_handler.commit()
+        self.cmd_handler.save(endereco)  # COMMAND!
+        await self.cmd_handler.commit()  # COMMIT!
 
         try:
             if loja_data.image_bytes and loja_data.image_filename:
@@ -211,12 +197,12 @@ class LojaService(BaseService):
     ) -> List[Usuario]:
 
         results: List[Usuario] = []
-        clientes: List[Cliente] = await self.cliente_repo.find_all(
+        clientes: List[Cliente] = await self.cliente_query_handler.find_all(
             loja_uuid=loja_uuid
         )
 
         for cliente in clientes:
-            usuario = await self.usuario_repo.find_one(
+            usuario = await self.usuario_query_handler.find_one(
                 uuid=cliente.usuario_uuid
             )
             if usuario:

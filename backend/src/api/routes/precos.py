@@ -61,7 +61,7 @@ async def cadastrar_precos(
 ) -> Dict[str, str]:
 
     query_handler = QueryHandler(Preco, connection)
-    command_handler = CommandHandler(Preco, connection)
+    cmd_handler = CommandHandler(connection)
 
     query = await query_handler.find_one(
         dia_da_semana=preco.dia_da_semana,
@@ -71,8 +71,8 @@ async def cadastrar_precos(
         raise ConflictException('Preço já cadastrado para este '
                                 'produto e para este dia da semana!')
     try:
-        command_handler.save(preco)
-        results = await command_handler.commit()
+        cmd_handler.save(preco)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -99,13 +99,13 @@ async def atualizar_preco_put(
 ):
 
     preco_query_handler = QueryHandler(Preco, connection)
-    preco_cmd_handler = CommandHandler(Preco, connection)
+    cmd_handler = CommandHandler(connection)
     preco = await preco_query_handler.find_one(uuid=uuid)
     if preco is None:
         raise NotFoundException("Preço não encontrado")
 
-    preco_cmd_handler.update(preco, itemData.model_dump())
-    await preco_cmd_handler.commit()
+    cmd_handler.update(preco, itemData.model_dump())
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -117,10 +117,10 @@ async def remover_preco(
     uuid: Annotated[str, Path(title="O uuid do preco a fazer delete")]
 ):
 
-    preco_cmd_handler = CommandHandler(Preco, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        preco_cmd_handler.delete_from_uuid(uuid=uuid)
-        await preco_cmd_handler.commit()
+        cmd_handler.delete_from_uuid(Preco, uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

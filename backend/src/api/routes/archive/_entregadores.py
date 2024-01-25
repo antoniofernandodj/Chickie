@@ -63,10 +63,10 @@ async def cadastrar_entregadores(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    command_handler = CommandHandler(Entregador, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        command_handler.save(entregador)
-        results = await command_handler.commit()
+        cmd_handler.save(entregador)
+        results = await cmd_handler.commit()
         uuid = results[0]
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -89,7 +89,7 @@ async def atualizar_entregador_put(
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
 
-    cmd_handler = CommandHandler(Entregador, connection)
+    cmd_handler = CommandHandler(connection)
     cmd_handler.update(
         entregador, entregadorData.model_dump()  # type: ignore
     )
@@ -110,7 +110,7 @@ async def atualizar_entregador_patch(
     loja = await auth_service.current_company(token)  # noqa
     query_handler = QueryHandler(Entregador, connection=connection)
 
-    cmd_handler = CommandHandler(Entregador, connection)
+    cmd_handler = CommandHandler(connection)
     entregador = await query_handler.find_one(uuid=uuid)
     if entregador is None:
         raise NotFoundException("Entregador não encontrado")
@@ -133,9 +133,9 @@ async def remover_entregador(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
 
-    cmd_handler = CommandHandler(Entregador, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        cmd_handler.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(Entregador, uuid=uuid)
         await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))

@@ -56,10 +56,10 @@ async def cadastrar_avaliacoes(
     avaliacao: AvaliacaoDeProduto
 ) -> Dict[str, str]:
 
-    command_handler = CommandHandler(AvaliacaoDeProduto, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        command_handler.save(avaliacao)
-        results = await command_handler.commit()
+        cmd_handler.save(avaliacao)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -79,7 +79,7 @@ async def atualizar_avaliacao_put(
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
 
-    cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
+    cmd_handler = CommandHandler(connection)
     cmd_handler.update(
         avaliacao, avaliacaoData.model_dump()  # type: ignore
     )
@@ -100,7 +100,7 @@ async def atualizar_avaliacao_patch(
     if avaliacao is None:
         raise NotFoundException("Avaliação não encontrada")
 
-    cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
+    cmd_handler = CommandHandler(connection)
     cmd_handler.update(
         avaliacao,
         avaliacaoData.model_dump()  # type: ignore
@@ -116,9 +116,9 @@ async def remover_avaliacao(
     uuid: Annotated[str, Path(title="O uuid da avaliação a fazer delete")]
 ):
 
-    cmd_handler = CommandHandler(AvaliacaoDeProduto, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        cmd_handler.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(AvaliacaoDeProduto, uuid=uuid)
         await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))

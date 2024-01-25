@@ -1,4 +1,4 @@
-from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler
 import datetime
 from src.domain.models import (
     Produto,
@@ -14,55 +14,26 @@ from src.domain.models import (
     Status
 )
 from aiopg.connection import Connection
-from typing import List, Optional, Dict, Union
+from typing import List, Optional
 from .base import BaseService
+import uuid
 
 
 class PedidoService(BaseService):
-    def __init__(
-        self, connection: Connection
-    ):
-        self.model = Pedido
-        self.connection = connection
-        self.query_handler = QueryHandler(
-            model=self.model, connection=self.connection
-        )
-        self.cmd_handler = CommandHandler(
-            model=self.model, connection=self.connection
-        )
-        self.user_repo = QueryHandler(
-            model=Usuario, connection=self.connection
-        )
-        self.preco_repo = QueryHandler(
-            model=Preco, connection=self.connection
-        )
-        self.produto_repo = QueryHandler(
-            model=Produto, connection=self.connection
-        )
-        self.loja_repo = QueryHandler(
-            model=Loja, connection=self.connection
-        )
-        self.endereco_repo = QueryHandler(
-            model=EnderecoEntrega, connection=connection
-        )
-        self.itens_pedido_repo = QueryHandler(
-            model=ItemPedido, connection=connection
-        )
-        self.itens_pedido_cmd = CommandHandler(
-            model=ItemPedido, connection=connection
-        )
-        self.status_repo = QueryHandler(
-            model=Status, connection=connection
-        )
-        self.pedido_cmd_handler = CommandHandler(
-            model=Pedido, connection=self.connection
-        )
-        self.itens_pedido_cmd_handler = CommandHandler(
-            model=ItemPedido, connection=self.connection
-        )
-        self.endereco_cmd_handler = CommandHandler(
-            model=EnderecoEntrega, connection=connection
-        )
+
+    model = Pedido
+
+    def __init__(self, connection: Connection):
+        super().__init__(connection)
+        conn = connection
+
+        self.user_query_handler = QueryHandler(Usuario, conn)
+        self.preco_query_handler = QueryHandler(Preco, conn)
+        self.produto_query_handler = QueryHandler(Produto, conn)
+        self.loja_query_handler = QueryHandler(Loja, conn)
+        self.status_query_handler = QueryHandler(Status, conn)
+        self.endereco_query_handler = QueryHandler(EnderecoEntrega, conn)
+        self.itens_pedido_query_handler = QueryHandler(ItemPedido, conn)
 
     async def get_all_pedidos(self, **kwargs) -> List[PedidoGET]:
         pedidos: List[Pedido] = await self.query_handler.find_all(
@@ -71,23 +42,31 @@ class PedidoService(BaseService):
 
         response: List[PedidoGET] = []
         for pedido in pedidos:
-            items: List[ItemPedido] = await self.itens_pedido_repo.find_all(
-                pedido_uuid=pedido.uuid
+            items: List[ItemPedido] = (
+                await self.itens_pedido_query_handler.find_all(
+                    pedido_uuid=pedido.uuid
+                )
             )
 
-            status: Optional[Status] = await self.status_repo.find_one(
-                uuid=pedido.status_uuid
+            status: Optional[Status] = (
+                await self.status_query_handler.find_one(
+                    uuid=pedido.status_uuid
+                )
             )
 
             endereco: Optional[EnderecoEntrega] = (
-                await self.endereco_repo.find_one(pedido_uuid=pedido.uuid)
+                await self.endereco_query_handler.find_one(
+                    pedido_uuid=pedido.uuid
+                )
             )
             if endereco is None:
                 raise ValueError('Endereço não encontrado!')
 
             total = 0.0
-            itens: List[ItemPedido] = await self.itens_pedido_repo.find_all(
-                pedido_uuid=pedido.uuid
+            itens: List[ItemPedido] = (
+                await self.itens_pedido_query_handler.find_all(
+                    pedido_uuid=pedido.uuid
+                )
             )
 
             for item in itens:
@@ -117,7 +96,7 @@ class PedidoService(BaseService):
         return response
 
     async def get_produto(self, produto_uuid: str):
-        produto: Optional[Produto] = await self.produto_repo.find_one(
+        produto: Optional[Produto] = await self.produto_query_handler.find_one(
             uuid=produto_uuid
         )
         if produto is None or produto.uuid is None:
@@ -126,7 +105,7 @@ class PedidoService(BaseService):
         return produto
 
     async def get_loja_from_uuid(self, loja_uuid: str):
-        loja: Optional[Loja] = await self.loja_repo.find_one(
+        loja: Optional[Loja] = await self.loja_query_handler.find_one(
             uuid=loja_uuid
         )
         if loja is None:
@@ -150,7 +129,7 @@ class PedidoService(BaseService):
         }
         dia_da_semana_hoje = dias_handler[data_atual.strftime("%A")]
         preco_selecionado = produto.preco
-        precos: List[Preco] = await self.preco_repo.find_all(
+        precos: List[Preco] = await self.preco_query_handler.find_all(
             produto_uuid=produto.uuid
         )
         for preco in precos:
@@ -166,22 +145,26 @@ class PedidoService(BaseService):
         if pedido is None or pedido.uuid is None:
             return None
 
-        items: List[ItemPedido] = await self.itens_pedido_repo.find_all(
-            pedido_uuid=uuid
+        items: List[ItemPedido] = (
+            await self.itens_pedido_query_handler.find_all(
+                pedido_uuid=uuid
+            )
         )
-        endereco = await self.endereco_repo.find_one(
+        endereco = await self.endereco_query_handler.find_one(
             pedido_uuid=pedido.uuid
         )
         if endereco is None:
             raise ValueError('Endereço não encontrado!')
 
-        status: Optional[Status] = await self.status_repo.find_one(
+        status: Optional[Status] = await self.status_query_handler.find_one(
             uuid=pedido.status_uuid
         )
 
         total = 0.0
-        itens: List[ItemPedido] = await self.itens_pedido_repo.find_all(
-            pedido_uuid=pedido.uuid
+        itens: List[ItemPedido] = (
+            await self.itens_pedido_query_handler.find_all(
+                pedido_uuid=pedido.uuid
+            )
         )
         for item in itens:
             if item.valor is None:
@@ -206,7 +189,9 @@ class PedidoService(BaseService):
     async def save_pedido(
         self,
         pedido_data: PedidoPOST
-    ) -> Dict[str, Union[str, list[str]]]:
+    ) -> None:
+
+        pedido_uuid = str(uuid.uuid1())
 
         pedido = Pedido(
             data_hora=pedido_data.data_hora,
@@ -218,25 +203,22 @@ class PedidoService(BaseService):
             usuario_uuid=pedido_data.usuario_uuid
         )
 
-        self.pedido_cmd_handler.save(pedido)  # #############
-        results = await self.pedido_cmd_handler.commit()
+        self.cmd_handler.save(pedido, pedido_uuid)    # COMMAND!
 
-        pedido.uuid = results[0].uuid
+        pedido.uuid = pedido_uuid
 
-        itens_uuid = await self.save_itens_for_pedido(  # #############
+        await self.save_itens_for_pedido(    # COMMAND!
             itens=pedido_data.itens, pedido=pedido
         )
 
         pedido_data.endereco.pedido_uuid = pedido.uuid
-        endereco_uuid = await self.save_endereco_for_pedido(  # #############
+        await self.save_endereco_for_pedido(    # COMMAND!
             pedido_data=pedido_data
         )
 
-        return {
-            'pedido_uuid': pedido.uuid,
-            'endereco_uuid': endereco_uuid,
-            'itens': itens_uuid
-        }
+        await self.cmd_handler.commit()
+
+        return None
 
     async def save_itens_for_pedido(
         self,
@@ -252,6 +234,7 @@ class PedidoService(BaseService):
             produto = await self.get_produto(item.produto_uuid)
             valor = await self.get_produto_preco(produto)
 
+            item_uuid = str(uuid.uuid1())
             item_pedido = ItemPedido(
                 quantidade=item.quantidade,
                 observacoes=item.observacoes,
@@ -262,10 +245,7 @@ class PedidoService(BaseService):
                 loja_uuid=pedido.loja_uuid
             )
 
-            self.itens_pedido_cmd_handler.save(item_pedido)  # #############
-            results = await self.itens_pedido_cmd_handler.commit()
-
-            item_uuid = results[0].uuid
+            self.cmd_handler.save(item_pedido, item_uuid)  # COMMAND!
 
             itens_uuid.append(item_uuid)
 
@@ -274,10 +254,10 @@ class PedidoService(BaseService):
     async def save_endereco_for_pedido(
         self, pedido_data: PedidoPOST
     ):
-        self.endereco_cmd_handler.save(pedido_data.endereco)  # #############
-        results = await self.endereco_cmd_handler.commit()
-        uuid = results[0].uuid
-        return uuid
+        endereco_uuid = str(uuid.uuid1())
+        self.cmd_handler.save(pedido_data.endereco, endereco_uuid)   # COMMAND!
+
+        return endereco_uuid
 
     async def listar_pedidos_de_usuario(self) -> None:
         return None
@@ -289,7 +269,7 @@ class PedidoService(BaseService):
         return None
 
     async def get_loja(self, produto: Produto) -> Optional[Loja]:
-        loja = await self.loja_repo.find_one(
+        loja = await self.loja_query_handler.find_one(
             uuid=produto.loja_uuid
         )
 
@@ -307,7 +287,7 @@ class PedidoService(BaseService):
 
     async def remover_pedido(self, uuid: str) -> None:
         itens_pedido: List[ItemPedido] = (
-            await self.itens_pedido_repo.find_all(
+            await self.itens_pedido_query_handler.find_all(
                 pedido_uuid=uuid
             )
         )
@@ -316,14 +296,12 @@ class PedidoService(BaseService):
             if item.uuid is None:
                 continue
 
-            self.itens_pedido_cmd.delete_from_uuid(
+            self.cmd_handler.delete_from_uuid(  # COMMAND!
+                ItemPedido,
                 uuid=item.uuid
             )
-            await self.itens_pedido_cmd.commit()
 
-        self.cmd_handler.delete_from_uuid(
-            uuid=uuid
-        )
+        self.cmd_handler.delete_from_uuid(Pedido, uuid=uuid)  # COMMAND!
         await self.cmd_handler.commit()
 
         return None
@@ -335,12 +313,13 @@ class PedidoService(BaseService):
         if pedido is None:
             raise ValueError("Pedido não encontrado")
 
-        print({'status_uuid': status_uuid})
-        novo_status = await self.status_repo.find_one(uuid=status_uuid)
+        novo_status = (
+            await self.status_query_handler.find_one(uuid=status_uuid)
+        )
         if novo_status is None:
             raise ValueError("Novo status não encontrado")
 
-        self.cmd_handler.update(pedido, {'status_uuid': novo_status.uuid})
+        self.cmd_handler.update(pedido, {'status_uuid': novo_status.uuid})  # COMMAND!  # noqa
         await self.cmd_handler.commit()
 
     async def concluir_pedido(
@@ -352,5 +331,5 @@ class PedidoService(BaseService):
         if pedido is None:
             raise ValueError("Pedido não encontrado")
 
-        self.cmd_handler.update(pedido, {'concluido': True})
+        self.cmd_handler.update(pedido, {'concluido': True})  # COMMAND!
         await self.cmd_handler.commit()

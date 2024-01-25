@@ -1,4 +1,4 @@
-from typing import Annotated, Dict, Optional, Any
+from typing import Annotated, Optional
 from src.exceptions import (
     NotFoundException
 )
@@ -66,12 +66,12 @@ async def requisitar_pedido(
 async def cadastrar_pedidos(
     connection: ConnectionDependency,
     pedido_data: PedidoPOST,
-) -> Dict[str, Any]:
+) -> dict:
 
     service = PedidoService(connection)
     try:
-        response = await service.save_pedido(pedido_data=pedido_data)
-        return response
+        await service.save_pedido(pedido_data=pedido_data)
+        return {}
     except Exception as error:
 
         import traceback

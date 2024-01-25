@@ -62,6 +62,8 @@ async def requisitar_produto(
     if produto is None:
         raise NotFoundException("Produto não encontrado")
 
+    print({'produto': produto})
+
     return produto
 
 
@@ -99,9 +101,7 @@ async def atualizar_produto_put(
 
     service = ProdutoService(connection)
     try:
-        await service.atualizar_produto(
-            uuid=uuid, produto_data=produto_data
-        )
+        await service.atualizar_produto(uuid, produto_data)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
         raise HTTPException(

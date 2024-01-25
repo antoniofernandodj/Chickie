@@ -1,4 +1,4 @@
-from src.infra.database_postgres.handlers import QueryHandler, CommandHandler
+from src.infra.database_postgres.handlers import QueryHandler
 from src.domain.models import (
     Produto,
     Preco,
@@ -6,7 +6,7 @@ from src.domain.models import (
     ProdutoPOST,
     ProdutoPUT,
     ProdutoGET,
-    AvaliacaoDeProduto
+    AvaliacaoDeProduto as Avaliacao
 )
 from aiopg.connection import Connection
 from typing import List, Dict, Any
@@ -14,34 +14,19 @@ from .base import BaseService
 
 
 class ProdutoService(BaseService):
+
+    model = Produto
+
     def __init__(self, connection: Connection):
+        super().__init__(connection)
+        conn = connection
+
         from src.domain.services import PedidoService
 
-        self.model = Produto
-        self.connection = connection
-        self.query_handler = QueryHandler(
-            model=self.model, connection=self.connection
-        )
-        self.cmd_handler = CommandHandler(
-            model=self.model, connection=self.connection
-        )
-        self.preco_query_handler = QueryHandler(
-            model=Preco, connection=self.connection
-        )
-        self.loja_query_handler = QueryHandler(
-            model=Loja, connection=self.connection
-        )
-        self.avaliacao_query_handler = QueryHandler(
-            model=AvaliacaoDeProduto, connection=connection
-        )
-        self.avaliacao_cmd_handler = CommandHandler(
-            model=AvaliacaoDeProduto, connection=connection
-        )
-        self.produto_cmd_handler = CommandHandler(
-            model=Produto, connection=self.connection
-        )
-
-        self.pedido_service = PedidoService(connection=connection)
+        self.preco_query_handler = QueryHandler(Preco, conn)
+        self.loja_query_handler = QueryHandler(Loja, conn)
+        self.avaliacao_query_handler = QueryHandler(Avaliacao, conn)
+        self.pedido_service = PedidoService(conn)
 
     async def save_produto(
         self,
@@ -57,8 +42,8 @@ class ProdutoService(BaseService):
             loja_uuid=produto_data.loja_uuid
         )
 
-        self.produto_cmd_handler.save(produto)
-        results = await self.produto_cmd_handler.commit()
+        self.cmd_handler.save(produto)  # COMMAND!
+        results = await self.cmd_handler.commit()  # COMMIT!
         produto.uuid = results[0].uuid
 
         loja = await self.get_loja_from_produto(produto=produto)
@@ -78,7 +63,7 @@ class ProdutoService(BaseService):
                 image_url = None
 
         except Exception:
-            self.cmd_handler.delete_from_uuid(produto.uuid)
+            self.cmd_handler.delete_from_uuid(Produto, produto.uuid)  # COMMAND!  # noqa
             await self.cmd_handler.commit()
 
             raise
@@ -147,24 +132,24 @@ class ProdutoService(BaseService):
             raise
 
         if avaliacao is None:
-            avaliacao = AvaliacaoDeProduto(
+            avaliacao = Avaliacao(
                 usuario_uuid=avaliacao_data.usuario.uuid,
                 loja_uuid=avaliacao_data.loja_uuid,
                 nota=avaliacao_data.nota,
                 descricao=avaliacao_data.descricao,
                 produto_uuid=produto.uuid
             )
-            self.avaliacao_cmd_handler.save(avaliacao)
-            results = await self.avaliacao_cmd_handler.commit()
+            self.cmd_handler.save(avaliacao)  # COMMAND!
+            results = await self.cmd_handler.commit()
             uuid = results[0].uuid
 
             return uuid
 
         else:
-            self.avaliacao_cmd_handler.update(
+            self.cmd_handler.update(  # COMMAND!
                 avaliacao, avaliacao_data.model_dump()
             )
-            await self.avaliacao_cmd_handler.commit()
+            await self.cmd_handler.commit()  # COMMIT
 
             return avaliacao.uuid
 
@@ -225,10 +210,10 @@ class ProdutoService(BaseService):
         if produto is None:
             raise ValueError("Produto não encontrado")
 
-        self.cmd_handler.update(
+        self.cmd_handler.update(  # COMMAND!
             produto, produto_data.model_dump()
         )
-        await self.cmd_handler.commit()
+        await self.cmd_handler.commit()  # COMMIT
 
         return None
 

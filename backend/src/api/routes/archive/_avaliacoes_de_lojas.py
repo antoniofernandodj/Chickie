@@ -51,10 +51,10 @@ async def cadastrar_avaliacao_loja(
     avaliacao: AvaliacaoDeLoja,
 ):
 
-    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        command_handler.save(avaliacao)
-        results = await command_handler.commit()
+        cmd_handler.save(avaliacao)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -70,15 +70,15 @@ async def atualizar_avaliacao_loja_put(
 ):
 
     query_handler = QueryHandler(AvaliacaoDeLoja, connection=connection)
-    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
+    cmd_handler = CommandHandler(connection)
     avaliacao = await query_handler.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliacao de Loja não encontrada")
 
-    command_handler.update(
+    cmd_handler.update(
         avaliacao, avaliacao_loja_data.model_dump()  # type: ignore
     )
-    await command_handler.commit()
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -91,15 +91,15 @@ async def atualizar_avaliacoes_loja_patch(
 ):
 
     query_handler = QueryHandler(AvaliacaoDeLoja, connection=connection)
-    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
+    cmd_handler = CommandHandler(connection)
     avaliacao = await query_handler.find_one(uuid=uuid)
     if avaliacao is None:
         raise NotFoundException("Avaliação encontrada")
 
-    command_handler.update(
+    cmd_handler.update(
         avaliacao, avaliacoes_loja_data.model_dump()  # type: ignore
     )
-    await command_handler.commit()
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -110,10 +110,10 @@ async def remover_avaliacoes_loja(
     uuid: Annotated[str, Path(title="O uuid do avaliacoes_lojaa fazer delete")]
 ):
 
-    command_handler = CommandHandler(AvaliacaoDeLoja, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        command_handler.delete_from_uuid(uuid=uuid)
-        await command_handler.commit()
+        cmd_handler.delete_from_uuid(AvaliacaoDeLoja, uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

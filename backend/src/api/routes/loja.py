@@ -295,14 +295,14 @@ async def ativar_inativar_loja(
 ) -> Any:
 
     loja_query_handler = QueryHandler(Loja, connection)
-    loja_cmd_handler = CommandHandler(Loja, connection)
+    cmd_handler = CommandHandler(connection)
 
     loja: Optional[Loja] = await loja_query_handler.find_one(uuid=uuid)
     if loja is None:
         raise NotFoundException('Loja não encontrada')
 
-    loja_cmd_handler.update(loja, {'ativo': ativar})
-    await loja_cmd_handler.commit()
+    cmd_handler.update(loja, {'ativo': ativar})
+    await cmd_handler.commit()
 
     status_msg = "ativada" if ativar is True else "inativada"
     return {"message": f"Loja {status_msg} com sucesso!"}
@@ -337,10 +337,10 @@ async def cadastrar_cliente(
         loja_uuid=usuario.loja_uuid
     )
 
-    cliente_command_handler = CommandHandler(Cliente, connection)
-    cliente_command_handler.save(cliente)
+    cmd_handler = CommandHandler(connection)
+    cmd_handler.save(cliente)
 
-    results = await cliente_command_handler.commit()
+    results = await cmd_handler.commit()
 
     cliente_uuid = results[0].uuid
 
@@ -377,10 +377,10 @@ async def cadastrar_cliente_v2(
         loja_uuid=loja_uuid
     )
 
-    cliente_command_handler = CommandHandler(Cliente, connection)
+    cmd_handler = CommandHandler(connection)
 
-    cliente_command_handler.save(cliente)
-    results = await cliente_command_handler.commit()
+    cmd_handler.save(cliente)
+    results = await cmd_handler.commit()
     cliente_uuid = results[0].uuid
 
     return {

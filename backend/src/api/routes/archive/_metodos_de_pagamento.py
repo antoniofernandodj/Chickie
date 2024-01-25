@@ -72,12 +72,10 @@ async def cadastrar_metodos_de_pagamento(
     if query:
         raise Exception
 
-    metodo_pagamento_command_handler = CommandHandler(
-        MetodoDePagamento, connection
-    )
+    cmd_handler = CommandHandler(connection)
     try:
-        metodo_pagamento_command_handler.save(metodo_de_pagamento)
-        results = await metodo_pagamento_command_handler.commit()
+        cmd_handler.save(metodo_de_pagamento)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -98,7 +96,7 @@ async def atualizar_metodo_de_pagamento_put(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     query_handler = QueryHandler(MetodoDePagamento, connection=connection)
-    cmd_handler = CommandHandler(MetodoDePagamento, connection=connection)
+    cmd_handler = CommandHandler(connection)
 
     metodo_de_pagamento: Optional[MetodoDePagamento] = (
         await query_handler.find_one(uuid=uuid)
@@ -129,7 +127,7 @@ async def atualizar_metodo_de_pagamento_patch(
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
     query_handler = QueryHandler(MetodoDePagamento, connection=connection)
-    cmd_handler = CommandHandler(MetodoDePagamento, connection=connection)
+    cmd_handler = CommandHandler(connection)
 
     metodo_de_pagamento: Optional[MetodoDePagamento] = await query_handler \
         .find_one(uuid=uuid)
@@ -157,9 +155,9 @@ async def remover_metodo_de_pagamento(
 
     auth_service = AuthService(connection)
     loja = await auth_service.current_company(token)  # noqa
-    cmd_handler = CommandHandler(MetodoDePagamento, connection=connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        cmd_handler.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(MetodoDePagamento, uuid=uuid)
         await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))

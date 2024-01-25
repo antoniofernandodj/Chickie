@@ -5,6 +5,7 @@ from src.domain.models import (
     Usuario,
     AvaliacaoDeLoja,
 )
+from src.domain.services import LojaService
 from aiopg.connection import Connection
 from typing import Optional
 from .base import BaseService
@@ -19,26 +20,19 @@ class PaginateOptions(TypedDict):
 
 
 class AvaliacaoDeLojaService(BaseService):
+
+    model = AvaliacaoDeLoja
+
     def __init__(
         self,
         connection: Connection,
-        loja: Optional[Loja] = None
     ):
-        self.model = AvaliacaoDeLoja
-        self.connection = connection
-        self.repo = QueryHandler(
-            model=self.model, connection=self.connection
-        )
-        self.user_repo = QueryHandler(
-            model=Usuario, connection=self.connection
-        )
-        self.preco_repo = QueryHandler(
-            model=Preco, connection=self.connection
-        )
-        self.loja_repo = QueryHandler(
-            model=Loja, connection=self.connection
-        )
-        self.loja = loja
+        conn = connection
+
+        self.user_query_handler = QueryHandler(Usuario, conn)
+        self.preco_query_handler = QueryHandler(Preco, conn)
+        self.loja_query_handler = QueryHandler(Loja, conn)
+        self.loja_service = LojaService(conn)
 
     async def avaliacao_de_loja(self, loja: Loja) -> Optional[dict]:
         sql = """
@@ -46,7 +40,9 @@ class AvaliacaoDeLojaService(BaseService):
         FROM Avaliacoes
         WHERE empresa_uuid = %s;
         """
-        result = await self.repo.execute_and_fetch_one(sql, (loja.uuid,))
+        result = await self.query_handler.execute_and_fetch_one(
+            sql, (loja.uuid,)
+        )
         return result
 
     async def buscar_lojas_por_avaliacao_acima_de(
@@ -56,10 +52,11 @@ class AvaliacaoDeLojaService(BaseService):
     ):
         avaliacoes = await self.buscar_avaliacoes_de_loja_acima_de(nota)
 
-        lojas = []
+        lojas: List[Loja] = []
         for avaliacao in avaliacoes:
-            loja = await self.get_loja(avaliacao)
-            lojas.append(loja)
+            loja = await self.loja_service.get(avaliacao.loja_uuid)
+            if loja:
+                lojas.append(loja)
 
         paginador = Paginador(
             data=lojas,
@@ -77,20 +74,11 @@ class AvaliacaoDeLojaService(BaseService):
         GROUP BY empresa_uuid
         HAVING AVG(nota) > %s;
         """
-        results = await self.repo.execute_and_fetch_all(sql, (nota,))
+        results = await self.query_handler.execute_and_fetch_all(
+            sql, (nota,)
+        )
         avaliacoes = [
             AvaliacaoDeLoja(**result) for result in results
         ]
 
-        [print(avaliacao) for avaliacao in avaliacoes]
-
         return avaliacoes
-
-    async def get_loja(self, avaliacao: AvaliacaoDeLoja) -> Optional[Loja]:
-        loja = await self.loja_repo.find_one(
-            uuid=avaliacao.loja_uuid
-        )
-        if loja is None:
-            raise
-
-        return loja

@@ -78,10 +78,10 @@ async def cadastrar_categorias(
     if query:
         raise ConflictException('Categoria já cadastrada!')
 
-    command_handler = CommandHandler(CategoriaProdutos, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        command_handler.save(categoria)
-        results = await command_handler.commit()
+        cmd_handler.save(categoria)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -108,7 +108,7 @@ async def atualizar_categoria_put(
 ):
 
     categorias_query_handler = QueryHandler(CategoriaProdutos, connection)
-    categorias_cmd_handler = CommandHandler(CategoriaProdutos, connection)
+    cmd_handler = CommandHandler(connection)
     try:
         categoria = await categorias_query_handler.find_one(uuid=uuid)
     except Exception as error:
@@ -116,10 +116,10 @@ async def atualizar_categoria_put(
     if categoria is None:
         raise NotFoundException("Categoria não encontrada")
 
-    categorias_cmd_handler.update(
+    cmd_handler.update(
         categoria, itemData.model_dump()  # type: ignore
     )
-    await categorias_cmd_handler.commit()
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -131,11 +131,11 @@ async def remover_categoria(
     uuid: Annotated[str, Path(title="O uuid da categoria a fazer delete")],
 ):
 
-    categorias_cmd_handler = CommandHandler(CategoriaProdutos, connection)
+    cmd_handler = CommandHandler(connection)
 
     try:
-        categorias_cmd_handler.delete_from_uuid(uuid=uuid)
-        await categorias_cmd_handler.commit()
+        cmd_handler.delete_from_uuid(CategoriaProdutos, uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

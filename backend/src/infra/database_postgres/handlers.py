@@ -1,7 +1,7 @@
 from aiopg import Connection
 import logging
 import uuid
-from typing import List, Optional, Any, Sequence, Protocol
+from typing import List, Optional, Any, Sequence, Protocol, Type
 from pydantic import BaseModel
 from asyncio import Lock
 from src.misc import ConsoleColors
@@ -307,7 +307,7 @@ class CommandHandler:
         tablename: The table name for the model.
         commands: A list of CommandDict representing pending database commands.
     """
-    def __init__(self, model: Any, connection: Connection):
+    def __init__(self, connection: Connection):
         """Initializes the CommandHandler with a model and database connection.
 
         Args:
@@ -315,9 +315,7 @@ class CommandHandler:
             connection: The aiopg Connection object for database interaction.
         """
         self.lock = Lock()
-        self.model = model
         self.connection = connection
-        self.tablename: str = model.__tablename__
         self.commands: List[CommandGroup] = []
 
     def save(
@@ -346,7 +344,7 @@ class CommandHandler:
             column_clause = ", ".join(columns)
             value_placeholder = ", ".join(["%s"] * len(columns))
             command = "INSERT INTO {} ({}) VALUES ({})".format(
-                self.tablename, column_clause, value_placeholder
+                model.__tablename__, column_clause, value_placeholder
             )
 
             self.commands.append(CommandGroup(
@@ -380,7 +378,7 @@ class CommandHandler:
         )
 
         command = "UPDATE {} SET {} WHERE uuid = '{}';".format(
-            self.tablename, set_clause, item.uuid
+            item.__tablename__, set_clause, item.uuid
         )
 
         if item.uuid is None:
@@ -406,7 +404,7 @@ class CommandHandler:
             if uuid is None:
                 raise
 
-            command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
+            command = f"DELETE FROM {item.__tablename__} WHERE uuid = %s;"
             self.commands.append(CommandGroup(
                 command=command,
                 command_type=CommandTypes.delete,
@@ -420,7 +418,7 @@ class CommandHandler:
         else:
             delete_one(data)
 
-    def delete_from_uuid(self, uuid: str) -> None:
+    def delete_from_uuid(self, model: Type[Entity], uuid: str) -> None:
         """Prepares a 'delete' command to remove a record from the
         database by UUID.
 
@@ -428,7 +426,7 @@ class CommandHandler:
             uuid: The UUID string of the record to be deleted.
         """
 
-        command = f"DELETE FROM {self.tablename} WHERE uuid = %s;"
+        command = f"DELETE FROM {model.__tablename__} WHERE uuid = %s;"
 
         self.commands.append(CommandGroup(
             command=command,

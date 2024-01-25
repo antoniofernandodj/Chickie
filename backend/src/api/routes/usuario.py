@@ -98,10 +98,9 @@ async def update_user(
     loja = await auth_service.current_company(token)  # noqa
 
     endereco_query_handler = QueryHandler(Endereco, connection)
-    endereco_command_handler = CommandHandler(Endereco, connection)
 
     user_query_handler = QueryHandler(Endereco, connection)
-    user_command_handler = CommandHandler(Endereco, connection)
+    cmd_handler = CommandHandler(connection)
 
     usuario: Optional[Usuario] = await user_query_handler.find_one(uuid=uuid)
     if usuario is None or usuario.uuid is None:
@@ -123,11 +122,11 @@ async def update_user(
             password_hash=usuario.password_hash,
         )
 
-        user_command_handler.update(
+        cmd_handler.update(
             usuario, usuario_updated_data
         )
 
-        await user_command_handler.commit()
+        await cmd_handler.commit()
 
         novo_endereco = Endereco(
             uf=user_data.uf,
@@ -142,12 +141,12 @@ async def update_user(
             usuario_uuid=usuario.uuid
         )
         if endereco:
-            endereco_command_handler.delete(endereco)
+            cmd_handler.delete(endereco)
 
-        endereco_command_handler.save(novo_endereco)
+        cmd_handler.save(novo_endereco)
 
         endereco_uuid: Optional[str] = None
-        results = await endereco_command_handler.commit()
+        results = await cmd_handler.commit()
         for result in results:
             if result.command_type == CommandTypes.save:
                 endereco_uuid = result.uuid
@@ -190,13 +189,13 @@ async def seguir_loja(
     )
 
     cliente_query_handler = QueryHandler(Cliente, connection=connection)
-    cliente_cmd_handler = CommandHandler(Cliente, connection)
+    cmd_handler = CommandHandler(connection)
 
     if follow_request_data.follow:
         response.status_code = 201
 
-        cliente_cmd_handler.save(cliente)
-        results = await cliente_cmd_handler.commit()
+        cmd_handler.save(cliente)
+        results = await cmd_handler.commit()
         result = results[0].uuid
         return {"result": result, 'follow': follow_request_data.follow}
 
@@ -207,8 +206,8 @@ async def seguir_loja(
         )
 
         if relationship:
-            cliente_cmd_handler.delete(relationship)
-            await cliente_cmd_handler.commit()
+            cmd_handler.delete(relationship)
+            await cmd_handler.commit()
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

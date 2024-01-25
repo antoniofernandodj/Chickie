@@ -13,7 +13,7 @@ async def test_command_handler():
     async with aiopg.create_pool(DSN) as pool:
         async with pool.acquire() as connection:
 
-            command_handler = CommandHandler(CategoriaProdutos, connection)
+            cmd_handler = CommandHandler(connection)
 
             categoria1 = CategoriaProdutos(
                 nome='cat1', descricao='desc',
@@ -30,13 +30,13 @@ async def test_command_handler():
                 loja_uuid=''  # raises HERE!
             )
 
-            command_handler.save([categoria1, categoria2, categoria3])
+            cmd_handler.save([categoria1, categoria2, categoria3])
 
-            assert len(command_handler.commands) == 3
+            assert len(cmd_handler.commands) == 3
 
             results = []
             with pytest.raises(psycopg2.errors.ForeignKeyViolation):
-                result = await command_handler.commit()
+                result = await cmd_handler.commit()
                 results.extend(result)
 
             assert len(results) == 0

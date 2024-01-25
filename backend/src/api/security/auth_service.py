@@ -20,8 +20,12 @@ class AuthService:
     def __init__(self, connection: Connection):
         self.connection = connection
         self.loja_service = LojaService(self.connection)
-        self.loja_repo = QueryHandler(Loja, connection=self.connection)
-        self.user_repo = QueryHandler(Usuario, connection=self.connection)
+        self.loja_query_handler = QueryHandler(
+            Loja, connection=self.connection
+        )
+        self.user_query_handler = QueryHandler(
+            Usuario, connection=self.connection
+        )
 
     async def authenticate_company(
         self,
@@ -40,9 +44,15 @@ class AuthService:
             None se a autenticação falhar.
         """
 
-        l1 = await self.loja_repo.find_one(username=username)
-        l2 = await self.loja_repo.find_one(email=username)
-        l3 = await self.loja_repo.find_one(celular=self.only_numbers(username))
+        l1 = await self.loja_query_handler.find_one(
+            username=username
+        )
+        l2 = await self.loja_query_handler.find_one(
+            email=username
+        )
+        l3 = await self.loja_query_handler.find_one(
+            celular=self.only_numbers(username)
+        )
         loja = l1 or l2 or l3
 
         if loja is None or not isinstance(loja, Loja):
@@ -69,9 +79,11 @@ class AuthService:
             ou None se a autenticação falhar.
         """
 
-        u1 = await self.user_repo.find_one(username=username)
-        u2 = await self.user_repo.find_one(email=username)
-        u3 = await self.user_repo.find_one(celular=self.only_numbers(username))
+        u1 = await self.user_query_handler.find_one(username=username)
+        u2 = await self.user_query_handler.find_one(email=username)
+        u3 = await self.user_query_handler.find_one(
+            celular=self.only_numbers(username)
+        )
         user = u1 or u2 or u3
 
         if user is None or not isinstance(user, Usuario):
@@ -105,7 +117,7 @@ class AuthService:
         except JWTError:
             raise AuthService.credentials_exception
 
-        loja = await self.loja_repo.find_one(username=username)
+        loja = await self.loja_query_handler.find_one(username=username)
 
         if loja is None or not isinstance(loja, Loja):
             raise AuthService.credentials_exception
@@ -136,7 +148,7 @@ class AuthService:
         except JWTError:
             raise self.credentials_exception
 
-        user = await self.user_repo.find_one(username=username)
+        user = await self.user_query_handler.find_one(username=username)
 
         if user is None or not isinstance(user, Usuario):
             raise AuthService.credentials_exception

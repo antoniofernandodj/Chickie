@@ -52,6 +52,9 @@ export class ProdutoService {
   }
 
   save(body: ProdutoBodyRequest): Observable<Object> {
+
+    console.log({ headers: this.headers })
+
     return this.http.post(this.baseUrl, body, { headers: this.headers })
   }
 

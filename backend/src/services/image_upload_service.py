@@ -1,5 +1,5 @@
 import re
-from config import settings
+from config import settings  # type: ignore
 import base64
 from typing import Any, Optional, Dict
 from pydantic import BaseModel
@@ -56,7 +56,6 @@ class ImageUploadServiceBase:
             public_ids, resource_type="image",
             type="upload"
         )
-        print(image_delete_result)
         return image_delete_result  # type: ignore
 
     def safe_name(self, name: str) -> str:
@@ -139,7 +138,7 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
 
     @property
     def image_produto_folder_path(self):
-        dirname = self.safe_name(f'{self.loja.uuid}_{self.loja.username}')
+        dirname = self.safe_name(f'{self.loja.username}_{self.loja.uuid}')
         return (f'lojas/{dirname}/imagem_produto/')
 
     def image_produto_metadata(
@@ -168,6 +167,7 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
         }
         """
         result = self.execute_query("resource_type:image")
+        print({'result': result})
         for image in result['resources']:
             if produto.uuid in image['public_id']:
                 return image

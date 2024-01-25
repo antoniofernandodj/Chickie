@@ -55,10 +55,10 @@ async def cadastrar_pagamentos(
     pagamento: Pagamento
 ) -> Dict[str, str]:
 
-    pagamentos_command_handler = CommandHandler(Pagamento, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        pagamentos_command_handler.save(pagamento)
-        results = await pagamentos_command_handler.commit()
+        cmd_handler.save(pagamento)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -74,7 +74,7 @@ async def atualizar_pagamento_put(
 ):
 
     query_handler = QueryHandler(Pagamento, connection=connection)
-    cmd_handler = CommandHandler(Pagamento, connection=connection)
+    cmd_handler = CommandHandler(connection)
 
     pagamento = await query_handler.find_one(uuid=uuid)
     if pagamento is None:
@@ -96,7 +96,7 @@ async def atualizar_pagamento_patch(
 ):
 
     query_handler = QueryHandler(Pagamento, connection=connection)
-    cmd_handler = CommandHandler(Pagamento, connection=connection)
+    cmd_handler = CommandHandler(connection)
     pagamento = await query_handler.find_one(uuid=uuid)
     if pagamento is None:
         raise NotFoundException("Pagamento não encontrado")
@@ -115,9 +115,9 @@ async def remover_pagamento(
     uuid: Annotated[str, Path(title="O uuid do pagemento a fazer delete")]
 ):
 
-    cmd_handler = CommandHandler(Pagamento, connection=connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        cmd_handler.delete_from_uuid(uuid=uuid)
+        cmd_handler.delete_from_uuid(Pagamento, uuid=uuid)
         await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))

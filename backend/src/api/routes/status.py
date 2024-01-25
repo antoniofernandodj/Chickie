@@ -63,11 +63,11 @@ async def cadastrar_status(
     if query:
         raise ConflictException('Status Já cadastrado!')
 
-    command_handler = CommandHandler(Status, connection)
+    cmd_handler = CommandHandler(connection)
 
     try:
-        command_handler.save(status)
-        results = await command_handler.commit()
+        cmd_handler.save(status)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -84,15 +84,15 @@ async def atualizar_status_put(
 ):
 
     status_query_handler = QueryHandler(Status, connection)
-    status_command_handler = CommandHandler(Status, connection)
+    cmd_handler = CommandHandler(connection)
     status_item = await status_query_handler.find_one(uuid=uuid)
     if status_item is None:
         raise NotFoundException("Status não encontrado")
 
-    status_command_handler.update(
+    cmd_handler.update(
         status_item, status_data.model_dump()  # type: ignore
     )
-    await status_command_handler.commit()
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -113,10 +113,10 @@ async def remover_status(
     uuid: Annotated[str, Path(title="O uuid do status a fazer delete")]
 ):
 
-    status_cmd_handler = CommandHandler(Status, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        status_cmd_handler.delete_from_uuid(uuid=uuid)
-        await status_cmd_handler.commit()
+        cmd_handler.delete_from_uuid(Status, uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

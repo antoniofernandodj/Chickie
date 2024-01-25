@@ -55,10 +55,10 @@ async def cadastrar_zonas_de_entrega(
     if query:
         raise Exception
 
-    command_handler = CommandHandler(ZonaDeEntrega, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        command_handler.save(zona_de_entrega)
-        results = await command_handler.commit()
+        cmd_handler.save(zona_de_entrega)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -76,16 +76,16 @@ async def atualizar_zona_de_entrega_put(
 ):
 
     zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
-    zonas_cmd_handler = CommandHandler(ZonaDeEntrega, connection)
+    cmd_handler = CommandHandler(connection)
 
     zona_de_entrega = await zonas_query_handler.find_one(uuid=uuid)
     if zona_de_entrega is None:
         raise NotFoundException("Zona de entrega não encontrada")
 
-    zonas_cmd_handler.update(
+    cmd_handler.update(
         zona_de_entrega, zona_de_entrega_Data.model_dump()  # type: ignore
     )
-    await zonas_cmd_handler.commit()
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -100,17 +100,17 @@ async def atualizar_zona_de_entrega_patch(
 ):
 
     zonas_query_handler = QueryHandler(ZonaDeEntrega, connection)
-    zonas_cmd_handler = CommandHandler(ZonaDeEntrega, connection)
+    cmd_handler = CommandHandler(connection)
 
     zona_de_entrega = await zonas_query_handler.find_one(uuid=uuid)
     if zona_de_entrega is None:
         raise NotFoundException("Zona de entrega não encontrada")
 
-    zonas_cmd_handler.update(
+    cmd_handler.update(
         zona_de_entrega, zona_de_entregaData.model_dump()  # type: ignore
     )
 
-    await zonas_cmd_handler.commit()
+    await cmd_handler.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -123,10 +123,10 @@ async def remover_zona_de_entrega(
     ]
 ):
 
-    zonas_cmd_handler = CommandHandler(ZonaDeEntrega, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        zonas_cmd_handler.delete_from_uuid(uuid=uuid)
-        await zonas_cmd_handler.commit()
+        cmd_handler.delete_from_uuid(ZonaDeEntrega, uuid=uuid)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

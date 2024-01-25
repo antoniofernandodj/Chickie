@@ -66,11 +66,11 @@ async def cadastrar_adicional(
     if query:
         raise ConflictException('Adicional Já cadastrado!')
 
-    adicional_command_handler = CommandHandler(Adicional, connection)
+    cmd_handler = CommandHandler(connection)
 
     try:
-        adicional_command_handler.save(adicional)
-        results = await adicional_command_handler.commit()
+        cmd_handler.save(adicional)
+        results = await cmd_handler.commit()
         uuid = results[0].uuid
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
@@ -85,10 +85,10 @@ async def remover_adicional(
     uuid: Annotated[str, Path(title="O uuid do adicional a fazer delete")]
 ):
 
-    adicional_cmd_handler = CommandHandler(Adicional, connection)
+    cmd_handler = CommandHandler(connection)
     try:
-        adicional_cmd_handler.delete_from_uuid(uuid=uuid)
-        await adicional_cmd_handler.commit()
+        cmd_handler.delete_from_uuid(uuid=uuid, model=Adicional)
+        await cmd_handler.commit()
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 

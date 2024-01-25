@@ -1,28 +1,26 @@
-from src.infra.database_postgres.handlers import CommandHandler
 from src.domain.models import (
     Usuario,
     UsuarioSignUp,
     EnderecoUsuario as Endereco
 )
-from aiopg import Connection
 from src.api.security.hash_service import HashService
 from src.exceptions import InvalidPasswordException
 from typing import Optional
+from .base import BaseService
+import uuid
 
 
-class UserService:
-    def __init__(
-        self,
-        connection: Connection
-    ):
-        self.user_cmd_handler = CommandHandler(Usuario, connection)
-        self.endereco_cmd_handler = CommandHandler(Endereco, connection)
+class UserService(BaseService):
+
+    model = Usuario
 
     async def registrar(
         self,
         user_data: UsuarioSignUp,
-
     ) -> Usuario:
+
+        usuario_uuid = str(uuid.uuid1())
+        endereco_uuid = str(uuid.uuid1())
 
         valid = self.validate_password(user_data.password)
         if not valid:
@@ -39,9 +37,8 @@ class UserService:
         )
         del user.password
 
-        self.user_cmd_handler.save(user)
-        results = await self.user_cmd_handler.commit()
-        user.uuid = results[0].uuid
+        self.cmd_handler.save(user, usuario_uuid)  # COMMAND!
+        user.uuid = usuario_uuid
 
         endereco = Endereco(
             uf=user_data.uf,
@@ -53,8 +50,9 @@ class UserService:
             complemento=user_data.complemento,
             usuario_uuid=user.uuid
         )
-        self.endereco_cmd_handler.save(endereco)
-        await self.endereco_cmd_handler.commit()
+        self.cmd_handler.save(endereco, endereco_uuid)  # COMMAND!
+
+        await self.cmd_handler.commit()
 
         del user_data
         return user
