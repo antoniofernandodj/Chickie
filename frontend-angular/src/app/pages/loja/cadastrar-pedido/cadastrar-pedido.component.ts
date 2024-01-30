@@ -96,7 +96,8 @@ export class CadastrarPedidoComponent {
       produto_uuid: '',
       uuid: uuidv4(),
       observacoes: '',
-      loja_uuid: this.companyData.loja.uuid
+      loja_uuid: this.companyData.loja.uuid,
+      ingredientes: []
     }]);
     this.fetchProducts(this.companyData.loja.uuid)
     this.fetchClientes()
@@ -130,7 +131,8 @@ export class CadastrarPedidoComponent {
       produto_uuid: '',
       uuid: randomUUID,
       observacoes: '',
-      loja_uuid: this.companyData.loja.uuid
+      loja_uuid: this.companyData.loja.uuid,
+      ingredientes: []
     })
   }
 
@@ -155,7 +157,7 @@ export class CadastrarPedidoComponent {
         }
       },
       error: (response: HttpErrorResponse) => {
-        let msg = '148: Erro ao buscar pelos produtos'
+        let msg = '160: Erro ao buscar pelos produtos'
         alert(msg); throw new Error(msg)
       }
     })
@@ -209,26 +211,23 @@ export class CadastrarPedidoComponent {
     return 0
   }
 
-  cadastrarPedido(event: Event) {
-
+  getBody() {
     let user_uuid = null;
-    let button = new ButtonHandler(event)
-    button.disable('Enviando o pedido...')
     if (this.userData && this.userData.uuid) {
       user_uuid = this.userData.uuid
     }
 
     let numeroCelular = this.celular.replace(/\D/g, '');
     if (numeroCelular.length != 11) {
-      alert('O numero de celular precisa ter 11 digitos contando com o DDD!')
-      return
+      let msg = 'O numero de celular precisa ter 11 digitos contando com o DDD!'
+      alert(msg); throw new Error(msg)
     }
 
     let itens = this.numeroDeItens.getValue()
     for (let item of itens) {
       if (!item.produto_uuid) {
-        alert('O campo produto é obrigatório!')
-        return
+        let msg = 'O campo produto é obrigatório!'
+        alert(msg); throw new Error(msg)
       }
     }
 
@@ -240,7 +239,8 @@ export class CadastrarPedidoComponent {
       itens: itens.map(item => ({
         produto_uuid: item.produto_uuid,
         quantidade: item.quantidade,
-        observacoes: item.observacoes
+        observacoes: item.observacoes,
+        ingredientes: item.ingredientes
       })),
       loja_uuid: this.companyData.loja.uuid,
       comentarios: this.comentarios,
@@ -251,6 +251,16 @@ export class CadastrarPedidoComponent {
     if (this.userData) {
       body.usuario_uuid = this.userData.uuid
     }
+
+    return body
+  }
+
+  cadastrarPedido(event: Event) {
+
+    let button = new ButtonHandler(event)
+    button.disable('Enviando o pedido...')
+
+    let body = this.getBody()
 
     this.pedidoService.save(body).subscribe({
       next: (response) => {

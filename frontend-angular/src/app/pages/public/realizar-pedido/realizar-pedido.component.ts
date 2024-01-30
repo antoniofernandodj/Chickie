@@ -7,13 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CommonModule } from '@angular/common';
 import { ButtonHandler } from '../../../handlers/button';
+import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 
 import {  ProdutoResponse, CategoriaResponse, LojaResponse,
-          ItemPedido, Endereco, User } from '../../../models/models';
+          ItemPedido, Endereco, User, Ingrediente } from '../../../models/models';
 
 import {  PedidoService, CategoriaService,
           AuthService, LojaService, AuthData,
-          ProdutoService } from '../../../services/services';
+          ProdutoService, IngredienteService } from '../../../services/services';
 
 
 @Component({
@@ -23,7 +24,8 @@ import {  PedidoService, CategoriaService,
     FormsModule,
     NgxMaskDirective,
     RouterModule,
-    CommonModule
+    CommonModule,
+    SpinnerComponent
   ],
   templateUrl: './realizar-pedido.component.html',
   styleUrl: './realizar-pedido.component.sass'
@@ -35,13 +37,15 @@ export class RealizarPedidoComponent {
   companyData: AuthData | null
   companyCategorias: BehaviorSubject<Array<CategoriaResponse>>
   produtoValue: any
-  numeroDeItens: BehaviorSubject<Array<ItemPedido>>
+  itensAEnviar: BehaviorSubject<Array<ItemPedido>>
   userData: AuthData | null
   endereco: Endereco
   celular: string
   observacoes: string
   comentarios: string
   lojaUUID: string
+  loadingCategorias: boolean
+  loadingIngredientes: boolean
 
   constructor(
 
@@ -50,7 +54,8 @@ export class RealizarPedidoComponent {
     private categoriaService: CategoriaService,
     private lojaService: LojaService,
     private authService: AuthService,
-    private pedidoService: PedidoService
+    private pedidoService: PedidoService,
+    private ingredienteService: IngredienteService,
 
   ) {
     this.userData = null
@@ -62,7 +67,11 @@ export class RealizarPedidoComponent {
     this.produtoValue = null
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([]);
     this.companyCategorias = new BehaviorSubject<Array<CategoriaResponse>>([]);
-    this.numeroDeItens = new BehaviorSubject<Array<ItemPedido>>([]);
+    this.itensAEnviar = new BehaviorSubject<Array<ItemPedido>>([]);
+
+    this.loadingCategorias = true
+    this.loadingIngredientes = true
+
     this.celular = ''
     this.endereco = {
       uf: '',
@@ -85,40 +94,50 @@ export class RealizarPedidoComponent {
       this.lojaUUID = params['lojaID'];
       this.fetchLoja(this.lojaUUID);
 
-      this.numeroDeItens = new BehaviorSubject<Array<ItemPedido>>([{
+      this.itensAEnviar = new BehaviorSubject<Array<ItemPedido>>([{
         quantidade: 1,
         produto_uuid: '',
         uuid: uuidv4(),
         observacoes: '',
-        loja_uuid: this.lojaUUID
+        loja_uuid: this.lojaUUID,
+        ingredientes: {}
       }]);
 
       this.fetchProducts(this.lojaUUID)
     })
   }
 
-
-
   addItem() {
     const randomUUID: string = uuidv4();
-    this.numeroDeItens.value.push({
+    let itemVazio = {
       quantidade: 1,
       produto_uuid: '',
       uuid: randomUUID,
       observacoes: '',
-      loja_uuid: this.lojaUUID
-    })
+      loja_uuid: this.lojaUUID,
+      ingredientes: {}
+    }
+
+    this.itensAEnviar.value.push(itemVazio)
+  }
+
+  updateItemForIngrediente(
+    item: ItemPedido,
+    ingrediente: Ingrediente,
+    value: boolean
+  ) {
+    item.ingredientes[ingrediente.uuid] = value
   }
 
   removeItem(item: any) {
 
-    if (!(this.numeroDeItens.value.length > 1)) {
+    if (!(this.itensAEnviar.value.length > 1)) {
       throw new Error('O pedido necessita de ao menos um pedido!')
     }
 
-    let newArr = this.numeroDeItens.getValue()
+    let newArr = this.itensAEnviar.getValue()
     newArr = newArr.filter(u => item.uuid != u.uuid)
-    this.numeroDeItens.next(newArr)
+    this.itensAEnviar.next(newArr)
   }
 
   private fetchLoja(companyUUID: string): void {
@@ -139,7 +158,12 @@ export class RealizarPedidoComponent {
         let payload = result.payload
         if (Array.isArray(payload)) {
           this.companyProducts.next(payload)
+
+          this.loadingCategorias = true
+          this.loadingIngredientes = true
+
           this.fetchCategoriasForProducts()
+          this.fetchProdutoIngredientes()
         }
       },
       error: (response: HttpErrorResponse) => {
@@ -163,11 +187,26 @@ export class RealizarPedidoComponent {
       })
 
     }
+    this.loadingCategorias = false
+  }
+
+  fetchProdutoIngredientes() {
+    for (let produto of this.companyProducts.value) {
+      this.ingredienteService.getAll(produto.uuid).subscribe({
+        next: (result: any) => {
+          produto.ingredientes = result
+        },
+        error: (result) => {
+          console.error(result)
+        }
+      })
+    }
+    this.loadingIngredientes = false
   }
 
   getPrecoTotal():number {
     let total = 0
-    for (let item of this.numeroDeItens.value) {
+    for (let item of this.itensAEnviar.value) {
       let parcial = (
         item.quantidade * this.getProdutoPreco(item.produto_uuid)
       )
@@ -187,6 +226,25 @@ export class RealizarPedidoComponent {
     return 0
   }
 
+  getProdutoIngredientes(produtoUUID: string): Array<Ingrediente> {
+    for (let produto of this.companyProducts.value) {
+      if (produto.uuid == produtoUUID) {
+        let found = produto.ingredientes
+        if (Array.isArray(found)) {
+          return found
+        } else {
+          return []
+        }
+      }
+    }
+    return []
+  }
+
+  logPayload() {
+    let body = this.getBody()
+    console.log({body: body})
+  }
+
   getProdutoPrecoBase(produtoUUID: string): number {
     for (let produto of this.companyProducts.value) {
       if (produto.uuid == produtoUUID) {
@@ -197,31 +255,28 @@ export class RealizarPedidoComponent {
     return 0
   }
 
-  cadastrarPedido(event: Event) {
-
+  getBody() {
     let user_uuid = null;
-    let button = new ButtonHandler(event)
-    button.disable('Enviando o pedido...')
     if (this.userData && this.userData.uuid) {
       user_uuid = this.userData.uuid
     }
 
     let numeroCelular = this.celular.replace(/\D/g, '');
     if (numeroCelular.length != 11) {
-      alert('O numero de celular precisa ter 11 digitos contando com o DDD!')
-      return
+      let msg = 'O numero de celular precisa ter 11 digitos contando com o DDD!'
+      alert(msg); throw new Error(msg)
     }
 
     if (!this.loja) {
-      alert('Loja não encotrada!')
-      return
+      let msg = 'Loja não encotrada!'
+      alert(msg); throw new Error(msg)
     }
 
-    let itens = this.numeroDeItens.getValue()
+    let itens = this.itensAEnviar.getValue()
     for (let item of itens) {
       if (!item.produto_uuid) {
-        alert('O campo produto é obrigatório!')
-        return
+        let msg = 'O campo produto é obrigatório!'
+        alert(msg); throw new Error(msg)
       }
     }
 
@@ -233,7 +288,8 @@ export class RealizarPedidoComponent {
       itens: itens.map(item => ({
         produto_uuid: item.produto_uuid,
         quantidade: item.quantidade,
-        observacoes: item.observacoes
+        observacoes: item.observacoes,
+        ingredientes: item.ingredientes
       })),
       loja_uuid: this.loja.uuid,
       comentarios: this.comentarios,
@@ -241,9 +297,39 @@ export class RealizarPedidoComponent {
       usuario_uuid: user_uuid,
     }
 
-    if (this.userData) {
-      body.usuario_uuid = this.userData.uuid
+    if (this.userData) { body.usuario_uuid = this.userData.uuid }
+
+    let groups = document.querySelectorAll(".radio-group")
+    for (let i=0; i< groups.length; i++) {
+      let group = groups[i]
+      let groupName = group.getAttribute('data-name')
+
+      let radios = group.querySelectorAll('input[type=radio]')
+
+      let peloMenosUmRadio = false
+      for (let i=0; i< radios.length; i++) {
+        let radio = radios[i] as HTMLInputElement
+        if (radio.checked) {
+          peloMenosUmRadio = true
+        }
+      }
+
+      if (!peloMenosUmRadio) {
+        let msg = `Marcar opção para ingrediente ${groupName}!`
+        alert(msg); throw new Error(msg)
+      }
     }
+
+
+    return body
+  }
+
+  cadastrarPedido(event: Event) {
+
+    let body = this.getBody()
+
+    let button = new ButtonHandler(event)
+    button.disable('Enviando o pedido...')
 
     this.pedidoService.save(body).subscribe({
       next: (response) => {
@@ -264,7 +350,7 @@ export class RealizarPedidoComponent {
     this.comentarios = ''
     this.companyProducts = new BehaviorSubject<Array<ProdutoResponse>>([]);
     this.companyCategorias = new BehaviorSubject<Array<CategoriaResponse>>([]);
-    this.numeroDeItens = new BehaviorSubject<Array<ItemPedido>>([]);
+    this.itensAEnviar = new BehaviorSubject<Array<ItemPedido>>([]);
     this.ngOnInit()
   }
 }

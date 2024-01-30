@@ -1,3 +1,6 @@
+import { Ingrediente } from "./ingrediente"
+
+
 export type ProdutoBodyRequest = {
   loja_uuid: string,
   categoria_uuid: string,
@@ -21,6 +24,7 @@ export type ProdutoResponse = {
   preco: number,
   descricao: string,
   categoria?: any,
+  ingredientes?: Array<Ingrediente>,
   image_url: string,
   preco_hoje?: number
 }

@@ -24,6 +24,7 @@ export type PedidoBodyRequest = {
   itens: Array<{
     produto_uuid: string,
     quantidade: number
+    ingredientes: any
   }>,
   loja_uuid: string,
   status_uuid: string | null

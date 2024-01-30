@@ -4,4 +4,5 @@ export type ItemPedido = {
   observacoes: string
   loja_uuid: string
   uuid: string
+  ingredientes: any
 }

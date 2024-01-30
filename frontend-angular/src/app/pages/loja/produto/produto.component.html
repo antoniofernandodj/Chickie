@@ -93,10 +93,9 @@
   @if (ingredientes.value.length) {
     <h2>Ingredientes</h2>
 
-
     @for (ingrediente of ingredientes.value; track $index) {
       <div>
-        <span>Nome: {{ingrediente.nome}} </span>
+        <span>Nome: {{ ingrediente.nome }} </span>
         <button (click)="removerIngrediente($event, ingrediente)">x</button>
       </div>
     }

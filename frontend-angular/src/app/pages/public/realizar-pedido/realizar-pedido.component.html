@@ -94,97 +94,154 @@
 
 </div>
 
-@for (item of numeroDeItens.value; track $index) {
 
-  <div style="margin: 25px;">
-    <label for="">Produtos</label>
-    <select
-      [(ngModel)]="item.produto_uuid"
-    >
+<button (click)="logPayload()">Exibir</button>
 
-      <option value="">Escolha um produto</option>
-      @for (produto of companyProducts.value; track $index) {
-        <option value="{{ produto.uuid }}">
-          {{ produto.nome }}
-        </option>
-      }
-    </select>
-    <div>
-      <label for="">Quantidade</label>
-      <input type="number" [(ngModel)]="item.quantidade" min="1">
-    </div>
 
-    <div>
-      <label for="">Observacoes</label>
-      <textarea
-        name="" id=""
-        cols="30" rows="3"
-        [(ngModel)]="item.observacoes"></textarea>
+@if (loadingCategorias || loadingIngredientes) {
 
-    </div>
-    <div>
-      @if (item.produto_uuid) {
+  <spinner />
+
+} @else {
+
+  <main>
+
+    @for (item of itensAEnviar.value; track $index) {
+
+      <div style="margin: 25px;">
+        <label for="">Produtos</label>
+        <select
+          [(ngModel)]="item.produto_uuid"
+        >
+
+          <option value="">Escolha um produto</option>
+          @for (produto of companyProducts.value; track $index) {
+            <option value="{{ produto.uuid }}">
+              {{ produto.nome }}
+            </option>
+          }
+        </select>
         <div>
-          Preço unitário:
-
-          {{
-            getProdutoPreco(item.produto_uuid) |
-            currency:'BRL':'symbol':'1.2-2'
-          }}
-
-          Preço total:
-
-          {{
-            (getProdutoPreco(item.produto_uuid) * item.quantidade) |
-            currency:'BRL':'symbol':'1.2-2'
-          }}
+          <label for="">Quantidade</label>
+          <input type="number" [(ngModel)]="item.quantidade" min="1">
         </div>
 
-        @if (
-          getProdutoPreco(item.produto_uuid) !=
-          getProdutoPrecoBase(item.produto_uuid)
-        ) {
-          <strong>
-            Em promoção!
-            De
+        <div>
+          <label for="">Observacoes</label>
+          <textarea
+            name="" id=""
+            cols="30" rows="3"
+            [(ngModel)]="item.observacoes"></textarea>
 
-            {{
-              getProdutoPrecoBase(item.produto_uuid) |
-              currency:'BRL':'symbol':'1.2-2'
-            }}
+        </div>
+        <div>
+          @if (item.produto_uuid) {
+            <div>
+              Preço unitário:
 
-            Por
+              {{
+                getProdutoPreco(item.produto_uuid) |
+                currency:'BRL':'symbol':'1.2-2'
+              }}
 
-            {{
-              getProdutoPreco(item.produto_uuid) |
-              currency:'BRL':'symbol':'1.2-2'
-            }}
-            cada um
-          </strong>
+              Preço total:
+
+              {{
+                (getProdutoPreco(item.produto_uuid) * item.quantidade) |
+                currency:'BRL':'symbol':'1.2-2'
+              }}
+            </div>
+
+            @if (
+              getProdutoPreco(item.produto_uuid) !=
+              getProdutoPrecoBase(item.produto_uuid)
+            ) {
+              <strong>
+                Em promoção!
+                De
+
+                {{
+                  getProdutoPrecoBase(item.produto_uuid) |
+                  currency:'BRL':'symbol':'1.2-2'
+                }}
+
+                Por
+
+                {{
+                  getProdutoPreco(item.produto_uuid) |
+                  currency:'BRL':'symbol':'1.2-2'
+                }}
+                cada um
+              </strong>
+            }
+          }
+        </div>
+        @if (itensAEnviar.value.length > 1) {
+          <div>
+            <button (click)="removeItem(item)">Remover Item</button>
+          </div>
         }
-      }
-    </div>
-    @if (numeroDeItens.value.length > 1) {
-      <div>
-        <button (click)="removeItem(item)">Remover Item</button>
       </div>
+
+
+      @if (getProdutoIngredientes(item.produto_uuid).length) {
+
+        <h3>Ingredientes</h3>
+        @for (
+          ingrediente of getProdutoIngredientes(item.produto_uuid);
+          track ingrediente.uuid
+        ) {
+          <div class="radio-group" [attr.data-name]="ingrediente.nome">
+
+            <strong>{{ ingrediente.nome }}:</strong>
+
+            <input
+              type="radio"
+              name="input-{{item.uuid}}-ingrediente-{{ingrediente.uuid}}"
+              [id]="'sim-' + item.uuid + '-ingrediente-' + ingrediente.uuid"
+              (change)="updateItemForIngrediente(item, ingrediente, true)"
+            >
+            <label [for]="'sim-' + item.uuid + '-ingrediente-' + ingrediente.uuid">
+              Sim
+            </label>
+
+            <input
+              type="radio"
+              name="input-{{item.uuid}}-ingrediente-{{ingrediente.uuid}}"
+              [id]="'nao-' + item.uuid + '-ingrediente-' + ingrediente.uuid"
+              (change)="updateItemForIngrediente(item, ingrediente, false)"
+            >
+            <label [for]="'nao-' + item.uuid + '-ingrediente-' + ingrediente.uuid">
+              Não
+            </label>
+
+          </div>
+        }
+
+      }
+
+      <hr>
+      <hr>
     }
-  </div>
+
+    <div>
+      <button (click)="addItem()">Adicionar Item</button>
+    </div>
+
+    <hr />
+
+    <label for="">Comentarios</label>
+    <textarea name="" id="" cols="30" rows="10" [(ngModel)]="comentarios">
+    </textarea>
+
+    <hr />
+
+    <div>
+      <button (click)="cadastrarPedido($event)">Concluir Pedido</button>
+    </div>
+
+  </main>
 
 }
 
-<div>
-  <button (click)="addItem()">Adicionar Item</button>
-</div>
 
-<hr />
-
-<label for="">Comentarios</label>
-<textarea name="" id="" cols="30" rows="10" [(ngModel)]="comentarios">
-</textarea>
-
-<hr />
-
-<div>
-  <button (click)="cadastrarPedido($event)">Concluir Pedido</button>
-</div>
