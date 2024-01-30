@@ -84,28 +84,6 @@ async def cadastrar_ingrediente(
     return {"uuid": uuid}
 
 
-@router.put("/{uuid}")
-async def atualizar_ingrediente_put(
-    connection: ConnectionDependency,
-    ingrediente_data: Ingrediente,
-    loja: CurrentLojaDependency,
-    uuid: Annotated[str, Path(title="O uuid do ingrediente a fazer put")],
-):
-
-    ingredientes_query_handler = QueryHandler(Ingrediente, connection)
-    cmd_handler = CommandHandler(connection)
-    ingrediente_item = await ingredientes_query_handler.find_one(uuid=uuid)
-    if ingrediente_item is None:
-        raise NotFoundException("Ingrediente não encontrado")
-
-    cmd_handler.update(
-        ingrediente_item, ingrediente_data.model_dump()  # type: ignore
-    )
-    await cmd_handler.commit()
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
 @router.delete("/{uuid}")
 async def remover_ingrediente(
     connection: ConnectionDependency,
