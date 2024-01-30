@@ -6,12 +6,13 @@ config = context.config
 
 MIGRATION_MODE = 'DEV'
 
-if MIGRATION_MODE == 'DEV':
-    from src.infra.database_postgres.config import engine_dev as engine
-elif MIGRATION_MODE == 'PROD':
-    from src.infra.database_postgres.config import engine_prod as engine
-else:
-    from src.infra.database_postgres.config import engine
+match MIGRATION_MODE:
+    case 'DEV':
+        from src.infra.database_postgres.config import engine_dev as engine
+    case 'PROD':
+        from src.infra.database_postgres.config import engine_prod as engine
+    case _:
+        from src.infra.database_postgres.config import engine
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

@@ -27,7 +27,7 @@ export class LojaSettingsComponent {
   companyData: BehaviorSubject<CompanyAuthData | null>
   imageBase64String: string
   ufs: Array<string>
-  uf: string
+  ufValue: string
 
   nomeValue: string
   emailValue: string
@@ -64,7 +64,7 @@ export class LojaSettingsComponent {
     this.cep = ''
 
     this.atualizandoCadastro = false
-    this.uf = ''
+    this.ufValue = ''
     this.ufs = [
       'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF',
       'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
@@ -102,7 +102,7 @@ export class LojaSettingsComponent {
   ngOnInit() {
     for (let item of this.ufs) {
       if (item == this.companyData.value?.loja.endereco.uf) {
-        this.uf = item
+        this.ufValue = item
       }
     }
   }
@@ -124,17 +124,13 @@ export class LojaSettingsComponent {
     if (numerosEncontrados?.length == 8) {
       this.viaCepService.getAddressInfo(this.cep).subscribe({
         next: (result: any) => {
-          console.log({erro: result.erro})
           if (result.erro) {
             throw new Error('CEP inválido')
           }
-
-          this.viaCepService.setCachedData(result)
-          console.log({result: result})
           this.logradouroValue = result.logradouro
           this.bairroValue = result.bairro
           this.cidadeValue = result.localidade
-          this.uf = result.uf
+          this.ufValue = result.ufValue
         },
         error: (result) => {
           alert('Erro na requisição')
@@ -203,7 +199,7 @@ export class LojaSettingsComponent {
       nome: this.nomeValue,
       username: this.usernameValue,
 
-      uf: this.uf,
+      uf: this.ufValue,
       cep: this.cep,
       cidade: this.cidadeValue,
       logradouro: this.logradouroValue,

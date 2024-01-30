@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { PrecoResponse, FileDataRequest } from '../../../models/models';
+import { PrecoResponse, FileDataRequest, Ingrediente } from '../../../models/models';
 import { CurrencyPipe } from '@angular/common';
 import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 
 import {  AuthService, CompanyAuthData, ImageService,
-          PrecoService, ProdutoService } from '../../../services/services';
+          PrecoService, ProdutoService,
+          IngredienteService } from '../../../services/services';
 
 import { ButtonHandler } from '../../../handlers/button';
 
@@ -24,6 +25,7 @@ class Produto {
   preco_hoje: number
   precos: Array<PrecoResponse>
 
+
   constructor(response: any) {
     this.produto_uuid = response.produto_uuid;
     this.categoria_uuid = response.categoria_uuid;
@@ -34,6 +36,7 @@ class Produto {
     this.preco_hoje = response.preco_hoje;
     this.precos = response.precos;
     this.image_url = response.image_url;
+
   }
 }
 
@@ -98,6 +101,7 @@ export class ProdutoComponent {
   diaDaSemanaValue: string
   diasDaSemanaCadastrados: BehaviorSubject<Array<DiaSemana>>
   diasDaSemanaDisponiveis: BehaviorSubject<Array<DiaSemana>>
+  ingredientes: BehaviorSubject<Array<Ingrediente>>
 
   selectedImage: string
   fileData: FileDataRequest
@@ -107,6 +111,10 @@ export class ProdutoComponent {
   descricaoValue: string
   precoValue: number
   imageLoading: boolean
+  nomeIngrediente: string
+  descricaoIngrediente: string
+  ingredientesLoading: boolean
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -114,7 +122,8 @@ export class ProdutoComponent {
     private produtoService: ProdutoService,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private ingredienteService: IngredienteService,
   ) {
     this.imageLoading = false
     this.atualizandoImagem = false
@@ -126,6 +135,9 @@ export class ProdutoComponent {
     this.valorValue = null
     this.companyData = this.authService.currentCompany()
     this.imageForm = this.formBuilder.group({ imageFile: [''] })
+    this.nomeIngrediente = ''
+    this.descricaoIngrediente = ''
+    this.ingredientesLoading = false
 
     this.nomeValue = ''
     this.descricaoValue = ''
@@ -133,6 +145,7 @@ export class ProdutoComponent {
 
     this.diasDaSemanaCadastrados = new BehaviorSubject<Array<DiaSemana>>([])
     this.diasDaSemanaDisponiveis = new BehaviorSubject<Array<DiaSemana>>([])
+    this.ingredientes = new BehaviorSubject<Array<Ingrediente>>([])
   }
 
   ngOnInit(): void {
@@ -140,6 +153,7 @@ export class ProdutoComponent {
       this.produtoUUID = params['id'];
     });
     this.refreshProdutoPrecos()
+    this.refreshProdutoIngredientes()
   }
 
   async onFileSelected(event: any) {
@@ -262,6 +276,18 @@ export class ProdutoComponent {
 
   }
 
+  refreshProdutoIngredientes() {
+    this.ingredientesLoading = true
+    this.ingredienteService.getAll(this.produtoUUID).subscribe({
+      next: (result: any) => {
+        this.ingredientes.next(result)
+      },
+      error: (result) => {
+        console.error(result)
+      }
+    })
+  }
+
   removerPreco(event: Event, preco: any) {
     let button  = new ButtonHandler(event)
 
@@ -280,9 +306,29 @@ export class ProdutoComponent {
     })
   }
 
+  removerIngrediente(event: Event, ingrediente: any) {
+    let button  = new ButtonHandler(event)
+
+    button.disable('Removendo...')
+
+    this.ingredienteService.delete(ingrediente).subscribe({
+      next: (response) => {
+        button.enable()
+        alert('Ingrediente removido com sucesso!');
+        this.refreshProdutoIngredientes()
+      },
+      error: (response) => {
+        button.enable()
+        alert('Erro ao remover ingrediente de produto')
+      }
+    })
+  }
+
   clearInputs() {
     this.valorValue = null
     this.diaDaSemanaValue = ''
+    this.descricaoIngrediente = ''
+    this.nomeIngrediente = ''
   }
 
   cadastrarPreco(event: Event) {
@@ -315,6 +361,47 @@ export class ProdutoComponent {
       error: (response) => {
         button.enable()
         alert('Erro no cadasto do preço')
+
+      }
+    })
+
+  }
+
+  cadastrarIngrediente(event: Event) {
+    let button = new ButtonHandler(event)
+    button.disable('Salvando...')
+
+    for (let input of [this.nomeIngrediente, this.descricaoIngrediente]) {
+      if (!input) {
+        button.enable()
+        let msg = 'É necessário preencher todos os campos!'
+        alert(msg); throw new Error(msg)
+      }
+    }
+
+    if (!this.companyData) {
+      button.enable()
+      let msg = 'Dados de loja não encontrados'
+      alert(msg); throw new Error(msg)
+    }
+
+    let body = {
+      nome: this.nomeIngrediente,
+      descricao: this.descricaoIngrediente,
+      produto_uuid: this.produtoUUID,
+      loja_uuid: this.companyData.loja.uuid
+    }
+
+    this.ingredienteService.save(body).subscribe({
+      next: (response) => {
+        button.enable()
+        alert('Ingrediente cadastrado com sucesso!')
+        this.ngOnInit()
+        this.clearInputs()
+      },
+      error: (response) => {
+        button.enable()
+        alert('Erro no cadasto do ingrediente')
 
       }
     })

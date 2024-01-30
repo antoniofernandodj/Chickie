@@ -1,6 +1,5 @@
 reset_schema:
 	poetry run python scripts/reset_schema.py
-	poetry run alembic upgrade head
 
 lines:
 	poetry run python scripts/lines.py

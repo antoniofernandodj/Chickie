@@ -43,3 +43,6 @@ from .zona_de_entrega import ZonaDeEntrega, ZonasDeEntrega  # noqa
 from .cliente import Cliente, ClientePOST  # noqa
 from .imagem_cadastro import LojaUpdateImageCadastro  # noqa
 from .adicional import Adicional  # noqa
+from .ingrediente import (  # noqa
+    Ingrediente
+)

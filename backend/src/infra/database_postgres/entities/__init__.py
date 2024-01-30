@@ -14,3 +14,4 @@ from .avaliacao import AvaliacaoDeLoja, AvaliacaoDeProduto  # noqa
 from .funcionario import Funcionario  # noqa
 from .pagamento import Pagamento, MetodosPagamento  # noqa
 from .zona_de_entrega import ZonaEntrega  # noqa
+from .ingrediente import Ingrediente  # noqa

@@ -95,13 +95,13 @@ export class SignupLojaComponent {
 
 
   getCEPData() {
-    console.log({'this.cepValue': this.cepValue})
     const numerosEncontrados = this.cepValue.match(/\d/g);
     if (numerosEncontrados?.length == 8) {
       this.viaCepService.getAddressInfo(this.cepValue).subscribe({
         next: (result: any) => {
-          this.viaCepService.setCachedData(result)
-          console.log({result: result})
+          if (result.erro) {
+            throw new Error('CEP inválido')
+          }
           this.logradouroValue = result.logradouro
           this.bairroValue = result.bairro
           this.cidadeValue = result.localidade

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, tap, of } from 'rxjs';
+import { Observable, catchError, tap, of, map } from 'rxjs';
 
 
 
@@ -25,27 +25,35 @@ export class ViaCepService {
 
   constructor(private http: HttpClient) { }
 
-  private readonly localStorageKey = 'addressInfo';
-
   getAddressInfo(cep: string) {
     const url = `https://viacep.com.br/ws/${cep}/json/`;
     const cachedData = this.getCachedData(cep);
     if (cachedData) {
-      console.log({msg: 'Got from cache!', value: cachedData})
       return of(cachedData);
     }
-    console.log({msg: 'Getting from api...', value: cachedData})
-    return this.http.get(url)
+    return this.http.get(url).pipe(
+      map((data: any) => {
+        this.setCachedData(data)
+        return data;
+      }),
+      catchError((error) => {
+        console.error('Error fetching address info:', error);
+        throw error;
+      })
+    );
 
   }
 
   private getCachedData(key: string): AddressInfo | null {
-    console.log({'this.localStorageKey': this.localStorageKey})
-    const cachedDataString = localStorage.getItem(key);
+    const numbersOnly = key.match(/\d/g)
+    const cep = (numbersOnly) ? numbersOnly.join('') : ''
+    const cachedDataString = localStorage.getItem(cep);
     return cachedDataString ? JSON.parse(cachedDataString) : null;
   }
 
   setCachedData(data: AddressInfo): void {
-    localStorage.setItem(this.localStorageKey, JSON.stringify(data));
+    const numbersOnly = data.cep.match(/\d/g)
+    const cep = (numbersOnly) ? numbersOnly.join('') : ''
+    localStorage.setItem(cep, JSON.stringify(data));
   }
 }

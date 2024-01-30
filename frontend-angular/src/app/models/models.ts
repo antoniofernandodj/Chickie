@@ -11,3 +11,4 @@ export { ItemPedido } from './itemPedido';
 export { LojaResponse } from './loja';
 export { Endereco } from './endereco';
 export { Pedido } from './pedido';
+export { IngredienteBodyRequest, Ingrediente } from "./ingrediente"
