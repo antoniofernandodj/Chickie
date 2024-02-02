@@ -15,3 +15,4 @@ from .funcionario import Funcionario  # noqa
 from .pagamento import Pagamento, MetodosPagamento  # noqa
 from .zona_de_entrega import ZonaEntrega  # noqa
 from .ingrediente import Ingrediente  # noqa
+from .ingrediente_item_pedido import IngredienteDeItemDePedido  # noqa

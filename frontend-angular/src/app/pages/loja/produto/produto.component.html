@@ -85,7 +85,7 @@
     @for (preco of produto.value.precos; track $index) {
       <div>
         <strong>Preço:</strong> {{ preco.valor | currency:"BRL" }}, Dia da semana: {{ preco.dia_da_semana }}
-        <button (click)="removerPreco($event, preco)">Remover preco</button>
+        <button (click)="removerPreco($event, preco)"> x </button>
       </div>
     }
   }

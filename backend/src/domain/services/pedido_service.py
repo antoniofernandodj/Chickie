@@ -8,10 +8,13 @@ from src.domain.models import (
     PedidoPOST,
     ItemPedido,
     ItemPedidoPOST,
+    ItemPedidoGET,
     EnderecoEntrega,
     Pedido,
     Usuario,
-    Status
+    Status,
+    Ingrediente,
+    IngredienteDeItemDePedido
 )
 from aiopg.connection import Connection
 from typing import List, Optional
@@ -34,6 +37,10 @@ class PedidoService(BaseService):
         self.status_query_handler = QueryHandler(Status, conn)
         self.endereco_query_handler = QueryHandler(EnderecoEntrega, conn)
         self.itens_pedido_query_handler = QueryHandler(ItemPedido, conn)
+        self.ingrediente_query_handler = QueryHandler(Ingrediente, conn)
+        self.ingrediente_item_pedido_query_handler = (
+            QueryHandler(IngredienteDeItemDePedido, conn)
+        )
 
     async def get_all_pedidos(self, **kwargs) -> List[PedidoGET]:
         pedidos: List[Pedido] = await self.query_handler.find_all(
@@ -42,7 +49,7 @@ class PedidoService(BaseService):
 
         response: List[PedidoGET] = []
         for pedido in pedidos:
-            items: List[ItemPedido] = (
+            itens: List[ItemPedido] = (
                 await self.itens_pedido_query_handler.find_all(
                     pedido_uuid=pedido.uuid
                 )
@@ -63,15 +70,30 @@ class PedidoService(BaseService):
                 raise ValueError('Endereço não encontrado!')
 
             total = 0.0
-            itens: List[ItemPedido] = (
-                await self.itens_pedido_query_handler.find_all(
-                    pedido_uuid=pedido.uuid
-                )
-            )
 
+            itens_do_pedido = []
             for item in itens:
                 if item.valor is None:
                     raise AttributeError('Item sem valor definido')
+
+                ingredientes: List[IngredienteDeItemDePedido] = await (
+                    self.ingrediente_item_pedido_query_handler.find_all(
+                        item_uuid=item.uuid
+                    )
+                )
+
+                itens_do_pedido.append(
+                    ItemPedidoGET(
+                        quantidade=item.quantidade,
+                        observacoes=item.observacoes,
+                        pedido_uuid=item.pedido_uuid,
+                        loja_uuid=item.loja_uuid,
+                        produto_descricao=item.produto_descricao,
+                        produto_nome=item.produto_nome,
+                        ingredientes=ingredientes,
+                        valor=item.valor
+                    )
+                )
 
                 total += (item.quantidade * item.valor)
 
@@ -84,7 +106,7 @@ class PedidoService(BaseService):
                     loja_uuid=pedido.loja_uuid,
                     endereco=endereco,
                     uuid=pedido.uuid,
-                    itens=items,
+                    itens=itens_do_pedido,
                     total=total,
                     data_hora=pedido.data_hora,
                     concluido=pedido.concluido,
@@ -145,9 +167,9 @@ class PedidoService(BaseService):
         if pedido is None or pedido.uuid is None:
             return None
 
-        items: List[ItemPedido] = (
+        itens: List[ItemPedido] = (
             await self.itens_pedido_query_handler.find_all(
-                pedido_uuid=uuid
+                pedido_uuid=pedido.uuid
             )
         )
         endereco = await self.endereco_query_handler.find_one(
@@ -161,14 +183,30 @@ class PedidoService(BaseService):
         )
 
         total = 0.0
-        itens: List[ItemPedido] = (
-            await self.itens_pedido_query_handler.find_all(
-                pedido_uuid=pedido.uuid
-            )
-        )
+
+        itens_do_pedido: List[ItemPedidoGET] = []
         for item in itens:
             if item.valor is None:
                 raise AttributeError('Item sem valor definido')
+
+            ingredientes: List[IngredienteDeItemDePedido] = await (
+                self.ingrediente_item_pedido_query_handler.find_all(
+                    item_uuid=item.uuid
+                )
+            )
+
+            itens_do_pedido.append(
+                ItemPedidoGET(
+                    quantidade=item.quantidade,
+                    observacoes=item.observacoes,
+                    pedido_uuid=item.pedido_uuid,
+                    loja_uuid=item.loja_uuid,
+                    produto_descricao=item.produto_descricao,
+                    produto_nome=item.produto_nome,
+                    ingredientes=ingredientes,
+                    valor=item.valor
+                )
+            )
             total += (item.quantidade * item.valor)
 
         return PedidoGET(
@@ -180,7 +218,7 @@ class PedidoService(BaseService):
             endereco=endereco,
             uuid=pedido.uuid,
             total=total,
-            itens=items,
+            itens=itens_do_pedido,
             data_hora=pedido.data_hora,
             concluido=pedido.concluido,
             comentarios=pedido.comentarios
@@ -194,6 +232,7 @@ class PedidoService(BaseService):
         pedido_uuid = str(uuid.uuid1())
 
         pedido = Pedido(
+            uuid=pedido_uuid,
             data_hora=pedido_data.data_hora,
             loja_uuid=pedido_data.loja_uuid,
             frete=pedido_data.frete,
@@ -205,10 +244,9 @@ class PedidoService(BaseService):
 
         self.cmd_handler.save(pedido, pedido_uuid)    # COMMAND!
 
-        pedido.uuid = pedido_uuid
-
         await self.save_itens_for_pedido(    # COMMAND!
-            itens=pedido_data.itens, pedido=pedido
+            itens=pedido_data.itens,
+            pedido=pedido
         )
 
         pedido_data.endereco.pedido_uuid = pedido.uuid
@@ -223,7 +261,7 @@ class PedidoService(BaseService):
     async def save_itens_for_pedido(
         self,
         itens: list[ItemPedidoPOST],
-        pedido: Pedido,
+        pedido: Pedido
     ) -> list[str]:
         itens_uuid: list[str] = []
 
@@ -236,6 +274,7 @@ class PedidoService(BaseService):
 
             item_uuid = str(uuid.uuid1())
             item_pedido = ItemPedido(
+                uuid=item_uuid,
                 quantidade=item.quantidade,
                 observacoes=item.observacoes,
                 pedido_uuid=pedido.uuid,
@@ -247,9 +286,34 @@ class PedidoService(BaseService):
 
             self.cmd_handler.save(item_pedido, item_uuid)  # COMMAND!
 
+            await self.save_ingredientes_for_item(item, item_uuid)
+
             itens_uuid.append(item_uuid)
 
         return itens_uuid
+
+    async def save_ingredientes_for_item(
+        self, item_pedido: ItemPedidoPOST, uuid: str
+    ):
+
+        for ingrediente in item_pedido.ingredientes:
+            query: Optional[Ingrediente] = (
+                await self.ingrediente_query_handler.find_one(
+                    uuid=ingrediente.uuid
+                )
+            )
+            if query is None:
+                raise ValueError('Ingrediente não encontrado')
+
+            ingrediente_de_item_de_pedido = IngredienteDeItemDePedido(
+                item_uuid=uuid,
+                nome=query.nome,
+                descricao=query.descricao,
+                incluso=ingrediente.value,
+                loja_uuid=query.loja_uuid
+            )
+
+            self.cmd_handler.save(ingrediente_de_item_de_pedido)  # COMMAND!
 
     async def save_endereco_for_pedido(
         self, pedido_data: PedidoPOST

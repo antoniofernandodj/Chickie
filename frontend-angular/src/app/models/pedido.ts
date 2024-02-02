@@ -14,6 +14,14 @@ export type Pedido = {
     produto_uuid: string,
     produto_nome: string,
     produto_descricao: string,
+    ingredientes: Array<{
+      nome: string,
+      descricao: string,
+      loja_uuid: string,
+      item_uuid: string,
+      incluso: boolean,
+      uuid: string
+    }>
     subtotal: number,
     quantidade: number,
     valor: number,

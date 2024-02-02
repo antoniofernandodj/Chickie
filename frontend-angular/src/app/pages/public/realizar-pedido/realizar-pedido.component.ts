@@ -100,7 +100,7 @@ export class RealizarPedidoComponent {
         uuid: uuidv4(),
         observacoes: '',
         loja_uuid: this.lojaUUID,
-        ingredientes: {}
+        ingredientes: []
       }]);
 
       this.fetchProducts(this.lojaUUID)
@@ -115,7 +115,7 @@ export class RealizarPedidoComponent {
       uuid: randomUUID,
       observacoes: '',
       loja_uuid: this.lojaUUID,
-      ingredientes: {}
+      ingredientes: []
     }
 
     this.itensAEnviar.value.push(itemVazio)
@@ -126,7 +126,14 @@ export class RealizarPedidoComponent {
     ingrediente: Ingrediente,
     value: boolean
   ) {
-    item.ingredientes[ingrediente.uuid] = value
+    for (let i of item.ingredientes) {
+      if (i.uuid == ingrediente.uuid) {
+        i.value = value
+        return
+      }
+    }
+
+    item.ingredientes.push({uuid: ingrediente.uuid,value: value})
   }
 
   removeItem(item: any) {
@@ -285,12 +292,7 @@ export class RealizarPedidoComponent {
       data_hora: new Date().toISOString(),
       endereco: this.endereco,
       frete: this.loja.frete || 0,
-      itens: itens.map(item => ({
-        produto_uuid: item.produto_uuid,
-        quantidade: item.quantidade,
-        observacoes: item.observacoes,
-        ingredientes: item.ingredientes
-      })),
+      itens: itens,
       loja_uuid: this.loja.uuid,
       comentarios: this.comentarios,
       status_uuid: null,

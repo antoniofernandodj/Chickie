@@ -20,4 +20,7 @@ class Preco(Base):
     uuid = Col(Str(36), primary_key=True, unique=True, nullable=False)
     produto_uuid = Col(Str(36), FK("produtos.uuid"), nullable=False)
     valor = Col(Float)
-    dia_da_semana = Col(Enum(DiasDaSemana))  # type: ignore
+    dia_da_semana = Col(
+        Enum(DiasDaSemana), name='dia_da_semana',
+        nullable=False,
+    )  # type: ignore

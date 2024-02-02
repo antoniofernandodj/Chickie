@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from src.domain.models import Status, EnderecoEntrega
 from typing import Optional, List, Annotated
-from .item_pedido import ItemPedido, ItemPedidoPOST
+from .item_pedido import ItemPedidoPOST, ItemPedidoGET
 from datetime import datetime
 
 
@@ -36,7 +36,7 @@ class PedidoGET(BaseModel):
     status_uuid: Optional[str] = None
     status: Optional[Status] = None
     endereco: Optional[EnderecoEntrega] = None
-    itens: List[ItemPedido] = []
+    itens: List[ItemPedidoGET] = []
     concluido: Optional[bool] = None
 
 

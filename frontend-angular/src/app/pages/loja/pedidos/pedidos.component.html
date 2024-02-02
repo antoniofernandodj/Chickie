@@ -74,6 +74,16 @@
             <li>Subtotal: {{item.valor * item.quantidade | currency:"BRL" }}</li>
             <li>Quantidade: {{item.quantidade}}</li>
             <li>Comentarios: {{ item.observacoes }}</li>
+            <li>Ingredientes:
+              <ul>
+                @for (ingrediente of item.ingredientes; track $index) {
+                  <li>
+                    {{ ingrediente.nome }}:
+                    {{ (ingrediente.incluso) ? 'sim' : 'não' }}
+                  </li>
+                }
+              </ul>
+            </li>
             <hr>
           }
           </ul>

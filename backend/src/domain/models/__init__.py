@@ -8,7 +8,7 @@ from .endereco import (  # noqa
 )
 from .status import Status, StatusList  # noqa
 from .categoria import CategoriaProdutos, CategoriasProdutos  # noqa
-from .item_pedido import ItemPedido, ItemPedidoPOST  # noqa
+from .item_pedido import ItemPedido, ItemPedidoPOST, ItemPedidoGET  # noqa
 from .login import Login  # noqa
 from .loja import Loja, Lojas, LojaGET, LojaPUT  # noqa
 from .pedido import (  # noqa
@@ -28,7 +28,12 @@ from .produto import (  # noqa
 )
 from .signup import UsuarioSignUp, LojaSignUp  # noqa
 from .auth import UserAuthData, LojaAuthData, LojaGET  # noqa
-from .usuario import Usuario, Usuarios, UsuarioGET, UsuarioFollowEmpresaRequest  # noqa
+from .usuario import (  # noqa
+    Usuario,
+    Usuarios,
+    UsuarioGET,
+    UsuarioFollowEmpresaRequest
+)
 from .entregador import Entregador, Entregadores  # noqa
 from .avaliacao import (  # noqa
     AvaliacaoDeProduto,
@@ -37,7 +42,10 @@ from .avaliacao import (  # noqa
     AvaliacoesDeLoja
 )
 from .funcionario import Funcionario, Funcionarios  # noqa
-from .metodo_de_pagamento import MetodoDePagamento, MetodosDePagamento  # noqa
+from .metodo_de_pagamento import (  # noqa
+    MetodoDePagamento,
+    MetodosDePagamento
+)
 from .pagamento import Pagamento, Pagamentos  # noqa
 from .zona_de_entrega import ZonaDeEntrega, ZonasDeEntrega  # noqa
 from .cliente import Cliente, ClientePOST  # noqa
@@ -46,3 +54,4 @@ from .adicional import Adicional  # noqa
 from .ingrediente import (  # noqa
     Ingrediente
 )
+from .ingrediente_item_pedido import IngredienteDeItemDePedido  # noqa
