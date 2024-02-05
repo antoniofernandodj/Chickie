@@ -1,0 +1,7 @@
+#frame, #frame_2 {
+  border: 0px;
+}
+
+QPushButton:hover {
+  background-color: rgba(180,200,220, 0.8);
+}

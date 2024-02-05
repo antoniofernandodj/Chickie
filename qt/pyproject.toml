@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "qt"
+version = "0.1.0"
+description = ""
+authors = ["Antonio Fernando <antoniofernandodj@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8,<3.13"
+pyside6 = "^6.6.1"
+httpx = "^0.26.0"
+dynaconf = "^3.2.4"
+pydantic = "^2.6.0"
+bcrypt = "^4.1.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
