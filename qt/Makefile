@@ -1,16 +1,15 @@
 dev:
 	clear
-	poetry run pyside6-uic views/main.ui \
-		-o views/main_ui.py
-
-	poetry run pyside6-uic views/loginForm.ui \
-		-o views/loginForm_ui.py
-
+	# make compile
 	poetry run python app.py
 
 compile:
-	poetry run pyside6-uic views/main.ui \
-		-o views/main_ui.py
 
-	poetry run pyside6-uic views/loginForm.ui \
-		-o views/loginForm_ui.py
+	poetry run pyside6-uic \
+		   src/views/main.ui \
+		-o src/views/main_ui.py
+
+
+	poetry run pyside6-uic \
+		   src/views/loginForm.ui \
+		-o src/views/loginForm_ui.py

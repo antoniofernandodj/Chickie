@@ -11,6 +11,8 @@ from src.domain.models import (
 from aiopg.connection import Connection
 from typing import List, Dict, Any
 from .base import BaseService
+import asyncio
+import datetime
 
 
 class ProdutoService(BaseService):
@@ -21,17 +23,11 @@ class ProdutoService(BaseService):
         super().__init__(connection)
         conn = connection
 
-        from src.domain.services import PedidoService
-
         self.preco_query_handler = QueryHandler(Preco, conn)
         self.loja_query_handler = QueryHandler(Loja, conn)
         self.avaliacao_query_handler = QueryHandler(Avaliacao, conn)
-        self.pedido_service = PedidoService(conn)
 
-    async def save_produto(
-        self,
-        produto_data: ProdutoPOST
-    ) -> Dict[str, str]:
+    async def save_produto(self, produto_data: ProdutoPOST) -> Dict[str, str]:
         from src.services import ImageUploadProdutoService
 
         produto = Produto(
@@ -68,15 +64,9 @@ class ProdutoService(BaseService):
 
             raise
 
-        return {
-            "uuid": produto.uuid,
-            'image_url': image_url or ''
-        }
+        return {"uuid": produto.uuid, 'image_url': image_url or ''}
 
-    async def get_loja_from_produto(
-        self,
-        produto: Produto
-    ) -> Loja:
+    async def get_loja_from_produto(self, produto: Produto) -> Loja:
 
         loja = await self.loja_query_handler.find_one(
             uuid=produto.loja_uuid
@@ -95,12 +85,15 @@ class ProdutoService(BaseService):
 
         from src.services import ImageUploadProdutoService
 
-        loja = await self.get_loja_from_produto(produto)
+        try:
+            loja = await self.get_loja_from_produto(produto)
 
-        image_service = ImageUploadProdutoService(loja=loja)
-        image_url = image_service.get_public_url_image_produto(
-            produto=produto
-        )
+            image_service = ImageUploadProdutoService(loja=loja)
+            image_url = image_service.get_public_url_image_produto(
+                produto=produto
+            )
+        except Exception:
+            image_url = None
 
         return image_url
 
@@ -109,7 +102,6 @@ class ProdutoService(BaseService):
         base_64_string: str,
         produto: Produto
     ):
-
         from src.services import ImageUploadProdutoService
 
         loja = await self.get_loja_from_produto(produto)
@@ -155,15 +147,18 @@ class ProdutoService(BaseService):
 
     async def get_all_produtos(self, **kwargs) -> List[ProdutoGET]:
         response: List[ProdutoGET] = []
-        produtos = await self.get_all(**kwargs)
-        for produto in produtos:
-            try:
-                image_url = await self.get_public_url_image(produto)
-            except ValueError:
-                image_url = None
+        produtos: List[Produto] = await self.get_all(**kwargs)
 
-            precos = await self.get_precos(produto)
-            preco_hoje = await self.pedido_service.get_produto_preco(produto)
+        for produto in produtos:
+            results = await asyncio.gather(
+                self.get_precos(produto),
+                self.get_public_url_image(produto)
+            )
+
+            precos = results[0]
+            image_url = results[1]
+
+            preco_hoje = await self.get_produto_preco(produto)
 
             response.append(
                 ProdutoGET(
@@ -181,18 +176,41 @@ class ProdutoService(BaseService):
 
         return response
 
+    async def get_produto_preco(self, produto: Produto) -> float:
+        data_atual = datetime.datetime.now()
+        dias_handler = {
+            'Monday': 'seg',
+            'Tuesday': 'ter',
+            'Wednesday': 'qua',
+            'Thursday': 'qui',
+            'Friday': 'sex',
+            'Saturday': 'sab',
+            'Sunday': 'dom'
+        }
+        dia_da_semana_hoje = dias_handler[data_atual.strftime("%A")]
+        preco_selecionado = produto.preco
+        precos: List[Preco] = await self.preco_query_handler.find_all(
+            produto_uuid=produto.uuid
+        )
+        for preco in precos:
+            if preco.dia_da_semana == dia_da_semana_hoje:
+                preco_selecionado = preco.valor
+
+        return preco_selecionado
+
     async def get_produto(self, uuid: str):
         produto = await self.get(uuid)
         if produto is None:
             return None
 
-        preco_hoje = await self.pedido_service.get_produto_preco(produto)
+        preco_hoje = await self.get_produto_preco(produto)
 
-        precos = await self.get_precos(produto)
-        try:
-            image_url = await self.get_public_url_image(produto)
-        except ValueError:
-            image_url = None
+        results = await asyncio.gather(
+            self.get_precos(produto),
+            self.get_public_url_image(produto)
+        )
+        precos = results[0]
+        image_url = results[1]
 
         return ProdutoGET(
             nome=produto.nome,

@@ -5,9 +5,12 @@ from src.domain.models import (
     EnderecoLoja,
     LojaGET,
     LojaPUT,
+    ProdutoGET,
+    Produto,
     Cliente,
     Usuario
 )
+import asyncio
 import uuid
 from src.exceptions import (
     LojaJaCadastradaException,
@@ -18,6 +21,7 @@ import bcrypt
 from typing import Optional, List
 from src.domain.services.base import BaseService
 
+
 from aiopg.connection import Connection
 
 
@@ -26,12 +30,74 @@ class LojaService(BaseService):
     model = Loja
 
     def __init__(self, connection: Connection):
+        from src.domain.services import ProdutoService
+
         super().__init__(connection)
         conn = connection
 
         self.endereco_query_handler = QueryHandler(EnderecoLoja, conn)
         self.cliente_query_handler = QueryHandler(Cliente, conn)
         self.usuario_query_handler = QueryHandler(Usuario, conn)
+        self.produto_service = ProdutoService(conn)
+
+    async def get_all_produtos_from_loja(self, loja: Loja) -> List[ProdutoGET]:
+        response: List[ProdutoGET] = []
+        produtos: List[Produto] = await self.produto_service.get_all(
+            loja_uuid=loja.uuid
+        )
+
+        for produto in produtos:
+            results = await asyncio.gather(
+                self.produto_service.get_precos(produto),
+                self.produto_service.get_public_url_image(produto)
+            )
+
+            precos = results[0]
+            image_url = results[1]
+
+            preco_hoje = await self.produto_service.get_produto_preco(produto)
+
+            response.append(
+                ProdutoGET(
+                    uuid=produto.uuid,
+                    nome=produto.nome,
+                    descricao=produto.nome,
+                    preco=produto.preco,
+                    categoria_uuid=produto.categoria_uuid,
+                    loja_uuid=produto.loja_uuid,
+                    precos=precos,
+                    preco_hoje=preco_hoje,
+                    image_url=image_url
+                )
+            )
+
+        return response
+
+    async def get_public_url_image_from_produto(
+        self,
+        produto: Produto,
+        loja: Loja
+    ) -> str | None:
+
+        from src.services import ImageUploadProdutoService
+
+        try:
+            image_service = ImageUploadProdutoService(loja=loja)
+            image_url = image_service.get_public_url_image_produto(
+                produto=produto
+            )
+        except Exception:
+            image_url = None
+
+        return image_url
+
+    async def get_loja_from_produto(self, produto: Produto) -> Loja:
+
+        loja = await self.query_handler.find_one(uuid=produto.loja_uuid)
+        if loja is None:
+            raise
+
+        return loja
 
     async def update_loja_data(self, uuid: str, data: LojaPUT):
         loja: Optional[Loja] = await self.query_handler.find_one(uuid=uuid)
@@ -104,7 +170,7 @@ class LojaService(BaseService):
         image_service = ImageUploadService(loja=loja)
         try:
             public_url = image_service.get_public_url_image_cadastro()
-        except ValueError:
+        except Exception:
             public_url = None
 
         loja_data.imagem_cadastro = public_url

@@ -8,14 +8,7 @@ from src.exceptions import (
     InvalidPasswordException
 )
 from fastapi.routing import APIRouter
-from src.dependencies import (
-    Oauth2PasswordRequestFormDependency,
-    ConnectionDependency,
-    LojaServiceDependency,
-    AuthServiceDependency,
-    CurrentLojaDependency,
-    UserServiceDependency,
-)
+from src import dependencies
 from fastapi import (
     HTTPException,
     status,
@@ -24,7 +17,7 @@ from fastapi import (
     Query
 )
 from typing import Any, Optional, List, Dict, Annotated
-from src.domain.models import (
+from src.domain.models import (  # noqa
     Cliente,
     Usuario,
     UsuarioGET,
@@ -47,7 +40,7 @@ from src.services import (
     ImageUploadService,
     ImageUploadServiceResponse,
 )
-from src.domain.services import ProdutoService
+# from src.domain.services import ProdutoService
 from src.api.security import AuthService
 from src.misc import Paginador  # noqa
 
@@ -59,8 +52,8 @@ router = APIRouter(prefix="/loja", tags=["Loja"])
     "/{uuid}"
 )
 async def requisitar_loja(
-    connection: ConnectionDependency,
-    service: LojaServiceDependency,
+    connection: dependencies.ConnectionDependency,
+    service: dependencies.LojaServiceDependency,
     uuid: Annotated[str, Path(title="O uuid da loja a fazer get")]
 ) -> LojaGET:
 
@@ -78,8 +71,8 @@ async def requisitar_loja(
     "/"
 )
 async def requisitar_lojas(
-    connection: ConnectionDependency,
-    service: LojaServiceDependency,
+    connection: dependencies.ConnectionDependency,
+    service: dependencies.LojaServiceDependency,
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> Lojas:
@@ -105,9 +98,9 @@ async def requisitar_lojas(
     response_model=LojaAuthData
 )
 async def login(
-    form_data: Oauth2PasswordRequestFormDependency,
-    auth_service: AuthServiceDependency,
-    service: LojaServiceDependency,
+    form_data: dependencies.Oauth2PasswordRequestFormDependency,
+    auth_service: dependencies.AuthServiceDependency,
+    service: dependencies.LojaServiceDependency,
 ) -> Any:
 
     loja = await auth_service.authenticate_company(
@@ -129,7 +122,7 @@ async def login(
 
 @router.put("/{uuid}", summary='Atualizar dados de cadastro da Loja')
 async def update_loja(
-    service: LojaServiceDependency,
+    service: dependencies.LojaServiceDependency,
     updated_data: LojaPUT,
     uuid: Annotated[str, Path(title="O uuid da loja a ser atualizada")]
 ):
@@ -150,7 +143,7 @@ async def update_loja(
     status_code=status.HTTP_201_CREATED
 )
 async def signup(
-    service: LojaServiceDependency,
+    service: dependencies.LojaServiceDependency,
     loja: LojaSignUp
 ) -> Any:
 
@@ -179,51 +172,17 @@ async def signup(
     return {"uuid": loja_cadastrada.uuid}
 
 
-@router.get("/{loja_uuid}/produtos")
+@router.get("/produtos/")
 async def requisitar_produtos_de_loja(
-    connection: ConnectionDependency,
-    loja_uuid: str,
-    categoria_uuid: str,
+    loja: dependencies.CurrentLojaDependency,
+    service: dependencies.LojaServiceDependency,
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> Produtos:
 
-    loja_query_handler = QueryHandler(Loja, connection=connection)
-    produto_query_handler = QueryHandler(Produto, connection=connection)
-    loja: Optional[Loja] = await loja_query_handler.find_one(
-        uuid=loja_uuid
-    )
-    if loja is None:
-        raise NotFoundException('Loja de produto não encontrada!')
-    produto_service = ProdutoService(connection=connection)
-
-    kwargs = {}
-    if categoria_uuid is not None:
-        kwargs["categoria_uuid"] = categoria_uuid
-
-    response = []
-    produtos: List[Produto] = await produto_query_handler.find_all(**kwargs)
-    for produto in produtos:
-        precos = await produto_service.get_precos(produto)
-        try:
-            image_url = await produto_service.get_public_url_image(produto)
-        except ValueError:
-            image_url = None
-        response_item = ProdutoGET(
-            uuid=produto.uuid,
-            nome=produto.nome,
-            descricao=produto.nome,
-            preco=produto.preco,
-            categoria_uuid=produto.categoria_uuid,
-            loja_uuid=produto.loja_uuid,
-            precos=precos,
-            image_url=image_url
-        )
-        response.append(response_item)
-
-    paginador = Paginador(response, offset, limit)
-
-    return Produtos(**paginador.get_response())
+    produtos = await service.get_all_produtos_from_loja(loja)
+    paginate = Paginador(produtos, offset, limit)
+    return Produtos(**paginate.get_response())
 
 
 @router.post(
@@ -234,7 +193,7 @@ async def requisitar_produtos_de_loja(
     }
 )
 async def atualizar_imagem_de_cadastro(
-    loja: CurrentLojaDependency,
+    loja: dependencies.CurrentLojaDependency,
     image: LojaUpdateImageCadastro
 ) -> Dict[str, ImageUploadServiceResponse]:
 
@@ -269,7 +228,7 @@ async def atualizar_imagem_de_cadastro(
     }
 )
 async def remover_imagem_de_cadastro(
-    loja: CurrentLojaDependency,
+    loja: dependencies.CurrentLojaDependency,
     image: LojaUpdateImageCadastro
 ):
 
@@ -289,7 +248,7 @@ async def remover_imagem_de_cadastro(
     "/ativar_inativar/{uuid}"
 )
 async def ativar_inativar_loja(
-    connection: ConnectionDependency,
+    connection: dependencies.ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ativar/inativar")],
     ativar: bool
 ) -> Any:
@@ -312,7 +271,7 @@ async def ativar_inativar_loja(
     "/{uuid}"
 )
 async def deletar_loja(
-    connection: ConnectionDependency,
+    connection: dependencies.ConnectionDependency,
     uuid: Annotated[str, Path(title="O uuid da loja a ser deletada")]
 ) -> Any:
 
@@ -321,8 +280,8 @@ async def deletar_loja(
 
 @router.post("/cliente", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente(
-    connection: ConnectionDependency,
-    loja: CurrentLojaDependency,
+    connection: dependencies.ConnectionDependency,
+    loja: dependencies.CurrentLojaDependency,
     usuario: UsuarioFollowEmpresaRequest
 ) -> Any:
 
@@ -349,10 +308,10 @@ async def cadastrar_cliente(
 
 @router.post("/cliente_v2/{loja_uuid}", status_code=status.HTTP_201_CREATED)
 async def cadastrar_cliente_v2(
-    connection: ConnectionDependency,
-    loja: CurrentLojaDependency,
+    connection: dependencies.ConnectionDependency,
+    loja: dependencies.CurrentLojaDependency,
+    user_service: dependencies.UserServiceDependency,
     usuario: UsuarioSignUp,
-    user_service: UserServiceDependency,
     loja_uuid: str
 ) -> Any:
 
@@ -391,8 +350,8 @@ async def cadastrar_cliente_v2(
 
 @router.post('/refresh')
 async def refresh(
-    service: LojaServiceDependency,
-    loja: CurrentLojaDependency,
+    service: dependencies.LojaServiceDependency,
+    loja: dependencies.CurrentLojaDependency,
     complete: str = Query('0')
 ):
 
@@ -410,8 +369,8 @@ async def refresh(
 
 @router.get("/clientes/")
 async def buscar_clientes(
-    connection: ConnectionDependency,
-    loja: CurrentLojaDependency,
+    connection: dependencies.ConnectionDependency,
+    loja: dependencies.CurrentLojaDependency,
 ) -> List[UsuarioGET]:
 
     response: List[UsuarioGET] = []

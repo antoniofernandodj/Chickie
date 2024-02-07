@@ -1,5 +1,4 @@
 from src.infra.database_postgres.handlers import QueryHandler
-import datetime
 from src.domain.models import (
     Produto,
     Preco,
@@ -27,9 +26,15 @@ class PedidoService(BaseService):
     model = Pedido
 
     def __init__(self, connection: Connection):
+        from src.domain.services import ProdutoService
+
         super().__init__(connection)
         conn = connection
 
+        self.produto_service = ProdutoService(conn)
+
+        self.get_produto_preco = self.produto_service.get_produto_preco
+        self.get_produto = self.produto_service.get
         self.user_query_handler = QueryHandler(Usuario, conn)
         self.preco_query_handler = QueryHandler(Preco, conn)
         self.produto_query_handler = QueryHandler(Produto, conn)
@@ -117,14 +122,14 @@ class PedidoService(BaseService):
 
         return response
 
-    async def get_produto(self, produto_uuid: str):
-        produto: Optional[Produto] = await self.produto_query_handler.find_one(
-            uuid=produto_uuid
-        )
-        if produto is None or produto.uuid is None:
-            raise ValueError('Produto não encontrado')
+    # async def get_produto(self, produto_uuid: str):
+    #     produto: Optional[Produto] = await self.produto_query_handler.find_one(  # noqa
+    #         uuid=produto_uuid
+    #     )
+    #     if produto is None or produto.uuid is None:
+    #         raise ValueError('Produto não encontrado')
 
-        return produto
+    #     return produto
 
     async def get_loja_from_uuid(self, loja_uuid: str):
         loja: Optional[Loja] = await self.loja_query_handler.find_one(
@@ -135,30 +140,40 @@ class PedidoService(BaseService):
 
         return loja
 
-    async def get_produto_preco(
-        self,
-        produto: Produto
-    ) -> float:
-        data_atual = datetime.datetime.now()
-        dias_handler = {
-            'Monday': 'seg',
-            'Tuesday': 'ter',
-            'Wednesday': 'qua',
-            'Thursday': 'qui',
-            'Friday': 'sex',
-            'Saturday': 'sab',
-            'Sunday': 'dom'
-        }
-        dia_da_semana_hoje = dias_handler[data_atual.strftime("%A")]
-        preco_selecionado = produto.preco
-        precos: List[Preco] = await self.preco_query_handler.find_all(
-            produto_uuid=produto.uuid
-        )
-        for preco in precos:
-            if preco.dia_da_semana == dia_da_semana_hoje:
-                preco_selecionado = preco.valor
+    # async def get_produto_preco(
+    #     self,
+    #     produto: Produto
+    # ) -> float:
+    #     data_atual = datetime.datetime.now()
+    #     dias_handler = {
+    #         'Monday': 'seg',
+    #         'Tuesday': 'ter',
+    #         'Wednesday': 'qua',
+    #         'Thursday': 'qui',
+    #         'Friday': 'sex',
+    #         'Saturday': 'sab',
+    #         'Sunday': 'dom'
+    #     }
+    #     dia_da_semana_hoje = dias_handler[data_atual.strftime("%A")]
+    #     preco_selecionado = produto.preco
+    #     precos: List[Preco] = await self.preco_query_handler.find_all(
+    #         produto_uuid=produto.uuid
+    #     )
+    #     for preco in precos:
+    #         if preco.dia_da_semana == dia_da_semana_hoje:
+    #             preco_selecionado = preco.valor
 
-        return preco_selecionado
+    #     return preco_selecionado
+
+    async def get_loja_from_produto(self, produto: Produto) -> Loja:
+
+        loja = await self.loja_query_handler.find_one(
+            uuid=produto.loja_uuid
+        )
+        if loja is None:
+            raise
+
+        return loja
 
     async def get_pedido(self, uuid: str) -> Optional[PedidoGET]:
         pedido: Optional[Pedido] = await self.query_handler.find_one(
@@ -224,10 +239,7 @@ class PedidoService(BaseService):
             comentarios=pedido.comentarios
         )
 
-    async def save_pedido(
-        self,
-        pedido_data: PedidoPOST
-    ) -> None:
+    async def save_pedido(self, pedido_data: PedidoPOST) -> None:
 
         pedido_uuid = str(uuid.uuid1())
 
@@ -269,7 +281,12 @@ class PedidoService(BaseService):
             raise AttributeError('Produto sem uuid')
 
         for item in itens:
-            produto = await self.get_produto(item.produto_uuid)
+            produto: Optional[Produto] = (
+                await self.get_produto(item.produto_uuid)
+            )
+            if produto is None:
+                raise
+
             valor = await self.get_produto_preco(produto)
 
             item_uuid = str(uuid.uuid1())
