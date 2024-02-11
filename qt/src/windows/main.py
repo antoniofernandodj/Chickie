@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QMainWindow
 from src.ui_models.uf import UF
 from src.controllers import MainController
 from src.services import FileService as FS
+from src.config import settings  # type: ignore
 
 
 class MainWindow(QMainWindow):
@@ -16,13 +17,14 @@ class MainWindow(QMainWindow):
         self.view.setupUi(self)
         self.setupUI()
 
-        qss = FS.get('src/styles/main.qss')
-        self.view.centralwidget.setStyleSheet(qss)
+        if settings.STYLES:
+            qss = FS.get('src/styles/main.qss')
+            self.view.centralwidget.setStyleSheet(qss)
 
-        qss = FS.get('src/styles/all.qss')
-        self.view.tab_widget.setStyleSheet(qss)
+            qss = FS.get('src/styles/all.qss')
+            self.view.tab_widget.setStyleSheet(qss)
 
-        self.setStyleSheet(FS.get('src/styles/main-window.qss'))
+            self.setStyleSheet(FS.get('src/styles/main-window.qss'))
 
         self.controller = MainController(self.view, self.app, self)
         self.controller.setup()

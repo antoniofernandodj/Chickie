@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(483, 600)
+        MainWindow.resize(420, 620)
         MainWindow.setStyleSheet(u"")
         self.action_sair = QAction(MainWindow)
         self.action_sair.setObjectName(u"action_sair")
@@ -79,7 +79,7 @@ class Ui_MainWindow(object):
         self.frame_2 = QFrame(self.frame)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setEnabled(True)
-        self.frame_2.setFrameShape(QFrame.StyledPanel)
+        self.frame_2.setFrameShape(QFrame.NoFrame)
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame_2)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -117,7 +117,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 483, 22))
+        self.menubar.setGeometry(QRect(0, 0, 420, 22))
         self.menu_arquivo = QMenu(self.menubar)
         self.menu_arquivo.setObjectName(u"menu_arquivo")
         MainWindow.setMenuBar(self.menubar)

@@ -1,4 +1,6 @@
-import os
+from os import path
+import httpx
+from src.config import settings  # type: ignore
 from src.controllers.base import BaseController
 from src.domain.data_models import ItemPedidoPOST
 from src.services import FileService
@@ -20,6 +22,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QRadioButton
 )
+from PySide6.QtGui import QPixmap
 from src.domain.services import (
     AuthService,
     ProdutoService,
@@ -121,9 +124,11 @@ class MainController(BaseController):
         data: Ingrediente
     ) -> None:
 
-        qss_path = 'src/styles/ingrediente.qss'
-        qss = FileService.get_text(qss_path)
-        container_widget.setStyleSheet(qss)
+        if settings.STYLES:
+            qss_path = 'src/styles/ingrediente.qss'
+            qss = FileService.get_text(qss_path)
+            container_widget.setStyleSheet(qss)
+
         layout = container_widget.layout()
 
         ui = IngredienteGroup()
@@ -376,6 +381,13 @@ class MainController(BaseController):
         self.view.list_widget_adicionais_pedido.clear()
 
         produto_uuid: str = self.view.combo_box_item_pedido.currentData()
+        produto = self.produto_service.get(produto_uuid)
+        if isinstance(produto, ProdutoGET):
+            response = httpx.get(produto.image_url or '')
+            if response.status_code == 200:
+                pixmap = QPixmap()
+                pixmap.loadFromData(response.content)
+                self.view.label_image.setPixmap(pixmap)
 
         if produto_uuid is None:
             scroll_area = self.view.scroll_area_ingredientes
@@ -383,9 +395,9 @@ class MainController(BaseController):
             self.view.list_widget_adicionais_pedido.clear()
             return
 
-        params = {'produto_uuid': produto_uuid}
-        ingredientes = self.ingrediente_service.get_all(params)
-        print({'ingredientes': ingredientes})
+        ingredientes = self.ingrediente_service.get_all({
+            'produto_uuid': produto_uuid
+        })
 
         parent = self.view.scroll_area_ingredientes
 
@@ -614,7 +626,7 @@ class MainController(BaseController):
             loja_uuid=self.loja.uuid,
             preco=preco,
             image_bytes=FileService.get_base64_string(file_path),
-            filename=os.path.basename(label.text())
+            filename=path.basename(label.text())
         )
 
         response = self.produto_service.save(produto)

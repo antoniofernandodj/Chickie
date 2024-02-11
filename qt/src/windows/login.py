@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMainWindow
 from src.controllers import LoginController
 from src.services import FileService as FS
+from src.config import settings
 
 # from PySide6.QtCore import Qt
 
@@ -16,9 +17,13 @@ class LoginWindow(QMainWindow):
         self.view = LoginView()
         self.view.setupUi(self)
 
-        self.setStyleSheet(FS.get('src/styles/main-window.qss'))
-        self.view.frame.setStyleSheet(FS.get('src/styles/all.qss'))
-        self.view.centralwidget.setStyleSheet(FS.get('src/styles/login.qss'))
+        if settings.STYLES:
+            style = 'src/styles/main-window.qss'
+            self.setStyleSheet(FS.get(style))
+            style = 'src/styles/all.qss'
+            self.view.frame.setStyleSheet(FS.get(style))
+            style = 'src/styles/login.qss'
+            self.view.centralwidget.setStyleSheet(FS.get(style))
 
         self.resize(450, 600)
 

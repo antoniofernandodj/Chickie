@@ -60,6 +60,7 @@ async def requisitar_produto(
 ) -> ProdutoGET:
 
     produto = await service.get_produto(uuid)
+    print({'produto': produto})
     if produto is None:
         raise NotFoundException("Produto não encontrado")
 

@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(851, 816)
+        MainWindow.resize(919, 816)
         MainWindow.setMinimumSize(QSize(0, 815))
         self.actionAtualizar = QAction(MainWindow)
         self.actionAtualizar.setObjectName(u"actionAtualizar")
@@ -1259,6 +1259,30 @@ class Ui_MainWindow(object):
         self.verticalLayout_18 = QVBoxLayout(self.frame_column_3_pedido)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.verticalLayout_18.setContentsMargins(2, 2, -1, 2)
+        self.label_image_produto_text = QLabel(self.frame_column_3_pedido)
+        self.label_image_produto_text.setObjectName(u"label_image_produto_text")
+        self.label_image_produto_text.setFont(font)
+
+        self.verticalLayout_18.addWidget(self.label_image_produto_text)
+
+        self.frame_31 = QFrame(self.frame_column_3_pedido)
+        self.frame_31.setObjectName(u"frame_31")
+        self.frame_31.setEnabled(True)
+        sizePolicy.setHeightForWidth(self.frame_31.sizePolicy().hasHeightForWidth())
+        self.frame_31.setSizePolicy(sizePolicy)
+        self.frame_31.setMinimumSize(QSize(0, 0))
+        self.frame_31.setFrameShape(QFrame.StyledPanel)
+        self.frame_31.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_36 = QVBoxLayout(self.frame_31)
+        self.verticalLayout_36.setObjectName(u"verticalLayout_36")
+        self.label_image = QLabel(self.frame_31)
+        self.label_image.setObjectName(u"label_image")
+
+        self.verticalLayout_36.addWidget(self.label_image)
+
+
+        self.verticalLayout_18.addWidget(self.frame_31)
+
         self.label_13 = QLabel(self.frame_column_3_pedido)
         self.label_13.setObjectName(u"label_13")
         self.label_13.setFont(font)
@@ -1683,7 +1707,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 851, 22))
+        self.menubar.setGeometry(QRect(0, 0, 919, 22))
         self.menu_arquivo = QMenu(self.menubar)
         self.menu_arquivo.setObjectName(u"menu_arquivo")
         self.menu_sobre = QMenu(self.menubar)
@@ -1712,7 +1736,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tab_widget.setCurrentIndex(0)
+        self.tab_widget.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1840,6 +1864,8 @@ class Ui_MainWindow(object):
         self.label_observacoes_pedido.setText(QCoreApplication.translate("MainWindow", u"Observa\u00e7\u00f5es", None))
         self.text_edit_observacao_item.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Observa\u00e7\u00f5es", None))
         self.push_button_adicionar_item_pedido.setText(QCoreApplication.translate("MainWindow", u"Adicionar Item", None))
+        self.label_image_produto_text.setText(QCoreApplication.translate("MainWindow", u"Imagem do produto", None))
+        self.label_image.setText("")
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Itens", None))
         ___qtablewidgetitem = self.table_widget_item_pedido.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Produto", None));

@@ -15,8 +15,7 @@ lines:
 	poetry run python scripts/lines.py
 
 dev:
-	make compile
-	poetry run python app.py
+	./dev.sh
 
 build:
 	rm -rf dist

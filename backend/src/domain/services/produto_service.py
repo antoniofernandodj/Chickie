@@ -13,7 +13,6 @@ from contextlib import suppress
 from aiopg.connection import Connection
 from typing import List, Dict, Any, Optional
 from .base import BaseService
-import asyncio
 import datetime
 
 
@@ -70,10 +69,7 @@ class ProdutoService(BaseService):
         return {"uuid": produto.uuid, 'image_url': image_url or ''}
 
     async def get_loja_from_produto(self, produto: Produto) -> Loja:
-
-        loja = await self.loja_query_handler.find_one(
-            uuid=produto.loja_uuid
-        )
+        loja = await self.loja_query_handler.find_one(uuid=produto.loja_uuid)
         if loja is None:
             raise
 
@@ -108,9 +104,7 @@ class ProdutoService(BaseService):
         return dias_da_semana_disponiveis
 
     async def get_public_url_image(self, produto: Produto) -> str | None:
-
         from src.services import ImageUploadProdutoService
-
         try:
             loja = await self.get_loja_from_produto(produto)
 
@@ -176,15 +170,11 @@ class ProdutoService(BaseService):
         produtos: List[Produto] = await self.get_all(**kwargs)
 
         for produto in produtos:
-            results = await asyncio.gather(
-                self.get_precos(produto),
-                self.get_public_url_image(produto)
-            )
 
             precos_disponiveis = await self.get_precos_disponiveis(produto)
 
-            precos = results[0]
-            image_url = results[1]
+            precos = await self.get_precos(produto)
+            image_url = await self.get_public_url_image(produto)
 
             preco_hoje = await self.get_produto_preco(produto)
 
@@ -235,12 +225,8 @@ class ProdutoService(BaseService):
         preco_hoje = await self.get_produto_preco(produto)
         precos_disponiveis = await self.get_precos_disponiveis(produto)
 
-        results = await asyncio.gather(
-            self.get_precos(produto),
-            self.get_public_url_image(produto)
-        )
-        precos = results[0]
-        image_url = results[1]
+        precos = await self.get_precos(produto)
+        image_url = await self.get_public_url_image(produto)
 
         return ProdutoGET(
             uuid=produto.uuid,

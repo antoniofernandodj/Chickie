@@ -104,6 +104,9 @@ class ImageUploadProdutoService(ImageUploadServiceBase):
 
     def get_public_url_image_produto(self, produto) -> str:
         file_metadata = self.image_produto_metadata(produto)
+
+        print({'file_metadata': file_metadata})
+
         if file_metadata:
             asset_id = file_metadata['secure_url']
             if isinstance(asset_id, str):

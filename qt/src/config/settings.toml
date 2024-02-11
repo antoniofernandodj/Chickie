@@ -1,2 +1,3 @@
 HOST = 'http://localhost:8010'
 MODE = 'prod'
+STYLES = false
