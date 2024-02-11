@@ -1,4 +1,3 @@
-from __feature__ import snake_case, true_property  # type: ignore  # noqa
 import base64
 import json
 
@@ -11,6 +10,8 @@ class FileService:
             text = f.read()
 
         return text
+
+    get = get_text
 
     @classmethod
     def get_json(cls, filepath: str) -> dict[str, str]:

@@ -9,9 +9,7 @@ from fastapi import (  # noqa
     Path,
     Query,
     Response,
-    Depends
 )
-from src.domain.services import ProdutoService
 from src.misc import Paginador  # noqa
 from src.services import (
     ImageUploadService,
@@ -24,7 +22,11 @@ from src.domain.models import (
     LojaUpdateImageCadastro,
     Produtos
 )
-from src.dependencies import ConnectionDependency, CurrentLojaDependency
+from src.dependencies import (
+    ConnectionDependency,
+    CurrentLojaDependency,
+    ProdutoServiceDependency
+)
 
 
 router = APIRouter(prefix="/produtos", tags=["Produto"])
@@ -32,14 +34,13 @@ router = APIRouter(prefix="/produtos", tags=["Produto"])
 
 @router.get("/")
 async def requisitar_produtos(
-    connection: ConnectionDependency,
+    service: ProdutoServiceDependency,
     loja_uuid: Optional[str] = Query(None),
     categoria_uuid: Optional[str] = Query(None),
     limit: int = Query(0),
     offset: int = Query(1),
 ) -> Produtos:
 
-    service = ProdutoService(connection)
     kwargs = {}
     if loja_uuid is not None:
         kwargs["loja_uuid"] = loja_uuid
@@ -47,34 +48,31 @@ async def requisitar_produtos(
         kwargs["categoria_uuid"] = categoria_uuid
 
     produtos = await service.get_all_produtos(**kwargs)
+
     paginate = Paginador(produtos, offset, limit)
     return Produtos(**paginate.get_response())
 
 
 @router.get("/{uuid}")
 async def requisitar_produto(
-    connection: ConnectionDependency,
+    service: ProdutoServiceDependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer get")]
 ) -> ProdutoGET:
 
-    service = ProdutoService(connection)
     produto = await service.get_produto(uuid)
     if produto is None:
         raise NotFoundException("Produto não encontrado")
-
-    print({'produto': produto})
 
     return produto
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def cadastrar_produto(
-    connection: ConnectionDependency,
+    service: ProdutoServiceDependency,
     produto_data: ProdutoPOST,
     loja: CurrentLojaDependency,
 ):
 
-    service = ProdutoService(connection)
     try:
         response = await service.save_produto(produto_data)
         return response
@@ -93,13 +91,12 @@ async def cadastrar_produto(
     summary='Atualizar dados de cadastro de produto'
 )
 async def atualizar_produto_put(
-    connection: ConnectionDependency,
+    service: ProdutoServiceDependency,
     produto_data: ProdutoPUT,
     loja: CurrentLojaDependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer put")]
 ):
 
-    service = ProdutoService(connection)
     try:
         await service.atualizar_produto(uuid, produto_data)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -119,19 +116,19 @@ async def atualizar_produto_put(
     }
 )
 async def atualizar_imagem_de_produto(
-    connection: ConnectionDependency,
+    service: ProdutoServiceDependency,
     uuid: str,
     loja: CurrentLojaDependency,
     image: LojaUpdateImageCadastro,
 ) -> Dict[str, ImageUploadServiceResponse]:
 
-    service = ProdutoService(connection)
+    image_service = ImageUploadService(loja=loja)
+
     produto = await service.get(uuid)
     if produto is None:
         raise NotFoundException('O produto não foi encontrado!')
 
     try:
-        image_service = ImageUploadService(loja=loja)
         try:
             image_bytes_base64 = image.bytes_base64.split(',')[1]
         except IndexError:
@@ -160,12 +157,11 @@ async def atualizar_imagem_de_produto(
     }
 )
 async def remover_imagem_de_produto(
-    connection: ConnectionDependency,
-    uuid: str,
+    service: ProdutoServiceDependency,
     loja: CurrentLojaDependency,
+    uuid: str,
 ):
 
-    service = ProdutoService(connection)
     produto = await service.get(uuid)
     if produto is None:
         raise NotFoundException('O produto não foi encontrado!')
@@ -187,13 +183,15 @@ async def remover_imagem_de_produto(
 @router.delete("/{uuid}")
 async def remover_produto(
     connection: ConnectionDependency,
+    service: ProdutoServiceDependency,
     loja: CurrentLojaDependency,
     uuid: Annotated[str, Path(title="O uuid do produto a fazer delete")]
 ):
 
-    service = ProdutoService(connection)
     try:
         await service.remove_produto(uuid=uuid)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(error))

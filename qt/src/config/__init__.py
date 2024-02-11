@@ -14,5 +14,10 @@ settings = Dynaconf(
     ]
 )
 
+try:
+    settings.HOST
+except AttributeError:
+    settings.HOST = 'http://localhost:8010'
+
 # `envvar_prefix` = export envvars with `export DYNACONF_FOO=bar`.
 # `settings_files` = Load these files in the order.

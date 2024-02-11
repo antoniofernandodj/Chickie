@@ -1,23 +1,25 @@
-from src.custom_widgets import CustomTableWidgetItem
+import os
+from src.controllers.base import BaseController
+from src.domain.data_models import ItemPedidoPOST
+from src.services import FileService
 from typing import Optional, List
 from datetime import datetime
 from contextlib import suppress
 from unidecode import unidecode
-from PySide6.QtCore import (
-    Signal,
-    Slot,
-    Qt
+from src.components import (
+    CustomTableWidgetItem,
+    IngredientesContainer,
+    IngredienteGroup
 )
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMessageBox,
-    QTableWidgetItem,
     QTableWidget,
     QFileDialog,
     QWidget,
     QVBoxLayout,
     QRadioButton
 )
-
 from src.domain.services import (
     AuthService,
     ProdutoService,
@@ -27,60 +29,38 @@ from src.domain.services import (
     StatusService,
     IngredienteService
 )
-
-from src.domain.data_models import ItemPedidoPOST
-from src.services import FileService
-
-from src.ui_models import PrecosModel, ProdutosModel, IngredienteModel
-from __feature__ import snake_case, true_property  # type: ignore  # noqa
-import os
-
-from src.custom_widgets.ingrediente_group_ui import (
-    get_ingrediente_group
+from src.ui_models import (
+    DiasDisponiveisListModel,
+    PrecosDeProdutoListModel,
+    StatusListModel,
+    CategoriaListModel,
+    ProdutosListModel,
+    IngredientesListModel
 )
-
-from src.domain.data_models import (  # noqa
+from src.domain.data_models import (
     Produto,
     Preco,
     Status,
     Ingrediente,
     ProdutoPOST,
+    ProdutoGET,
     CategoriaProdutos,
-    Funcionario,
-    ZonaDeEntrega,
-    Pedido,
     PedidoPOST,
-    ItemPedido,
     EnderecoEntrega,
     IngredientesSelect
+    # Funcionario,
+    # ZonaDeEntrega,
+    # Pedido,
+    # ItemPedido,
 )
 
-from src.controllers.base import BaseController
 
 with suppress(ImportError):
     from src.windows import MainWindow
     from src.views.main_ui import Ui_MainWindow as MainView
 
 
-class IngredientesContainer(QWidget):
-
-    data: List[Ingrediente]
-    select: dict[str, bool]
-
-    def setup(self) -> None:
-        self.data = []
-        self.select = {}
-
-    def add_data(self, ingrediente: Ingrediente):
-        self.data.append(ingrediente)
-
-    def get_data(self):
-        return self.data
-
-
 class MainController(BaseController):
-    categoria_catastrada = Signal(CategoriaProdutos)
-    produto_catastrado = Signal(str)
 
     def __init__(self, view: "MainView", app, window: "MainWindow"):
         super().__init__()
@@ -90,29 +70,51 @@ class MainController(BaseController):
         self.window = window
 
         self.auth_service = AuthService()
-        self.categoria_service = CategoriaService()
-        self.produto_service = ProdutoService()
-        self.pedido_service = PedidoService()
         self.preco_service = PrecoService()
         self.status_service = StatusService()
+        self.pedido_service = PedidoService()
+        self.produto_service = ProdutoService()
+        self.categoria_service = CategoriaService()
         self.ingrediente_service = IngredienteService()
-        self.ingrediente_container = IngredientesContainer()
-        self.ingrediente_container.setup()
 
-        self.produto_model = ProdutosModel(self.window)
-        self.preco_model = PrecosModel(self.window)
-        self.ingrediente_model = IngredienteModel(self.window)
+        self.ingrediente_container = IngredientesContainer()
+        self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
+
+        w = self.window
+        self.ingrediente_list_model = IngredientesListModel(w)
+        self.produtos_model = ProdutosListModel(None, w)
+        self.precos_model = PrecosDeProdutoListModel(None, w)
+        self.dias_disponiveis_model = (
+            DiasDisponiveisListModel(None, w)
+        )
+        self.categoria_model = CategoriaListModel(w)
+        self.status_model = StatusListModel(w)
+        c = self.categoria_model
+        d = self.dias_disponiveis_model
+        self.view.combo_box_categorias_preco.setModel(c)
+        self.view.combo_box_categoria_produto.setModel(c)
+        self.view.list_view_categorias_cadastradas.setModel(c)
+        self.view.combo_box_item_pedido.setModel(self.produtos_model)
+        self.view.combo_box_produto_preco.setModel(self.produtos_model)
+        self.view.combo_box_dia_da_semana_preco.setModel(d)
+        self.view.list_view_status_cadastrados.setModel(self.status_model)
+        self.view.list_view_precos_cadastrados.setModel(self.precos_model)
+        self.view.list_view_ingredientes.setModel(self.ingrediente_list_model)
+        self.view.list_view_produtos_cadastrados.setModel(self.produtos_model)
+        self.view.combo_box_categoria_pedido.setModel(self.categoria_model)
 
         self.total_pedido = 0.0
 
-    def radio_clicked(self):
+        self.refresh_ingredientes()
+
+    def radio_ingrediente_clicked(self) -> None:
         radio_button: QRadioButton = self.sender()  # type: ignore
         ingrediente: Ingrediente = radio_button.ingrediente  # type: ignore
         self.ingrediente_container.select[str(ingrediente.uuid)] = (
-            radio_button.checked
+            radio_button.isChecked()
         )
 
-    def adicionar_ingrediente(
+    def adicionar_ingrediente_a_pedido(
         self,
         container_widget: QWidget,
         label: str,
@@ -121,24 +123,39 @@ class MainController(BaseController):
 
         qss_path = 'src/styles/ingrediente.qss'
         qss = FileService.get_text(qss_path)
-        container_widget.style_sheet = qss
+        container_widget.setStyleSheet(qss)
         layout = container_widget.layout()
 
-        IngredienteGroup = get_ingrediente_group(label=label)
         ui = IngredienteGroup()
-        ui.setupUi(container_widget)
-        ui.radio_nao.ingrediente = data  # type: ignore
-        ui.radio_sim.ingrediente = data  # type: ignore
+        ui.setup_ui(label, container_widget)
 
-        ui.radio_nao.clicked.connect(self.radio_clicked)
-        ui.radio_sim.clicked.connect(self.radio_clicked)
+        for radio_button in [ui.radio_nao, ui.radio_sim]:
+            radio_button.ingrediente = data  # type: ignore
+            radio_button.clicked.connect(self.radio_ingrediente_clicked)
 
-        layout.add_widget(ui.frame)
+        layout.addWidget(ui.frame)
 
-    def setup(self):
+    def adicionar_ingrediente_a_lista_de_cadastro(self):
+
+        nome = self.view.line_edit_nome_ingrediente.text()
+        descricao = self.view.text_edit_ingrediente_descricao.toPlainText()
+        ingrediente = {'nome': nome, 'descricao': descricao}
+
+        self.ingrediente_list_model.add_ingrediente(ingrediente)
+
+        self.view.line_edit_nome_ingrediente.clear()
+        self.view.text_edit_ingrediente_descricao.clear()
+
+    def remover_ingrediente_da_lista_de_cadastro(self):
+        selected_items = self.view.list_view_ingredientes.selectedIndexes()
+        if selected_items:
+            item = selected_items[0]
+            self.ingrediente_list_model.remove(item)
+
+    def setup(self) -> None:
         self.loja = self.auth_service.get_loja_data()
 
-        self.view.table_widget_item_pedido.row_count = 0
+        self.view.table_widget_item_pedido.setRowCount(0)
 
         # Let's register callbacks!!!
 
@@ -160,9 +177,6 @@ class MainController(BaseController):
         cb = self.cadastrar_preco
         self.view.push_button_cadastrar_preco.clicked.connect(cb)
 
-        cb = self.cadastrar_cliente
-        self.view.push_button_cadastrar_cliente.clicked.connect(cb)
-
         cb = self.cadastrar_pedido
         self.view.push_button_cadastrar_pedido.clicked.connect(cb)
 
@@ -172,17 +186,38 @@ class MainController(BaseController):
         cb = self.adicionar_item_na_lista
         self.view.push_button_adicionar_item_pedido.clicked.connect(cb)
 
-        cb = self.atualizar_categorias
-        self.categoria_catastrada.connect(cb)
-
-        cb = self.atualizar_produtos
-        self.produto_catastrado.connect(cb)
-
         cb = self.refresh_ingredientes
         self.view.combo_box_item_pedido.currentIndexChanged.connect(cb)
 
-        cb = self.set_frete_spin_box
-        self.view.check_box_frete_pedido.clicked.connect(cb)
+        cb = self.itens_pedido_refresh
+        self.view.combo_box_categoria_pedido.currentIndexChanged.connect(cb)
+
+        cb = self.refresh_produtos
+        self.view.combo_box_categoria_produto.currentIndexChanged.connect(cb)
+
+        cb = self.refresh_produtos_preco
+        self.view.combo_box_categorias_preco.currentIndexChanged.connect(cb)
+
+        cb = self.remover_produto
+        self.view.push_button_remover_produto.clicked.connect(cb)
+
+        cb = self.remover_preco
+        self.view.push_button_remover_preco.clicked.connect(cb)
+
+        cb = self.remover_categoria
+        self.view.push_button_remover_categoria.clicked.connect(cb)
+
+        cb = self.remover_status
+        self.view.push_button_remover_status.clicked.connect(cb)
+
+        cb = self.adicionar_ingrediente_a_lista_de_cadastro
+        self.view.push_button_adicionar_ingrediente.clicked.connect(cb)
+
+        cb = self.remover_ingrediente_da_lista_de_cadastro
+        self.view.push_button_remover_ingrediente.clicked.connect(cb)
+
+        # cb = self.cadastrar_cliente
+        # self.view.push_button_cadastrar_cliente.clicked.connect(cb)
 
         # self.view.pushButtonCadastrarFornecedor.clicked.connect(
         #     self.cadastrar_fornecedor
@@ -194,32 +229,186 @@ class MainController(BaseController):
         #     self.cadastrar_zona_entrega
         # )
 
-    def refresh_ingredientes(self, item) -> None:
-        produto: Produto = self.view.combo_box_item_pedido.current_data()
-        if produto.uuid is None:
+    def remover_preco(self) -> None:
+        selected_items = (
+            self.view.list_view_precos_cadastrados.selectedIndexes()
+        )
+
+        if selected_items:
+            preco_index = selected_items[0]
+
+            try:
+                preco_removido = self.precos_model.remove(preco_index)
+                produto_uuid = preco_removido.produto_uuid
+                self.dias_disponiveis_model.refresh(produto_uuid)
+
+                title = 'Sucesso'
+                message = 'Preco removido com sucesso!'
+                QMessageBox.information(self.window, title, message)
+            except Exception:
+                title = 'Erro'
+                message = 'Erro na remoção do preço!'
+                QMessageBox.critical(self.window, title, message)
+                return
+
+    def remover_produto(self) -> None:
+
+        selected_indexes = (
+            self.view.list_view_produtos_cadastrados.selectedIndexes()
+        )
+
+        if selected_indexes is None:
+            return
+
+        selected_index = selected_indexes[0]
+
+        produto_uuid = self.produtos_model.data(
+            selected_index,
+            role=Qt.ItemDataRole.UserRole
+        )
+
+        if produto_uuid is None:
+            return
+
+        produto = self.produto_service.get(produto_uuid)
+        if not isinstance(produto, ProdutoGET):
             raise
-        ingredientes = self.ingrediente_model.get_data(produto.uuid)
+
+        status_code = self.produto_service.delete_by_uuid(produto_uuid)
+        if status_code is None or not (200 <= status_code < 300):
+            QMessageBox.information(self.window, 'Erro', (
+                'Erro na remoção do produto. '
+            ))
+            return
+
+        title = 'Sucesso'
+        message = 'Produto removido com sucesso!'
+        QMessageBox.information(self.window, title, message)
+        self.produtos_model.refresh(produto.categoria_uuid)
+
+    def remover_categoria(self) -> None:
+
+        selected_indexes = (
+            self.view.list_view_categorias_cadastradas.selectedIndexes()
+        )
+
+        if selected_indexes is None:
+            return
+
+        selected_index = selected_indexes[0]
+
+        categoria_uuid = self.categoria_model.data(
+            selected_index,
+            role=Qt.ItemDataRole.UserRole
+        )
+
+        if categoria_uuid is None:
+            return
+
+        status_code = self.categoria_service.delete_by_uuid(categoria_uuid)
+        if status_code is None or not (200 <= status_code < 300):
+            QMessageBox.warning(self.window, 'Erro', (
+                'Erro na remoção da categoria. '
+                'verifique se a mesma não possui produtos associados'
+            ))
+            return
+
+        title = 'Sucesso'
+        message = 'Categoria removida com sucesso!'
+        QMessageBox.information(self.window, title, message)
+        self.categoria_model.refresh()
+
+    def remover_status(self) -> None:
+
+        selected_indexes = (
+            self.view.list_view_status_cadastrados.selectedIndexes()
+        )
+
+        if selected_indexes is None:
+            return
+
+        selected_index = selected_indexes[0]
+
+        status_uuid = self.status_model.data(
+            selected_index,
+            role=Qt.ItemDataRole.UserRole
+        )
+
+        if status_uuid is None:
+            return
+
+        status_code = self.status_service.delete_by_uuid(status_uuid)
+        if status_code is None or not (200 <= status_code < 300):
+            QMessageBox.warning(self.window, 'Erro', (
+                'Erro na remoção do Status. '
+                'verifique se o mesmo não possui pedidos associados'
+            ))
+            return
+
+        title = 'Sucesso'
+        message = 'Status removida com sucesso!'
+        QMessageBox.information(self.window, title, message)
+        self.status_model.refresh()
+
+    def itens_pedido_refresh(self) -> None:
+        self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
+        self.view.list_widget_adicionais_pedido.clear()
+        categoria_uuid = self.view.combo_box_categoria_pedido.currentData()
+        self.produtos_model.refresh(categoria_uuid)
+
+    def refresh_produtos_preco(self) -> None:
+        model = self.produtos_model
+        model.clear()
+
+        categoria_uuid = self.view.combo_box_categorias_preco.currentData()
+        self.produtos_model.refresh(categoria_uuid)
+
+    def refresh_produtos(self) -> None:
+
+        self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
+        self.view.list_widget_adicionais_pedido.clear()
+
+        categoria_uuid = self.view.combo_box_categoria_produto.currentData()
+        self.produtos_model.refresh(categoria_uuid)
+
+    def refresh_ingredientes(self) -> None:
+
+        self.view.list_widget_adicionais_pedido.clear()
+
+        produto_uuid: str = self.view.combo_box_item_pedido.currentData()
+
+        if produto_uuid is None:
+            scroll_area = self.view.scroll_area_ingredientes
+            self.ingrediente_container.setup(scroll_area)
+            self.view.list_widget_adicionais_pedido.clear()
+            return
+
+        params = {'produto_uuid': produto_uuid}
+        ingredientes = self.ingrediente_service.get_all(params)
+        print({'ingredientes': ingredientes})
 
         parent = self.view.scroll_area_ingredientes
 
         self.ingrediente_container = IngredientesContainer()
-        self.ingrediente_container.setup()
+        self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
 
         container_layout = QVBoxLayout(self.ingrediente_container)
-        self.ingrediente_container.set_layout(container_layout)
+        self.ingrediente_container.setLayout(container_layout)
 
         for ingrediente in ingredientes:
             self.ingrediente_container.add_data(ingrediente)
-            self.adicionar_ingrediente(
+            self.adicionar_ingrediente_a_pedido(
                 self.ingrediente_container,
                 ingrediente.nome,
                 ingrediente
             )
 
-        parent.set_widget(self.ingrediente_container)
-        parent.widget_resizable = True
+            self.ingrediente_container.select[ingrediente.uuid] = None
 
-    def show_file_dialog(self):
+        parent.setWidget(self.ingrediente_container)
+        parent.setWidgetResizable(True)
+
+    def show_file_dialog(self) -> None:
         label = self.view.label_produto_image_filename
 
         formats = [
@@ -232,33 +421,27 @@ class MainController(BaseController):
         ]
         filters = ';;'.join(formats)
         caption = 'Escolha a imagem'
-        file_path, _ = QFileDialog.get_open_file_name(
+        file_path, _ = QFileDialog.getOpenFileName(
             self.window,
             filter=filters,
             selectedFilter=formats[0],
             caption=caption
         )
         if len(file_path) > 60:
-            label.text = f"...{file_path[-60:]}"
+            label.setText(f"...{file_path[-60:]}")
         else:
-            label.text = f"...{file_path}"
+            label.setText(f"...{file_path}")
         label.value = file_path  # type: ignore  # noqa
 
-    def set_frete_spin_box(self):
-        if self.view.check_box_frete_pedido.checked:  # type: ignore
-            self.view.double_spin_box_frete_pedido.hide()
-        else:
-            self.view.double_spin_box_frete_pedido.show()
-
-    def refresh_text_browser_total_pedido(self):
+    def refresh_text_browser_total_pedido(self) -> None:
         fmt = f"R${self.total_pedido:.2f}"
-        self.view.line_edit_total_item_pedido.text = fmt
+        self.view.line_edit_total_item_pedido.setText(fmt)
 
     def get_table_selected_row_items(self, table_widget: QTableWidget):
         items_in_row = []
 
-        selected_row = table_widget.current_row()
-        for col in range(table_widget.column_count):
+        selected_row = table_widget.currentRow()
+        for col in range(table_widget.columnCount()):
             item: CustomTableWidgetItem = table_widget.item(  # type: ignore
                 selected_row, col
             )
@@ -267,10 +450,10 @@ class MainController(BaseController):
 
         return items_in_row
 
-    def remover_item_na_lista(self, item: QTableWidgetItem) -> None:
+    def remover_item_na_lista(self) -> None:
         table_widget = self.view.table_widget_item_pedido
 
-        selected_row = table_widget.current_row()
+        selected_row = table_widget.currentRow()
 
         items_in_row = self.get_table_selected_row_items(table_widget)
 
@@ -282,7 +465,7 @@ class MainController(BaseController):
         subtotal = preco * quantidade
 
         if selected_row >= 0:
-            table_widget.remove_row(selected_row)
+            table_widget.removeRow(selected_row)
 
         self.total_pedido -= subtotal
         self.refresh_text_browser_total_pedido()
@@ -290,25 +473,33 @@ class MainController(BaseController):
     def adicionar_item_na_lista(self) -> None:
         table_widget = self.view.table_widget_item_pedido
         combo_box = self.view.combo_box_item_pedido
-        produto: Optional[Produto] = combo_box.current_data()
+        produto_uuid: str = combo_box.currentData()
+
+        produto: Optional[Produto] = self.produto_service.get(produto_uuid)
 
         if produto is None or produto.uuid is None:
             title = 'Aviso'
             message = 'Escolha ao menos um produto!'
-            QMessageBox.critical(self.window, title, message)
+            QMessageBox.warning(self.window, title, message)
             return
 
-        quantidade = self.view.spin_box_item_pedido.value
+        quantidade = self.view.spin_box_item_pedido.value()
         subtotal = produto.preco * quantidade
 
         ingredientes: List[IngredientesSelect] = []
         for uuid, value in self.ingrediente_container.select.items():
+            if value is None:
+                title = 'Aviso'
+                message = 'Favor, marcar todos os ingredientes!'
+                QMessageBox.warning(self.window, title, message)
+                return
+
             select = IngredientesSelect(uuid=uuid, value=value)
             ingredientes.append(select)
 
         ip = ItemPedidoPOST(
-            quantidade=self.view.spin_box_item_pedido.value,
-            observacoes=self.view.text_edit_observacao_item.plain_text,
+            quantidade=self.view.spin_box_item_pedido.value(),
+            observacoes=self.view.text_edit_observacao_item.toPlainText(),
             produto_uuid=produto.uuid,
             ingredientes=ingredientes,
             loja_uuid=self.loja.uuid
@@ -320,10 +511,12 @@ class MainController(BaseController):
             if ingrediente_sel.value is True:
                 uuid = ingrediente_sel.uuid
                 ingrediente = self.ingrediente_service.get(uuid)
+                if not isinstance(ingrediente, Ingrediente):
+                    raise
                 ingredientes_nomes.append(ingrediente.nome)
 
-        row_count = table_widget.row_count
-        table_widget.insert_row(row_count)
+        row_count = table_widget.rowCount()
+        table_widget.insertRow(row_count)
 
         datas = [
             (produto.nome, produto.uuid),
@@ -341,30 +534,30 @@ class MainController(BaseController):
             row.append(item)
 
         for column, item in enumerate(row):
-            item.set_flags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            table_widget.set_item(row_count, column, item)
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            table_widget.setItem(row_count, column, item)
 
         self.total_pedido += subtotal
         self.refresh_text_browser_total_pedido()
 
         self.view.text_edit_observacao_item.clear()
-        self.view.spin_box_item_pedido.value = 1
-        self.view.spin_box_quantidade_acicionais.value = 0
+        self.view.spin_box_item_pedido.setValue(1)
+        self.view.spin_box_quantidade_acicionais.setValue(0)
 
         parent = self.view.scroll_area_ingredientes
 
         self.ingrediente_container = IngredientesContainer()
-        self.ingrediente_container.setup()
+        self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
         container_layout = QVBoxLayout(self.ingrediente_container)
-        self.ingrediente_container.set_layout(container_layout)
-        parent.set_widget(self.ingrediente_container)
-        parent.widget_resizable = True
+        self.ingrediente_container.setLayout(container_layout)
+        parent.setWidget(self.ingrediente_container)
+        parent.setWidgetResizable(True)
 
-    def cadastrar_categoria_produto(self):
-        text_edit = self.view.plain_text_edit_descricao_categoria_produto
+    def cadastrar_categoria_produto(self) -> None:
+        text_edit = self.view.text_edit_descricao_categoria_produto
 
-        nome = self.view.line_edit_nome_categoria_produto.text
-        descricao = text_edit.plain_text
+        nome = self.view.line_edit_nome_categoria_produto.text()
+        descricao = text_edit.toPlainText()
 
         categoria = CategoriaProdutos(
             nome=nome,
@@ -386,48 +579,71 @@ class MainController(BaseController):
         QMessageBox.information(self.window, title, message)
 
         self.view.line_edit_nome_categoria_produto.clear()
-        self.view.plain_text_edit_descricao_categoria_produto.clear()
-        self.categoria_catastrada.emit(categoria)
+        self.view.text_edit_descricao_categoria_produto.clear()
+
+        self.categoria_model.refresh()
 
     def cadastrar_produto(self) -> None:
         label = self.view.label_produto_image_filename
-        file_path: str = label.value  # type: ignore
-
-        nome = self.view.line_edit_nome_produto.text
-        produto_descricao = self.view.text_edit_descricao_produto.plain_text
-
-        categoria: CategoriaProdutos = (
-            self.view.combo_box_categoria_produto.current_data()
-        )
-        if (
-            categoria is None or
-            categoria.uuid is None or
-            not isinstance(categoria.uuid, str)
-        ):
-            title = 'Aviso'
-            message = 'Escolha ao menos uma categoria!'
-            QMessageBox.critical(self.window, title, message)
+        try:
+            file_path: str = label.value  # type: ignore
+        except AttributeError:
+            title = 'Alerta'
+            message = 'Escolher imagem de produto!'
+            QMessageBox.warning(self.window, title, message)
             return
 
-        preco = self.view.double_spin_box_preco_produto.value
+        nome = self.view.line_edit_nome_produto.text()
+        produto_descricao = self.view.text_edit_descricao_produto.toPlainText()
+
+        categoria_uuid: Optional[str] = (
+            self.view.combo_box_categoria_produto.currentData()
+        )
+        if categoria_uuid is None:
+            title = 'Aviso'
+            message = 'Escolha ao menos uma categoria!'
+            QMessageBox.warning(self.window, title, message)
+            return
+
+        preco = self.view.double_spin_box_preco_produto.value()
 
         produto = ProdutoPOST(
             nome=nome,
             descricao=produto_descricao,
-            categoria_uuid=categoria.uuid,
+            categoria_uuid=categoria_uuid,
             loja_uuid=self.loja.uuid,
             preco=preco,
             image_bytes=FileService.get_base64_string(file_path),
-            filename=os.path.basename(label.text)
+            filename=os.path.basename(label.text())
         )
 
         response = self.produto_service.save(produto)
 
         try:
-            self.handle_response(response)
+            produto_uuid = self.handle_response(response)
         except ValueError as error:
             self.show_message('Error', str(error))
             return None
+        if produto_uuid is None:
+            self.show_message('Error', 'Erro no cadastro do produto')
+            return None
+
+        ingredientes_error: List[Ingrediente] = []
+        for ingrediente_data in self.ingrediente_list_model.ingredientes():
+            ingrediente = Ingrediente(
+                nome=ingrediente_data['nome'],
+                descricao=ingrediente_data['descricao'],
+                produto_uuid=produto_uuid,
+                loja_uuid=self.loja.uuid
+            )
+            response = self.ingrediente_service.save(ingrediente)
+            if (600 > response.status_code >= 400):
+                ingredientes_error.append(ingrediente)
+
+        for i in ingredientes_error:
+            title = 'Erro'
+            message = f"Erro no cadastrado do ingrediente {i.nome}!"
+            QMessageBox.critical(self.window, title, message)
 
         title = 'Sucesso'
         message = "Produto cadastrado com sucesso!"
@@ -436,20 +652,35 @@ class MainController(BaseController):
         self.view.line_edit_nome_produto.clear()
         self.view.text_edit_descricao_produto.clear()
         self.view.double_spin_box_preco_produto.clear()
-        self.produto_catastrado.emit(produto)
+        self.view.line_edit_nome_ingrediente.clear()
+        self.view.text_edit_ingrediente_descricao.clear()
+
+        self.produtos_model.refresh(categoria_uuid)
+        self.ingrediente_list_model.clear()
+
         label.clear()
 
-    def cadastrar_preco(self):
-        produto = self.view.combo_box_produto_preco.current_data()
+    def cadastrar_preco(self) -> None:
+        combo_box = self.view.combo_box_dia_da_semana_preco
+        spinbox = self.view.double_spin_valor_preco
 
-        valor = self.view.double_spin_valor_preco.value
+        produto_uuid = self.view.combo_box_produto_preco.currentData()
+        if produto_uuid is None:
+            title = 'Aviso'
+            message = 'Escolha ao menos um produto!'
+            QMessageBox.warning(self.window, title, message)
+            return
+
+        produto: Optional[ProdutoGET] = self.produto_service.get(produto_uuid)
+
+        valor = self.view.double_spin_valor_preco.value()
         combo = self.view.combo_box_dia_da_semana_preco
-        dia_da_semana = unidecode(combo.current_text[:3].lower())
+        dia_da_semana = unidecode(combo.currentText()[:3].lower())
 
         if produto is None or produto.uuid is None:
             title = 'Aviso'
             message = 'Escolha ao menos um produto!'
-            QMessageBox.critical(self.window, title, message)
+            QMessageBox.warning(self.window, title, message)
             return
 
         response = self.preco_service.save(Preco(
@@ -468,73 +699,80 @@ class MainController(BaseController):
         message = "Preço de produto cadastrado com sucesso!"
         QMessageBox.information(self.window, title, message)
 
-    def cadastrar_cliente(self):
-        nome = self.view.line_edit_nome_cliente.text
-        email = self.view.line_edit_email_cliente.text
-        username = self.view.line_edit_username_cliente.text
-        telefone = self.view.line_edit_telefone_cliente.text
-        celular = self.view.line_edit_celular_cliente.text
-        senha = '123456'
+        spinbox.setValue(0)
 
-        logradouro = self.view.line_edit_logradouro_cliente.text
-        uf = self.view.combo_box_uf_cliente.current_text
-        cidade = self.view.line_edit_cidade_cliente.text
-        numero = self.view.line_edit_numero_cliente.text
-        bairro = self.view.line_edit_bairro_cliente.text
-        cep = self.view.line_edit_cep_cliente.text
-        complemento = self.view.line_edit_complemento_cliente.text
+        combo_box.removeItem(combo_box.currentIndex())
 
-        body = {
-            "nome": nome,
-            "username": username,
-            "email": email,
-            "telefone": telefone,
-            "celular": celular,
-            "endereco": {
-                "uf": uf,
-                "cidade": cidade,
-                "logradouro": logradouro,
-                "numero": numero,
-                "nome": nome,
-                "complemento": complemento,
-                "bairro": bairro,
-                "cep": cep,
-            },
-            "password": senha,
-            "loja_uuid": self.loja.uuid,
-        }
+        self.precos_model.refresh(produto.uuid)
+        self.dias_disponiveis_model.refresh(produto.uuid)
 
-        response = self.post_request("loja/cliente", json=body)
+    # def cadastrar_cliente(self):
+    #     nome = self.view.line_edit_nome_cliente.text
+    #     email = self.view.line_edit_email_cliente.text
+    #     username = self.view.line_edit_username_cliente.text
+    #     telefone = self.view.line_edit_telefone_cliente.text
+    #     celular = self.view.line_edit_celular_cliente.text
+    #     senha = '123456'
 
-        try:
-            self.handle_response(response)
-        except ValueError as error:
-            self.show_message('Error', str(error))
-            return None
+    #     logradouro = self.view.line_edit_logradouro_cliente.text
+    #     uf = self.view.combo_box_uf_cliente.currentText()
+    #     cidade = self.view.line_edit_cidade_cliente.text
+    #     numero = self.view.line_edit_numero_cliente.text
+    #     bairro = self.view.line_edit_bairro_cliente.text
+    #     cep = self.view.line_edit_cep_cliente.text
+    #     complemento = self.view.line_edit_complemento_cliente.text
 
-        title = 'Sucesso'
-        message = "Cliente cadastrado com sucesso!"
-        QMessageBox.information(self.window, title, message)
+    #     body = {
+    #         "nome": nome,
+    #         "username": username,
+    #         "email": email,
+    #         "telefone": telefone,
+    #         "celular": celular,
+    #         "endereco": {
+    #             "uf": uf,
+    #             "cidade": cidade,
+    #             "logradouro": logradouro,
+    #             "numero": numero,
+    #             "nome": nome,
+    #             "complemento": complemento,
+    #             "bairro": bairro,
+    #             "cep": cep,
+    #         },
+    #         "password": senha,
+    #         "loja_uuid": self.loja.uuid,
+    #     }
 
-        self.view.line_edit_nome_cliente.clear()
-        self.view.line_edit_email_cliente.clear()
-        self.view.line_edit_username_cliente.clear()
-        self.view.line_edit_telefone_cliente.clear()
-        self.view.line_edit_celular_cliente.clear()
+    #     print({'body': body})
 
-        self.view.line_edit_logradouro_cliente.clear()
-        self.view.line_edit_cidade_cliente.clear()
-        self.view.line_edit_numero_cliente.clear()
-        self.view.line_edit_bairro_cliente.clear()
-        self.view.line_edit_cep_cliente.clear()
-        self.view.line_edit_complemento_cliente.clear()
+    #     # try:
+    #     #     self.handle_response(response)
+    #     # except ValueError as error:
+    #     #     self.show_message('Error', str(error))
+    #     #     return None
+
+    #     title = 'Sucesso'
+    #     message = "Cliente cadastrado com sucesso!"
+    #     QMessageBox.information(self.window, title, message)
+
+    #     self.view.line_edit_nome_cliente.clear()
+    #     self.view.line_edit_email_cliente.clear()
+    #     self.view.line_edit_username_cliente.clear()
+    #     self.view.line_edit_telefone_cliente.clear()
+    #     self.view.line_edit_celular_cliente.clear()
+
+    #     self.view.line_edit_logradouro_cliente.clear()
+    #     self.view.line_edit_cidade_cliente.clear()
+    #     self.view.line_edit_numero_cliente.clear()
+    #     self.view.line_edit_bairro_cliente.clear()
+    #     self.view.line_edit_cep_cliente.clear()
+    #     self.view.line_edit_complemento_cliente.clear()
 
     def get_itens_pedido(self) -> List[ItemPedidoPOST]:
         items_pedido: List[ItemPedidoPOST] = []
         table_widget = self.view.table_widget_item_pedido
-        for row_number in range(table_widget.row_count):
+        for row_number in range(table_widget.rowCount()):
             row_items = []
-            for column_number in range(table_widget.column_count):
+            for column_number in range(table_widget.columnCount()):
                 item: CustomTableWidgetItem = (  # type: ignore
                     table_widget.item(row_number, column_number)
                 )
@@ -550,18 +788,24 @@ class MainController(BaseController):
 
         return items_pedido
 
-    def cadastrar_pedido(self):
+    def cadastrar_pedido(self) -> None:
         items_pedido = self.get_itens_pedido()
-        frete = self.view.double_spin_box_frete_pedido.value
-        cep = self.view.line_edit_cep.text
-        celular = self.view.line_edit_celular_pedido.text
-        cidade = self.view.line_edit_cidade.text
-        logradouro = self.view.line_edit_logradouro_pedido.text
-        uf = self.view.combo_box_uf_pedido.current_text
-        numero = self.view.line_edit_numero_end.text
-        bairro = self.view.line_edit_bairro.text
-        complemento = self.view.line_edit_complemento.text
-        comentarios = self.view.text_edit_comentarios_pedido.plain_text
+        if len(items_pedido) == 0:
+            title = 'Aviso'
+            text = 'Escolher ao menos um item no pedido!'
+            QMessageBox.warning(self.window, title, text)
+            return None
+
+        frete = self.view.double_spin_box_frete_pedido.value()
+        cep = self.view.line_edit_cep.text()
+        celular = self.view.line_edit_celular_pedido.text()
+        cidade = self.view.line_edit_cidade.text()
+        logradouro = self.view.line_edit_logradouro_pedido.text()
+        uf = self.view.combo_box_uf_pedido.currentText()
+        numero = self.view.line_edit_numero_end.text()
+        bairro = self.view.line_edit_bairro.text()
+        complemento = self.view.line_edit_complemento.text()
+        comentarios = self.view.text_edit_comentarios_pedido.toPlainText()
 
         pedido = PedidoPOST(
             celular=celular,
@@ -581,15 +825,13 @@ class MainController(BaseController):
             comentarios=comentarios
         )
 
-        print({'pedido': pedido})
+        response = self.pedido_service.save(pedido)
 
-        # response = self.pedido_service.save(pedido)
-
-        # try:
-        #     self.handle_response(response)
-        # except ValueError as error:
-        #     self.show_message('Error', str(error))
-        #     return
+        try:
+            self.handle_response(response)
+        except ValueError as error:
+            self.show_message('Error', str(error))
+            return
 
         title = 'Sucesso'
         message = 'Pedido cadastrado com sucesso!'
@@ -604,21 +846,21 @@ class MainController(BaseController):
         self.view.line_edit_complemento.clear()
         self.view.text_edit_comentarios_pedido.clear()
         self.view.text_edit_observacao_item.clear()
-        self.view.double_spin_box_frete_pedido.value = 0
-        self.view.table_widget_item_pedido.row_count = 0
+        self.view.double_spin_box_frete_pedido.setValue(0)
+        self.view.table_widget_item_pedido.setRowCount(0)
 
         parent = self.view.scroll_area_ingredientes
 
         self.ingrediente_container = IngredientesContainer()
-        self.ingrediente_container.setup()
+        self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
         container_layout = QVBoxLayout(self.ingrediente_container)
-        self.ingrediente_container.set_layout(container_layout)
-        parent.set_widget(self.ingrediente_container)
-        parent.widget_resizable = True
+        self.ingrediente_container.setLayout(container_layout)
+        parent.setWidget(self.ingrediente_container)
+        parent.setWidgetResizable(True)
 
-    def cadastrar_status_pedido(self):
-        nome = self.view.line_edit_nome_status_pedido.text
-        descricao = self.view.text_edit_descricao_status_pedido.plain_text
+    def cadastrar_status_pedido(self) -> None:
+        nome = self.view.line_edit_nome_status_pedido.text()
+        descricao = self.view.text_edit_descricao_status_pedido.toPlainText()
 
         response = self.status_service.save(Status(
             nome=nome,
@@ -639,51 +881,14 @@ class MainController(BaseController):
         self.view.line_edit_nome_status_pedido.clear()
         self.view.text_edit_descricao_status_pedido.clear()
 
-    @Slot(CategoriaProdutos)
-    def atualizar_categorias(self, categoria: CategoriaProdutos):
-        self.window.categorias.refresh()
-        id = categoria.uuid
-        if id is None:
-            raise
-
-        nome = categoria.nome
-        self.view.combo_box_categoria_produto.add_item(nome, userData=id)
-
-    @Slot(Produto)
-    def atualizar_produtos(self, produto: Produto):
-        p = produto
-        self.window.produtos.refresh()
-        self.view.combo_box_produto_preco.add_item(produto.nome, userData=p)
-        self.view.combo_box_item_pedido.add_item(produto.nome, userData=p)
-
-    @Slot(Produto)
-    def atualizar_ingredientes(self, produto: Produto):
-        if produto.uuid is None:
-            raise
-
-        ingredientes = self.ingrediente_model.get_data(produto.uuid)
-        for ingrediente in ingredientes:
-            print({'ingrediente': ingrediente})
+        self.status_model.refresh()
 
     def refresh_precos(self) -> None:
         combo_box = self.view.combo_box_produto_preco
-        produto: Optional[Produto] = combo_box.current_data()
-        if produto is None or produto.uuid is None:
-            return
+        produto_uuid: str = combo_box.currentData()
 
-        table_widget = self.view.table_widget_precos_cadastrados
-        table_widget.row_count = 0
-        for preco in self.preco_model.get_data(produto_uuid=produto.uuid):
-
-            table_widget.insert_row(0)
-
-            row = [
-                QTableWidgetItem(preco.dia_da_semana),
-                QTableWidgetItem(str(preco.valor))
-            ]
-
-            for col, item in enumerate(row):
-                table_widget.set_item(0, col, item)
+        self.precos_model.refresh(produto_uuid)
+        self.dias_disponiveis_model.refresh(produto_uuid)
 
 
 """
@@ -703,8 +908,6 @@ class MainController(BaseController):
             "nome": nome,
             "CNPJ": CNPJ,
         }
-
-        response = self.post_request("fornecedores/", json=body)
 
         try:
             self.handle_response(
@@ -730,8 +933,6 @@ class MainController(BaseController):
             "celular": celular,
         }
 
-        response = self.post_request("fornecedores/", json=body)
-
         try:
             msg = "Funcionario cadastrado com sucesso!"
             self.handle_response(response, msg)  # ######
@@ -743,7 +944,7 @@ class MainController(BaseController):
         cidade = self.view.lineEditCidadeZonaEntrega.text
         Bairro = self.view.lineEditBairroZonaEntrega.text
         CEP = self.view.lineEditCEPZonaEntrega.text
-        UF = self.view.comboBoxUFZonaEntrega.current_text
+        UF = self.view.comboBoxUFZonaEntrega.currentText()
         taxa = self.view.doubleSpinBoxTaxaZonaEntrega.value
 
         body = {
@@ -755,8 +956,6 @@ class MainController(BaseController):
             "taxa_de_entrega": taxa,
             "loja_uuid": self.loja.uuid,
         }
-
-        response = self.post_request("zonas-de-entrega/", json=body)
 
         try:
             self.handle_response(

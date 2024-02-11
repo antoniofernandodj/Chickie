@@ -6,10 +6,12 @@ from src.domain.models import (
     ProdutoPOST,
     ProdutoPUT,
     ProdutoGET,
+    Ingrediente,
     AvaliacaoDeProduto as Avaliacao
 )
+from contextlib import suppress
 from aiopg.connection import Connection
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from .base import BaseService
 import asyncio
 import datetime
@@ -24,6 +26,7 @@ class ProdutoService(BaseService):
         conn = connection
 
         self.preco_query_handler = QueryHandler(Preco, conn)
+        self.ingrediente_query_handler = QueryHandler(Ingrediente, conn)
         self.loja_query_handler = QueryHandler(Loja, conn)
         self.avaliacao_query_handler = QueryHandler(Avaliacao, conn)
 
@@ -80,6 +83,29 @@ class ProdutoService(BaseService):
         return await self.preco_query_handler.find_all(
             produto_uuid=produto.uuid
         )
+
+    async def get_precos_disponiveis(
+        self,
+        produto: Produto
+    ) -> dict[str, str]:
+
+        dias_da_semana_disponiveis = {
+            'seg': 'Segunda',
+            'ter': 'Terça',
+            'qua': 'Quarta',
+            'qui': 'Quinta',
+            'sex': 'Sexta',
+            'sab': 'Sábado',
+            'dom': 'Domingo'
+        }
+
+        precos = await self.preco_query_handler.find_all(
+            produto_uuid=produto.uuid
+        )
+        for preco in precos:
+            dias_da_semana_disponiveis.pop(preco.dia_da_semana, None)
+
+        return dias_da_semana_disponiveis
 
     async def get_public_url_image(self, produto: Produto) -> str | None:
 
@@ -155,6 +181,8 @@ class ProdutoService(BaseService):
                 self.get_public_url_image(produto)
             )
 
+            precos_disponiveis = await self.get_precos_disponiveis(produto)
+
             precos = results[0]
             image_url = results[1]
 
@@ -169,6 +197,7 @@ class ProdutoService(BaseService):
                     categoria_uuid=produto.categoria_uuid,
                     loja_uuid=produto.loja_uuid,
                     precos=precos,
+                    precos_disponiveis=precos_disponiveis,
                     preco_hoje=preco_hoje,
                     image_url=image_url
                 )
@@ -199,11 +228,12 @@ class ProdutoService(BaseService):
         return preco_selecionado
 
     async def get_produto(self, uuid: str):
-        produto = await self.get(uuid)
+        produto: Optional[Produto] = await self.get(uuid)
         if produto is None:
             return None
 
         preco_hoje = await self.get_produto_preco(produto)
+        precos_disponiveis = await self.get_precos_disponiveis(produto)
 
         results = await asyncio.gather(
             self.get_precos(produto),
@@ -213,12 +243,14 @@ class ProdutoService(BaseService):
         image_url = results[1]
 
         return ProdutoGET(
+            uuid=produto.uuid,
             nome=produto.nome,
             descricao=produto.nome,
             preco=produto.preco,
             categoria_uuid=produto.categoria_uuid,
             loja_uuid=produto.loja_uuid,
             precos=precos,
+            precos_disponiveis=precos_disponiveis,
             preco_hoje=preco_hoje,
             image_url=image_url
         )
@@ -235,8 +267,35 @@ class ProdutoService(BaseService):
 
         return None
 
-    async def remove_produto(self, uuid: str) -> Dict[str, str]:
-
+    async def remove_produto(self, uuid: str) -> None:
+        from src.services import ImageUploadProdutoService
         # Remover avaliações, Preços e Imagem de cadastro
 
-        return {"uuid": 'removido'}
+        precos: List[Preco] = (
+            await self.preco_query_handler.find_all(produto_uuid=uuid)
+        )
+
+        for preco in precos:
+            self.cmd_handler.delete(preco)
+
+        ingredientes: List[Ingrediente] = (
+            await self.ingrediente_query_handler.find_all(produto_uuid=uuid)
+        )
+
+        for ingrediente in ingredientes:
+            self.cmd_handler.delete(ingrediente)
+
+        produto: Optional[Produto] = await (
+            self.query_handler.find_one(uuid=uuid)
+        )
+
+        if produto is None:
+            raise ValueError('Produto não encontrado')
+
+        self.cmd_handler.delete(produto)
+        loja = await self.get_loja_from_produto(produto)
+        image_service = ImageUploadProdutoService(loja)
+        with suppress(ValueError):
+            image_service.delete_image_produto(produto)
+
+        await self.cmd_handler.commit()

@@ -42,6 +42,7 @@ class ProdutoGET(BaseModel):
     categoria_uuid: str
     loja_uuid: str
     precos: List[Preco]
+    precos_disponiveis: dict[str, str]
 
     image_url: Optional[str] = None
     preco_hoje: Optional[float] = None

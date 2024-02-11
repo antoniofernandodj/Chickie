@@ -1,3 +1,1 @@
-QFrame {
-  border: 0px;
-}
+QFrame { border: 0px; }

@@ -1,3 +1,24 @@
 #frame, #frame_21 {
   border: 0px;
 }
+
+#scroll_area_ingredientes {
+  background-color: rgb(200,200,200);
+  border-radius: 15px;
+  padding-left: 15px;
+  padding-top: 10px;
+}
+
+#frame_19 {
+  border: 1px solid rgb(200,200,200);
+  border-radius: 15px;
+  padding: 0px;
+  min-height: 35px;
+}
+
+#scroll_area_column_1_pedido,
+#scroll_area_column_2_pedido,
+#frame_column_3_pedido {
+  background-color: rgb(100,100,100);
+}
+

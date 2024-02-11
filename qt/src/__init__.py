@@ -1,7 +1,7 @@
 from . import (  # noqa
     config,
     controllers,
-    custom_widgets,
+    components,
     domain,
     services,
     ui_models,

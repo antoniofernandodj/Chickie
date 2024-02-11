@@ -19,13 +19,13 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
     QHBoxLayout, QLabel, QLineEdit, QMainWindow,
     QMenu, QMenuBar, QPushButton, QSizePolicy,
-    QSpacerItem, QStatusBar, QVBoxLayout, QWidget)
+    QStatusBar, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(721, 600)
+        MainWindow.resize(483, 600)
         MainWindow.setStyleSheet(u"")
         self.action_sair = QAction(MainWindow)
         self.action_sair.setObjectName(u"action_sair")
@@ -34,29 +34,19 @@ class Ui_MainWindow(object):
         self.centralwidget.setStyleSheet(u"")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontal_spacer = QSpacerItem(40, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontal_spacer)
-
         self.frame = QFrame(self.centralwidget)
         self.frame.setObjectName(u"frame")
+        self.frame.setMaximumSize(QSize(420, 16777215))
         self.frame.setStyleSheet(u"")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.vertical_spacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self.verticalLayout_2.addItem(self.vertical_spacer_4)
-
+        self.verticalLayout_2.setContentsMargins(60, 40, 60, 40)
         self.label_title = QLabel(self.frame)
         self.label_title.setObjectName(u"label_title")
 
         self.verticalLayout_2.addWidget(self.label_title, 0, Qt.AlignHCenter)
-
-        self.vertical_spacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Maximum)
-
-        self.verticalLayout_2.addItem(self.vertical_spacer_2)
 
         self.label_login = QLabel(self.frame)
         self.label_login.setObjectName(u"label_login")
@@ -66,6 +56,7 @@ class Ui_MainWindow(object):
         self.line_edit_login = QLineEdit(self.frame)
         self.line_edit_login.setObjectName(u"line_edit_login")
         self.line_edit_login.setMinimumSize(QSize(0, 40))
+        self.line_edit_login.setStyleSheet(u"")
         self.line_edit_login.setMaxLength(30)
         self.line_edit_login.setAlignment(Qt.AlignCenter)
 
@@ -101,10 +92,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.frame_2)
 
-        self.vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self.verticalLayout_2.addItem(self.vertical_spacer)
-
         self.push_button_entrar = QPushButton(self.frame)
         self.push_button_entrar.setObjectName(u"push_button_entrar")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -112,6 +99,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.push_button_entrar.sizePolicy().hasHeightForWidth())
         self.push_button_entrar.setSizePolicy(sizePolicy)
+        self.push_button_entrar.setMaximumSize(QSize(16777215, 50))
         self.push_button_entrar.setBaseSize(QSize(0, 0))
         self.push_button_entrar.setStyleSheet(u"")
 
@@ -119,24 +107,17 @@ class Ui_MainWindow(object):
 
         self.push_button_esqueci_a_senha = QPushButton(self.frame)
         self.push_button_esqueci_a_senha.setObjectName(u"push_button_esqueci_a_senha")
+        self.push_button_esqueci_a_senha.setMinimumSize(QSize(0, 30))
 
         self.verticalLayout_2.addWidget(self.push_button_esqueci_a_senha)
-
-        self.vertical_spacer_3 = QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self.verticalLayout_2.addItem(self.vertical_spacer_3)
 
 
         self.horizontalLayout.addWidget(self.frame)
 
-        self.horizontal_spacer_2 = QSpacerItem(40, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontal_spacer_2)
-
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 721, 22))
+        self.menubar.setGeometry(QRect(0, 0, 483, 22))
         self.menu_arquivo = QMenu(self.menubar)
         self.menu_arquivo.setObjectName(u"menu_arquivo")
         MainWindow.setMenuBar(self.menubar)
@@ -158,7 +139,7 @@ class Ui_MainWindow(object):
         self.label_title.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:20pt; font-weight:600;\">Chickie</span></p></body></html>", None))
         self.label_login.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:600;\">Login</span></p></body></html>", None))
         self.line_edit_login.setText("")
-        self.line_edit_login.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Digite seu username de cadastro (ou email)", None))
+        self.line_edit_login.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Digite seu username (ou email)", None))
         self.label_senha.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:600;\">Senha</span></p></body></html>", None))
         self.line_edit_senha.setText("")
         self.line_edit_senha.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Digite sua senha", None))

@@ -1,9 +1,7 @@
-from PySide6.QtWidgets import QMainWindow, QListWidgetItem
+from PySide6.QtWidgets import QMainWindow
 from src.ui_models.uf import UF
 from src.controllers import MainController
-from src.ui_models import CategoriasModel, ProdutosModel, StatusModel
-from src.services import FileService
-from __feature__ import snake_case, true_property  # type: ignore  # noqa
+from src.services import FileService as FS
 
 
 class MainWindow(QMainWindow):
@@ -14,17 +12,17 @@ class MainWindow(QMainWindow):
 
         self.app = app
 
-        self.categorias = CategoriasModel(self)
-        self.produtos = ProdutosModel(self)
-        self.status = StatusModel(self)
-        self.items = []
-
         self.view = Ui_MainWindow()
         self.view.setupUi(self)
         self.setupUI()
 
-        qss = FileService.get_text('src/styles/main.qss')
-        self.view.centralwidget.style_sheet = qss
+        qss = FS.get('src/styles/main.qss')
+        self.view.centralwidget.setStyleSheet(qss)
+
+        qss = FS.get('src/styles/all.qss')
+        self.view.tab_widget.setStyleSheet(qss)
+
+        self.setStyleSheet(FS.get('src/styles/main-window.qss'))
 
         self.controller = MainController(self.view, self.app, self)
         self.controller.setup()
@@ -32,32 +30,25 @@ class MainWindow(QMainWindow):
         self.view.action_sair.triggered.connect(self.app.exit)
 
     def setupUI(self):
+
         self.view.combo_box_uf_pedido.clear()
         self.view.combo_box_uf_cliente.clear()
 
-        self.view.combo_box_uf_pedido.add_items([uf.name for uf in UF])
-        self.view.combo_box_uf_cliente.add_items([uf.name for uf in UF])
+        self.view.combo_box_uf_pedido.addItems([uf.name for uf in UF])
+        self.view.combo_box_uf_cliente.addItems([uf.name for uf in UF])
 
         combo_box = self.view.combo_box_categoria_produto
         combo_box.clear()
 
         text = 'Escolha uma categoria de produto...'
-        combo_box.add_item(text, userData=None)
-        for categoria in self.categorias.data:
-            Item = QListWidgetItem
-            combo_box.add_item(categoria.nome, userData=categoria)
-            list_widget = self.view.list_widget_categorias_cadastradas
-            list_widget.add_item(Item(categoria.nome))
+        combo_box.addItem(text, userData=None)
 
-        combo_box_produto_preco = self.view.combo_box_produto_preco
-        combo_box_item_pedido = self.view.combo_box_item_pedido
+        cb_produto_preco = self.view.combo_box_produto_preco
+        cb_item_pedido = self.view.combo_box_item_pedido
 
-        combo_box_produto_preco.clear()
-        combo_box_item_pedido.clear()
+        cb_produto_preco.clear()
+        cb_item_pedido.clear()
 
         text = 'Escolha um produto...'
-        combo_box_produto_preco.add_item(text, userData=None)
-        self.view.combo_box_item_pedido.add_item(text, userData=None)
-        for produto in self.produtos.data:
-            combo_box_produto_preco.add_item(produto.nome, userData=produto)
-            combo_box_item_pedido.add_item(produto.nome, userData=produto)
+        cb_produto_preco.addItem(text, userData=None)
+        cb_item_pedido.addItem(text, userData=None)

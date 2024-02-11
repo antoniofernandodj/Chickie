@@ -56,6 +56,9 @@ class LojaService(BaseService):
             image_url = results[1]
 
             preco_hoje = await self.produto_service.get_produto_preco(produto)
+            precos_disponiveis = (
+                await self.produto_service.get_precos_disponiveis(produto)
+            )
 
             response.append(
                 ProdutoGET(
@@ -66,6 +69,7 @@ class LojaService(BaseService):
                     categoria_uuid=produto.categoria_uuid,
                     loja_uuid=produto.loja_uuid,
                     precos=precos,
+                    precos_disponiveis=precos_disponiveis,
                     preco_hoje=preco_hoje,
                     image_url=image_url
                 )

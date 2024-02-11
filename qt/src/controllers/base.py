@@ -3,7 +3,6 @@ from src.config import settings
 from PySide6.QtWidgets import QMessageBox
 from typing import Optional
 from contextlib import suppress
-from __feature__ import snake_case, true_property  # type: ignore  # noqa
 
 from src.domain.services import AuthService
 import json

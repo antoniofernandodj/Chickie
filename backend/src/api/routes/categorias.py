@@ -137,6 +137,8 @@ async def remover_categoria(
         cmd_handler.delete_from_uuid(CategoriaProdutos, uuid=uuid)
         await cmd_handler.commit()
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(error))
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

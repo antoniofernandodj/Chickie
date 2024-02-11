@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import QMainWindow
 from src.controllers import LoginController
-from src.services import FileService
-from __feature__ import snake_case, true_property  # type: ignore  # noqa
+from src.services import FileService as FS
 
 # from PySide6.QtCore import Qt
 
@@ -17,8 +16,9 @@ class LoginWindow(QMainWindow):
         self.view = LoginView()
         self.view.setupUi(self)
 
-        qss = FileService.get_text('src/styles/login.qss')
-        self.view.centralwidget.style_sheet = qss
+        self.setStyleSheet(FS.get('src/styles/main-window.qss'))
+        self.view.frame.setStyleSheet(FS.get('src/styles/all.qss'))
+        self.view.centralwidget.setStyleSheet(FS.get('src/styles/login.qss'))
 
         self.resize(450, 600)
 
