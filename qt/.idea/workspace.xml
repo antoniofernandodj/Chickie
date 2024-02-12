@@ -5,27 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ebdf8e22-aa7e-4d09-9b76-9c0cdf79f04b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/qt.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev.sh" beforeDir="false" afterPath="$PROJECT_DIR$/dev.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/olamundo.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config/settings.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/settings.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/login.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/login.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/domain/data_models/endereco.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/domain/data_models/endereco.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/domain/services/pedido.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/domain/services/pedido.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui_models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui_models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/pedidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/pedidos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/ingrediente_group.ui" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/ingrediente_group.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/ingrediente_group_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/ingrediente_group_ui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/main.ui" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/main.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/main_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/main_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/windows/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/windows/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,15 +33,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/cqrs&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/antonio/Development/Chickie/backend&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.app.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/antonio/Development/Chickie/backend",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors"
   }
-}</component>
+}]]></component>
+  <component name="RunManager">
+    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="qt" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.app" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

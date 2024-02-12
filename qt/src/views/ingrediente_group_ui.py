@@ -23,7 +23,13 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(635, 300)
-        Form.setStyleSheet(u"")
+        Form.setStyleSheet(u"#frame {\n"
+"  border: 0px;\n"
+"  border-bottom-width: 1px;\n"
+"  border-bottom-style: solid;\n"
+"  border-bottom-color: rgba(0,0,0,0.3);\n"
+"}\n"
+"")
         self.frame = QFrame(Form)
         self.frame.setObjectName(u"frame")
         self.frame.setGeometry(QRect(150, 130, 241, 50))
@@ -34,7 +40,7 @@ class Ui_Form(object):
         font.setUnderline(False)
         self.frame.setFont(font)
         self.frame.setStyleSheet(u"")
-        self.frame.setFrameShape(QFrame.Box)
+        self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.frame.setMidLineWidth(1)
         self.horizontalLayout = QHBoxLayout(self.frame)
@@ -44,7 +50,7 @@ class Ui_Form(object):
         self.frame_2 = QFrame(self.frame)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setStyleSheet(u"")
-        self.frame_2.setFrameShape(QFrame.Box)
+        self.frame_2.setFrameShape(QFrame.NoFrame)
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.frame_2.setMidLineWidth(1)
         self.verticalLayout = QVBoxLayout(self.frame_2)
@@ -63,7 +69,7 @@ class Ui_Form(object):
         self.frame_3 = QFrame(self.frame)
         self.frame_3.setObjectName(u"frame_3")
         self.frame_3.setMaximumSize(QSize(150, 16777215))
-        self.frame_3.setFrameShape(QFrame.Box)
+        self.frame_3.setFrameShape(QFrame.NoFrame)
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.frame_3.setMidLineWidth(1)
         self.horizontalLayout_2 = QHBoxLayout(self.frame_3)

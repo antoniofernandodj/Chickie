@@ -23,12 +23,12 @@ class ItemPedido(BaseModel):
 
 class ItemPedidoGET(BaseModel):
     __tablename__ = "itens_pedido"
+    produto_nome: str
+    produto_descricao: str
     quantidade: int
     observacoes: str
     pedido_uuid: str
     loja_uuid: str
-    produto_nome: str
-    produto_descricao: str
     ingredientes: List[IngredienteDeItemDePedido]
     valor: float
     uuid: Optional[str] = None

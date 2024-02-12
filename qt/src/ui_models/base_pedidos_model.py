@@ -4,7 +4,7 @@ from PySide6.QtCore import (
     QPersistentModelIndex,
     Qt,
 )
-from PySide6.QtWidgets import QTableView
+from PySide6.QtWidgets import QTableView, QHeaderView
 import datetime
 from src.domain.services import PedidoService
 from src.domain.data_models import PedidoGET, EnderecoEntrega  # noqa
@@ -140,6 +140,9 @@ class BasePedidosTableModel(QAbstractTableModel):
     def set_size(self, table_view: QTableView, sizes: List[int]):
         for index, value in enumerate(sizes):
             table_view.setColumnWidth(index, int(value * 9))
+
+        mode = QHeaderView.ResizeMode.Fixed
+        table_view.horizontalHeader().setSectionResizeMode(mode)
 
     def assert_never(self, arg: Never) -> NoReturn:
         raise NotImplementedError('Caso não tratado')

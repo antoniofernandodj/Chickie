@@ -1919,6 +1919,11 @@
                   <height>300</height>
                  </size>
                 </property>
+                <property name="styleSheet">
+                 <string notr="true">QLineEdit {
+    padding-left: 5px;
+}</string>
+                </property>
                 <property name="widgetResizable">
                  <bool>true</bool>
                 </property>
@@ -2039,6 +2044,13 @@
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontal_layout_4">
+                    <item>
+                     <widget class="QLabel" name="label_7">
+                      <property name="text">
+                       <string>CEP</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item>
                      <widget class="QLineEdit" name="line_edit_cep">
                       <property name="minimumSize">

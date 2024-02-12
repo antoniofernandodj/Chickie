@@ -909,6 +909,9 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.scroll_area_column_1_pedido.sizePolicy().hasHeightForWidth())
         self.scroll_area_column_1_pedido.setSizePolicy(sizePolicy1)
         self.scroll_area_column_1_pedido.setMinimumSize(QSize(0, 300))
+        self.scroll_area_column_1_pedido.setStyleSheet(u"QLineEdit {\n"
+"    padding-left: 5px;\n"
+"}")
         self.scroll_area_column_1_pedido.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
@@ -969,6 +972,11 @@ class Ui_MainWindow(object):
 
         self.horizontal_layout_4 = QHBoxLayout()
         self.horizontal_layout_4.setObjectName(u"horizontal_layout_4")
+        self.label_7 = QLabel(self.scrollAreaWidgetContents_2)
+        self.label_7.setObjectName(u"label_7")
+
+        self.horizontal_layout_4.addWidget(self.label_7)
+
         self.line_edit_cep = QLineEdit(self.scrollAreaWidgetContents_2)
         self.line_edit_cep.setObjectName(u"line_edit_cep")
         self.line_edit_cep.setMinimumSize(QSize(0, 30))
@@ -1833,6 +1841,7 @@ class Ui_MainWindow(object):
         self.line_edit_celular_pedido.setText(QCoreApplication.translate("MainWindow", u"(00) 0 0000-0000", None))
         self.line_edit_celular_pedido.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Celular (00) 0 0000-0000", None))
         self.label_endereco_pedido.setText(QCoreApplication.translate("MainWindow", u"Endere\u00e7o", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"CEP", None))
         self.line_edit_cep.setInputMask(QCoreApplication.translate("MainWindow", u"00000-000", None))
         self.line_edit_cep.setText(QCoreApplication.translate("MainWindow", u"00000-000", None))
         self.line_edit_cep.setPlaceholderText(QCoreApplication.translate("MainWindow", u"CEP", None))
