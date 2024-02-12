@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(919, 816)
+        MainWindow.resize(919, 815)
         MainWindow.setMinimumSize(QSize(0, 815))
         self.actionAtualizar = QAction(MainWindow)
         self.actionAtualizar.setObjectName(u"actionAtualizar")
@@ -912,7 +912,7 @@ class Ui_MainWindow(object):
         self.scroll_area_column_1_pedido.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 310, 501))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 310, 500))
         self.verticalLayout_20 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
         self.label_cliente_pedido = QLabel(self.scrollAreaWidgetContents_2)
@@ -1257,8 +1257,9 @@ class Ui_MainWindow(object):
         self.frame_column_3_pedido.setFrameShape(QFrame.StyledPanel)
         self.frame_column_3_pedido.setFrameShadow(QFrame.Raised)
         self.verticalLayout_18 = QVBoxLayout(self.frame_column_3_pedido)
+        self.verticalLayout_18.setSpacing(9)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
-        self.verticalLayout_18.setContentsMargins(2, 2, -1, 2)
+        self.verticalLayout_18.setContentsMargins(9, 9, -1, 9)
         self.label_image_produto_text = QLabel(self.frame_column_3_pedido)
         self.label_image_produto_text.setObjectName(u"label_image_produto_text")
         self.label_image_produto_text.setFont(font)
@@ -1325,6 +1326,7 @@ class Ui_MainWindow(object):
         self.line_edit_total_item_pedido.setObjectName(u"line_edit_total_item_pedido")
         self.line_edit_total_item_pedido.setEnabled(False)
         self.line_edit_total_item_pedido.setMaximumSize(QSize(100, 16777215))
+        self.line_edit_total_item_pedido.setStyleSheet(u"border: 0px;")
 
         self.horizontalLayout_3.addWidget(self.line_edit_total_item_pedido)
 
@@ -1880,6 +1882,7 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem5 = self.table_widget_item_pedido.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Ingredientes", None));
         self.label_total_item_pedido.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:600;\">Total:</span></p></body></html>", None))
+        self.line_edit_total_item_pedido.setText("")
         self.label_comentarios_pedido.setText(QCoreApplication.translate("MainWindow", u"Coment\u00e1rios do pedido", None))
         self.push_button_cadastrar_pedido.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_pedido), QCoreApplication.translate("MainWindow", u"Pedido", None))

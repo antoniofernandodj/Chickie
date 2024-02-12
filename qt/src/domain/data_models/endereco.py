@@ -2,7 +2,33 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 
-class EnderecoLoja(BaseModel):
+class Endereco:
+
+    logradouro: str
+    numero: str
+    bairro: str
+    cidade: str
+    uf: str
+    cep: Optional[str]
+    complemento: Optional[str]
+
+    def to_string(self) -> str:
+        linha = "{}, {} - {}, {} - {}".format(
+            self.logradouro,
+            self.numero,
+            self.bairro,
+            self.cidade,
+            self.uf
+        )
+
+        if self.cep:
+            linha += f", CEP: {self.cep}"
+        if self.complemento:
+            linha += f", {self.complemento}"
+        return linha
+
+
+class EnderecoLoja(BaseModel, Endereco):
     __tablename__ = "enderecos_lojas"
     uf: str
     cidade: str
@@ -16,7 +42,7 @@ class EnderecoLoja(BaseModel):
     uuid: Optional[str] = None
 
 
-class EnderecoUsuario(BaseModel):
+class EnderecoUsuario(BaseModel, Endereco):
     __tablename__ = "enderecos_usuarios"
     uf: str
     cidade: str
@@ -30,7 +56,7 @@ class EnderecoUsuario(BaseModel):
     uuid: Optional[str] = None
 
 
-class EnderecoEntrega(BaseModel):
+class EnderecoEntrega(BaseModel, Endereco):
     __tablename__ = "enderecos_entregas"
     uf: str
     cidade: str

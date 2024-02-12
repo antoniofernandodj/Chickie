@@ -11,6 +11,10 @@ compile:
 		   src/views/ingrediente_group.ui \
 		-o src/views/ingrediente_group_ui.py
 
+	poetry run pyside6-uic \
+	       src/views/pedidos.ui \
+		-o src/views/pedidos_ui.py
+
 lines:
 	poetry run python scripts/lines.py
 

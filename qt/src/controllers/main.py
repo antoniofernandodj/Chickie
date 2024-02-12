@@ -105,10 +105,24 @@ class MainController(BaseController):
         self.view.list_view_ingredientes.setModel(self.ingrediente_list_model)
         self.view.list_view_produtos_cadastrados.setModel(self.produtos_model)
         self.view.combo_box_categoria_pedido.setModel(self.categoria_model)
+        self.view.action_pedidos.triggered.connect(self.visualizar_pedidos)
+        self.view.action_historico.triggered.connect(self.visualizar_historico)
 
         self.total_pedido = 0.0
 
         self.refresh_ingredientes()
+
+    def visualizar_pedidos(self):
+        from src.windows import PedidosDialog
+
+        dialog_pedidos = PedidosDialog()
+        dialog_pedidos.show()
+
+    def visualizar_historico(self):
+        from src.windows import HistoricoDialog
+
+        dialog_historico = HistoricoDialog()
+        dialog_historico.show()
 
     def radio_ingrediente_clicked(self) -> None:
         radio_button: QRadioButton = self.sender()  # type: ignore
@@ -141,7 +155,6 @@ class MainController(BaseController):
         layout.addWidget(ui.frame)
 
     def adicionar_ingrediente_a_lista_de_cadastro(self):
-
         nome = self.view.line_edit_nome_ingrediente.text()
         descricao = self.view.text_edit_ingrediente_descricao.toPlainText()
         ingrediente = {'nome': nome, 'descricao': descricao}
@@ -257,7 +270,6 @@ class MainController(BaseController):
                 return
 
     def remover_produto(self) -> None:
-
         selected_indexes = (
             self.view.list_view_produtos_cadastrados.selectedIndexes()
         )
@@ -292,7 +304,6 @@ class MainController(BaseController):
         self.produtos_model.refresh(produto.categoria_uuid)
 
     def remover_categoria(self) -> None:
-
         selected_indexes = (
             self.view.list_view_categorias_cadastradas.selectedIndexes()
         )
@@ -324,7 +335,6 @@ class MainController(BaseController):
         self.categoria_model.refresh()
 
     def remover_status(self) -> None:
-
         selected_indexes = (
             self.view.list_view_status_cadastrados.selectedIndexes()
         )
@@ -356,6 +366,7 @@ class MainController(BaseController):
         self.status_model.refresh()
 
     def itens_pedido_refresh(self) -> None:
+        self.view.label_image.setPixmap(QPixmap())
         self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
         self.view.list_widget_adicionais_pedido.clear()
         categoria_uuid = self.view.combo_box_categoria_pedido.currentData()
@@ -369,7 +380,6 @@ class MainController(BaseController):
         self.produtos_model.refresh(categoria_uuid)
 
     def refresh_produtos(self) -> None:
-
         self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
         self.view.list_widget_adicionais_pedido.clear()
 
@@ -377,7 +387,7 @@ class MainController(BaseController):
         self.produtos_model.refresh(categoria_uuid)
 
     def refresh_ingredientes(self) -> None:
-
+        self.view.label_image.setPixmap(QPixmap())
         self.view.list_widget_adicionais_pedido.clear()
 
         produto_uuid: str = self.view.combo_box_item_pedido.currentData()
@@ -753,8 +763,6 @@ class MainController(BaseController):
     #         "password": senha,
     #         "loja_uuid": self.loja.uuid,
     #     }
-
-    #     print({'body': body})
 
     #     # try:
     #     #     self.handle_response(response)

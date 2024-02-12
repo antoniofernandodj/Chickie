@@ -14,4 +14,8 @@ cd /home/antonio/Development/Chickie/qt
 	   src/views/ingrediente_group.ui \
 	-o src/views/ingrediente_group_ui.py
 
-./.venv/bin/python3.10 app.py
+./.venv/bin/pyside6-uic \
+       src/views/pedidos.ui \
+	-o src/views/pedidos_ui.py
+
+./.venv/bin/python3 app.py

@@ -7,5 +7,7 @@ from .precos_list_model import (  # noqa
 from .status_list_model import StatusListModel  # noqa
 from .categoria_list_model import CategoriaListModel  # noqa
 from .ingredientes_list_model import IngredientesListModel  # noqa
+from .pedidos_table_model import PedidosTableModel  # noqa
+from .historico_table_model import HistoricoTableModel  # noqa
 
 # from .clientes import ClientesModel  # noqa

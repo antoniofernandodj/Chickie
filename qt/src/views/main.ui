@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>919</width>
-    <height>816</height>
+    <height>815</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1928,7 +1928,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>310</width>
-                   <height>501</height>
+                   <height>500</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2613,14 +2613,17 @@
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_18">
+                 <property name="spacing">
+                  <number>9</number>
+                 </property>
                  <property name="leftMargin">
-                  <number>2</number>
+                  <number>9</number>
                  </property>
                  <property name="topMargin">
-                  <number>2</number>
+                  <number>9</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>2</number>
+                  <number>9</number>
                  </property>
                  <item>
                   <widget class="QLabel" name="label_image_produto_text">
@@ -2752,6 +2755,12 @@
                         <width>100</width>
                         <height>16777215</height>
                        </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">border: 0px;</string>
+                      </property>
+                      <property name="text">
+                       <string/>
                       </property>
                      </widget>
                     </item>
