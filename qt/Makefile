@@ -21,13 +21,15 @@ lines:
 dev:
 	./dev.sh
 
-build:
+b:
 	rm -rf dist
 	rm -rf build
 
 	# poetry run pyinstaller --name="Chiquitos" --windowed app.py
-	poetry run cxfreeze -c app.py --target-dir dist/Chiquitos
-	mv ./dist/Chiquitos/app ./dist/Chiquitos/Chiquitos
+	# poetry run cxfreeze -c app.py --target-dir dist/Chiquitos
+	# mv ./dist/Chiquitos/app ./dist/Chiquitos/Chiquitos
+
+	poetry run python setup.py build
 
 run:
 	./dist/Chiquitos/Chiquitos

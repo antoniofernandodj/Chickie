@@ -23,7 +23,6 @@ class PedidosController:
         self.dialog.view.push_button_concluido.clicked.connect(self.concluido)
         self.pedidos_model = PedidosTableModel()
         self.status_model = StatusListModel()
-        self.dialog.finished.connect(self.delete)
         self.itens_model = ItensPedidoTableModel()
         self.dialog.view.table_view_itens_pedido.setModel(self.itens_model)
 
@@ -45,6 +44,9 @@ class PedidosController:
 
     def visualizar_pedido(self):
         selected_items = self.dialog.view.table_view_pedidos.selectedIndexes()
+        if not selected_items:
+            return
+
         index = selected_items[0]
         if index.column() != 0:
             title = 'Aviso'
@@ -103,7 +105,3 @@ class PedidosController:
             text = 'Erro na conclusão do pedido'
             QMessageBox.critical(self.dialog, title, text)
             return
-
-    def delete(self):
-        del self
-        self = None  # noqa

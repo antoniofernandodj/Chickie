@@ -4,14 +4,16 @@ from src.config import settings  # type: ignore
 from src.controllers.base import BaseController
 from src.domain.data_models import ItemPedidoPOST
 from src.services import FileService
-from typing import Optional, List
+from typing import Optional, List, Any
 from datetime import datetime
 from contextlib import suppress
 from unidecode import unidecode
+from dataclasses import dataclass
 from src.components import (
     CustomTableWidgetItem,
     IngredientesContainer,
-    IngredienteGroup
+    IngredienteGroup,
+    CustomRadioButton
 )
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -20,7 +22,6 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QWidget,
     QVBoxLayout,
-    QRadioButton
 )
 from PySide6.QtGui import QPixmap
 from src.domain.services import (
@@ -41,7 +42,6 @@ from src.ui_models import (
     IngredientesListModel
 )
 from src.domain.data_models import (
-    Produto,
     Preco,
     Status,
     Ingrediente,
@@ -56,6 +56,12 @@ from src.domain.data_models import (
     # Pedido,
     # ItemPedido,
 )
+
+
+@dataclass
+class Data:
+    name: str
+    value: Any
 
 
 with suppress(ImportError):
@@ -125,17 +131,16 @@ class MainController(BaseController):
         dialog_historico.show()
 
     def radio_ingrediente_clicked(self) -> None:
-        radio_button: QRadioButton = self.sender()  # type: ignore
-        ingrediente: Ingrediente = radio_button.ingrediente  # type: ignore
-        self.ingrediente_container.select[str(ingrediente.uuid)] = (
-            radio_button.isChecked()
-        )
+        radio_button: CustomRadioButton = self.sender()  # type: ignore
+        ingrediente = radio_button.get_ingrediente()
+        value = radio_button.get_value()
+        self.ingrediente_container.select[str(ingrediente.uuid)] = value
 
     def adicionar_ingrediente_a_pedido(
         self,
         container_widget: QWidget,
         label: str,
-        data: Ingrediente
+        ingrediente: Ingrediente
     ) -> None:
 
         if settings.STYLES:
@@ -148,9 +153,9 @@ class MainController(BaseController):
         ui = IngredienteGroup()
         ui.setup_ui(label, container_widget)
 
-        for radio_button in [ui.radio_nao, ui.radio_sim]:
-            radio_button.ingrediente = data  # type: ignore
-            radio_button.clicked.connect(self.radio_ingrediente_clicked)
+        for button in [ui.radio_nao, ui.radio_sim]:
+            button.set_ingrediente(ingrediente)
+            button.clicked.connect(self.radio_ingrediente_clicked)
 
         layout.addWidget(ui.frame)
 
@@ -248,12 +253,24 @@ class MainController(BaseController):
         # )
 
     def remover_preco(self) -> None:
+
+        QMB = QMessageBox
+        title = 'Confirmar'
+        text = 'Você tem certeza que deseja remover o preço selecionado?'
+        buttons = QMB.StandardButton.Yes | QMB.StandardButton.No
+        confirm = QMB.question(self.window, title, text, buttons)
+        if confirm == QMB.StandardButton.No:
+            return
+
         selected_items = (
             self.view.list_view_precos_cadastrados.selectedIndexes()
         )
 
         if selected_items:
-            preco_index = selected_items[0]
+            try:
+                preco_index = selected_items[0]
+            except Exception:
+                return
 
             try:
                 preco_removido = self.precos_model.remove(preco_index)
@@ -270,6 +287,16 @@ class MainController(BaseController):
                 return
 
     def remover_produto(self) -> None:
+        QMB = QMessageBox
+        title = 'Confirmar'
+        text = ('Você tem certeza que deseja remover o produto '
+                'e todos os preços associados?')
+
+        buttons = QMB.StandardButton.Yes | QMB.StandardButton.No
+        confirm = QMB.question(self.window, title, text, buttons)
+        if confirm == QMB.StandardButton.No:
+            return
+
         selected_indexes = (
             self.view.list_view_produtos_cadastrados.selectedIndexes()
         )
@@ -304,6 +331,16 @@ class MainController(BaseController):
         self.produtos_model.refresh(produto.categoria_uuid)
 
     def remover_categoria(self) -> None:
+        QMB = QMessageBox
+        title = 'Confirmar'
+        text = ('Você tem certeza que deseja remover a categoria '
+                'selecionada?')
+
+        buttons = QMB.StandardButton.Yes | QMB.StandardButton.No
+        confirm = QMB.question(self.window, title, text, buttons)
+        if confirm == QMB.StandardButton.No:
+            return
+
         selected_indexes = (
             self.view.list_view_categorias_cadastradas.selectedIndexes()
         )
@@ -335,6 +372,16 @@ class MainController(BaseController):
         self.categoria_model.refresh()
 
     def remover_status(self) -> None:
+        QMB = QMessageBox
+        title = 'Confirmar'
+        text = ('Você tem certeza que deseja remover o status '
+                'selecionado?')
+
+        buttons = QMB.StandardButton.Yes | QMB.StandardButton.No
+        confirm = QMB.question(self.window, title, text, buttons)
+        if confirm == QMB.StandardButton.No:
+            return
+
         selected_indexes = (
             self.view.list_view_status_cadastrados.selectedIndexes()
         )
@@ -497,9 +544,8 @@ class MainController(BaseController):
         combo_box = self.view.combo_box_item_pedido
         produto_uuid: str = combo_box.currentData()
 
-        produto: Optional[Produto] = self.produto_service.get(produto_uuid)
-
-        if produto is None or produto.uuid is None:
+        produto = self.produto_service.get(produto_uuid)
+        if not isinstance(produto, ProdutoGET) or produto.uuid is None:
             title = 'Aviso'
             message = 'Escolha ao menos um produto!'
             QMessageBox.warning(self.window, title, message)
@@ -510,14 +556,16 @@ class MainController(BaseController):
 
         ingredientes: List[IngredientesSelect] = []
         for uuid, value in self.ingrediente_container.select.items():
+            print(uuid, value)
             if value is None:
                 title = 'Aviso'
                 message = 'Favor, marcar todos os ingredientes!'
                 QMessageBox.warning(self.window, title, message)
                 return
 
-            select = IngredientesSelect(uuid=uuid, value=value)
-            ingredientes.append(select)
+            if value is True:
+                select = IngredientesSelect(uuid=uuid, value=value)
+                ingredientes.append(select)
 
         ip = ItemPedidoPOST(
             quantidade=self.view.spin_box_item_pedido.value(),
@@ -540,24 +588,27 @@ class MainController(BaseController):
         row_count = table_widget.rowCount()
         table_widget.insertRow(row_count)
 
-        datas = [
-            (produto.nome, produto.uuid),
-            (produto.preco, produto.preco),
-            (ip.quantidade, ip.quantidade),
-            (produto.preco * ip.quantidade, produto.preco * ip.quantidade),
-            (ip.observacoes, ip.observacoes),
-            (', '.join(ingredientes_nomes), ip.ingredientes)
+        subtotal = produto.preco * ip.quantidade
+        preco = produto.preco
+
+        datas: list[Data] = [
+            Data(name=produto.nome, value=produto.uuid),
+            Data(name=f'R${preco:.2f}'.replace('.', ','), value=preco),
+            Data(name=str(ip.quantidade), value=ip.quantidade),
+            Data(name=f'R${subtotal:.2f}'.replace('.', ','), value=subtotal),
+            Data(name=ip.observacoes, value=ip.observacoes),
+            Data(name=', '.join(ingredientes_nomes), value=ip.ingredientes)
         ]
 
         row: List[CustomTableWidgetItem] = []
         for data in datas:
-            item = CustomTableWidgetItem(str(data[0]))
-            item.store_data(data[1])
+            item = CustomTableWidgetItem(data.name)
+            item.store_data(data.value)
             row.append(item)
 
-        for column, item in enumerate(row):
+        for column_number, item in enumerate(row):
             item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            table_widget.setItem(row_count, column, item)
+            table_widget.setItem(row_count, column_number, item)
 
         self.total_pedido += subtotal
         self.refresh_text_browser_total_pedido()
@@ -606,6 +657,16 @@ class MainController(BaseController):
         self.categoria_model.refresh()
 
     def cadastrar_produto(self) -> None:
+        QMB = QMessageBox
+        title = 'Confirmar'
+        text = ('Tem certeza que deseja cadastrar o produto '
+                'com as informações escolhidas?')
+
+        buttons = QMB.StandardButton.Yes | QMB.StandardButton.No
+        confirm = QMB.question(self.window, title, text, buttons)
+        if confirm == QMB.StandardButton.No:
+            return
+
         label = self.view.label_produto_image_filename
         try:
             file_path: str = label.value  # type: ignore
@@ -636,7 +697,7 @@ class MainController(BaseController):
             loja_uuid=self.loja.uuid,
             preco=preco,
             image_bytes=FileService.get_base64_string(file_path),
-            filename=path.basename(label.text())
+            filename=path.basename(file_path)
         )
 
         response = self.produto_service.save(produto)
@@ -728,67 +789,10 @@ class MainController(BaseController):
         self.precos_model.refresh(produto.uuid)
         self.dias_disponiveis_model.refresh(produto.uuid)
 
-    # def cadastrar_cliente(self):
-    #     nome = self.view.line_edit_nome_cliente.text
-    #     email = self.view.line_edit_email_cliente.text
-    #     username = self.view.line_edit_username_cliente.text
-    #     telefone = self.view.line_edit_telefone_cliente.text
-    #     celular = self.view.line_edit_celular_cliente.text
-    #     senha = '123456'
-
-    #     logradouro = self.view.line_edit_logradouro_cliente.text
-    #     uf = self.view.combo_box_uf_cliente.currentText()
-    #     cidade = self.view.line_edit_cidade_cliente.text
-    #     numero = self.view.line_edit_numero_cliente.text
-    #     bairro = self.view.line_edit_bairro_cliente.text
-    #     cep = self.view.line_edit_cep_cliente.text
-    #     complemento = self.view.line_edit_complemento_cliente.text
-
-    #     body = {
-    #         "nome": nome,
-    #         "username": username,
-    #         "email": email,
-    #         "telefone": telefone,
-    #         "celular": celular,
-    #         "endereco": {
-    #             "uf": uf,
-    #             "cidade": cidade,
-    #             "logradouro": logradouro,
-    #             "numero": numero,
-    #             "nome": nome,
-    #             "complemento": complemento,
-    #             "bairro": bairro,
-    #             "cep": cep,
-    #         },
-    #         "password": senha,
-    #         "loja_uuid": self.loja.uuid,
-    #     }
-
-    #     # try:
-    #     #     self.handle_response(response)
-    #     # except ValueError as error:
-    #     #     self.show_message('Error', str(error))
-    #     #     return None
-
-    #     title = 'Sucesso'
-    #     message = "Cliente cadastrado com sucesso!"
-    #     QMessageBox.information(self.window, title, message)
-
-    #     self.view.line_edit_nome_cliente.clear()
-    #     self.view.line_edit_email_cliente.clear()
-    #     self.view.line_edit_username_cliente.clear()
-    #     self.view.line_edit_telefone_cliente.clear()
-    #     self.view.line_edit_celular_cliente.clear()
-
-    #     self.view.line_edit_logradouro_cliente.clear()
-    #     self.view.line_edit_cidade_cliente.clear()
-    #     self.view.line_edit_numero_cliente.clear()
-    #     self.view.line_edit_bairro_cliente.clear()
-    #     self.view.line_edit_cep_cliente.clear()
-    #     self.view.line_edit_complemento_cliente.clear()
-
     def get_itens_pedido(self) -> List[ItemPedidoPOST]:
+
         items_pedido: List[ItemPedidoPOST] = []
+
         table_widget = self.view.table_widget_item_pedido
         for row_number in range(table_widget.rowCount()):
             row_items = []
@@ -796,9 +800,15 @@ class MainController(BaseController):
                 item: CustomTableWidgetItem = (  # type: ignore
                     table_widget.item(row_number, column_number)
                 )
-                item_data = item.get_stored_data()
-                row_items.append(item_data)
+                item_data: Data = item.get_stored_data()
+                row_items.append(item_data.value)
 
+            # 0: nome
+            # 1: preco
+            # 2: quantidade
+            # 3: subtotal
+            # 4: observacoes
+            # 5: ingredientes
             items_pedido.append(ItemPedidoPOST(
                 produto_uuid=row_items[0],
                 quantidade=row_items[2],
@@ -809,6 +819,16 @@ class MainController(BaseController):
         return items_pedido
 
     def cadastrar_pedido(self) -> None:
+        QMB = QMessageBox
+        title = 'Confirmar'
+        text = ('Tem certeza que deseja cadastrar o pedido '
+                'com as informações escolhidas?')
+
+        buttons = QMB.StandardButton.Yes | QMB.StandardButton.No
+        confirm = QMB.question(self.window, title, text, buttons)
+        if confirm == QMB.StandardButton.No:
+            return
+
         items_pedido = self.get_itens_pedido()
         if len(items_pedido) == 0:
             title = 'Aviso'
@@ -869,6 +889,14 @@ class MainController(BaseController):
         self.view.double_spin_box_frete_pedido.setValue(0)
         self.view.table_widget_item_pedido.setRowCount(0)
 
+        self.view.label_image.setPixmap(QPixmap())
+        self.view.list_widget_adicionais_pedido.clear()
+        scroll_area = self.view.scroll_area_ingredientes
+        self.ingrediente_container.setup(scroll_area)
+
+        self.view.combo_box_categoria_pedido.setCurrentIndex(0)
+        self.produtos_model.refresh()
+
         parent = self.view.scroll_area_ingredientes
 
         self.ingrediente_container = IngredientesContainer()
@@ -909,6 +937,65 @@ class MainController(BaseController):
 
         self.precos_model.refresh(produto_uuid)
         self.dias_disponiveis_model.refresh(produto_uuid)
+
+    # def cadastrar_cliente(self):
+    #     nome = self.view.line_edit_nome_cliente.text
+    #     email = self.view.line_edit_email_cliente.text
+    #     username = self.view.line_edit_username_cliente.text
+    #     telefone = self.view.line_edit_telefone_cliente.text
+    #     celular = self.view.line_edit_celular_cliente.text
+    #     senha = '123456'
+
+    #     logradouro = self.view.line_edit_logradouro_cliente.text
+    #     uf = self.view.combo_box_uf_cliente.currentText()
+    #     cidade = self.view.line_edit_cidade_cliente.text
+    #     numero = self.view.line_edit_numero_cliente.text
+    #     bairro = self.view.line_edit_bairro_cliente.text
+    #     cep = self.view.line_edit_cep_cliente.text
+    #     complemento = self.view.line_edit_complemento_cliente.text
+
+    #     body = {
+    #         "nome": nome,
+    #         "username": username,
+    #         "email": email,
+    #         "telefone": telefone,
+    #         "celular": celular,
+    #         "endereco": {
+    #             "uf": uf,
+    #             "cidade": cidade,
+    #             "logradouro": logradouro,
+    #             "numero": numero,
+    #             "nome": nome,
+    #             "complemento": complemento,
+    #             "bairro": bairro,
+    #             "cep": cep,
+    #         },
+    #         "password": senha,
+    #         "loja_uuid": self.loja.uuid,
+    #     }
+
+    #     # try:
+    #     #     self.handle_response(response)
+    #     # except ValueError as error:
+    #     #     self.show_message('Error', str(error))
+    #     #     return None
+
+    #     title = 'Sucesso'
+    #     message = "Cliente cadastrado com sucesso!"
+    #     QMessageBox.information(self.window, title, message)
+
+    #     self.view.line_edit_nome_cliente.clear()
+    #     self.view.line_edit_email_cliente.clear()
+    #     self.view.line_edit_username_cliente.clear()
+    #     self.view.line_edit_telefone_cliente.clear()
+    #     self.view.line_edit_celular_cliente.clear()
+
+    #     self.view.line_edit_logradouro_cliente.clear()
+    #     self.view.line_edit_cidade_cliente.clear()
+    #     self.view.line_edit_numero_cliente.clear()
+    #     self.view.line_edit_bairro_cliente.clear()
+    #     self.view.line_edit_cep_cliente.clear()
+    #     self.view.line_edit_complemento_cliente.clear()
 
 
 """

@@ -68,6 +68,11 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tab_widget = QTabWidget(self.centralwidget)
         self.tab_widget.setObjectName(u"tab_widget")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tab_widget.sizePolicy().hasHeightForWidth())
+        self.tab_widget.setSizePolicy(sizePolicy)
         self.tab_widget.setMinimumSize(QSize(0, 35))
         self.tab_widget.setMaximumSize(QSize(16777215, 16777215))
         self.tab_status = QWidget()
@@ -80,7 +85,7 @@ class Ui_MainWindow(object):
         self.frame_34.setFrameShape(QFrame.NoFrame)
         self.frame_34.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_8 = QHBoxLayout(self.frame_34)
-        self.horizontalLayout_8.setSpacing(20)
+        self.horizontalLayout_8.setSpacing(2)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.horizontalLayout_8.setContentsMargins(0, 0, 0, 0)
         self.frame_9 = QFrame(self.frame_34)
@@ -88,9 +93,9 @@ class Ui_MainWindow(object):
         self.frame_9.setFrameShape(QFrame.NoFrame)
         self.frame_9.setFrameShadow(QFrame.Raised)
         self.verticalLayout_15 = QVBoxLayout(self.frame_9)
-        self.verticalLayout_15.setSpacing(20)
+        self.verticalLayout_15.setSpacing(10)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
-        self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_15.setContentsMargins(20, 20, 20, 20)
         self.label_5 = QLabel(self.frame_9)
         self.label_5.setObjectName(u"label_5")
         self.label_5.setMaximumSize(QSize(16777215, 50))
@@ -105,7 +110,7 @@ class Ui_MainWindow(object):
         self.label_nome_status_pedido.setMaximumSize(QSize(16777215, 30))
         self.label_nome_status_pedido.setFont(font)
 
-        self.verticalLayout_15.addWidget(self.label_nome_status_pedido, 0, Qt.AlignHCenter)
+        self.verticalLayout_15.addWidget(self.label_nome_status_pedido, 0, Qt.AlignLeft)
 
         self.line_edit_nome_status_pedido = QLineEdit(self.frame_9)
         self.line_edit_nome_status_pedido.setObjectName(u"line_edit_nome_status_pedido")
@@ -118,7 +123,7 @@ class Ui_MainWindow(object):
         self.label_descricao_status_pedido.setMaximumSize(QSize(16777215, 30))
         self.label_descricao_status_pedido.setFont(font)
 
-        self.verticalLayout_15.addWidget(self.label_descricao_status_pedido, 0, Qt.AlignHCenter)
+        self.verticalLayout_15.addWidget(self.label_descricao_status_pedido, 0, Qt.AlignLeft)
 
         self.text_edit_descricao_status_pedido = QTextEdit(self.frame_9)
         self.text_edit_descricao_status_pedido.setObjectName(u"text_edit_descricao_status_pedido")
@@ -134,19 +139,19 @@ class Ui_MainWindow(object):
         self.frame_35.setFrameShape(QFrame.NoFrame)
         self.frame_35.setFrameShadow(QFrame.Raised)
         self.verticalLayout_27 = QVBoxLayout(self.frame_35)
-        self.verticalLayout_27.setSpacing(0)
+        self.verticalLayout_27.setSpacing(10)
         self.verticalLayout_27.setObjectName(u"verticalLayout_27")
-        self.verticalLayout_27.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_27.setContentsMargins(20, 20, 20, 20)
         self.label_status_cadastrados = QLabel(self.frame_35)
         self.label_status_cadastrados.setObjectName(u"label_status_cadastrados")
         self.label_status_cadastrados.setMaximumSize(QSize(16777215, 50))
         self.label_status_cadastrados.setFont(font)
 
-        self.verticalLayout_27.addWidget(self.label_status_cadastrados, 0, Qt.AlignHCenter)
+        self.verticalLayout_27.addWidget(self.label_status_cadastrados, 0, Qt.AlignLeft)
 
         self.list_view_status_cadastrados = QListView(self.frame_35)
         self.list_view_status_cadastrados.setObjectName(u"list_view_status_cadastrados")
-        self.list_view_status_cadastrados.setMaximumSize(QSize(16777215, 350))
+        self.list_view_status_cadastrados.setMaximumSize(QSize(16777215, 16777215))
 
         self.verticalLayout_27.addWidget(self.list_view_status_cadastrados)
 
@@ -219,26 +224,30 @@ class Ui_MainWindow(object):
         self.frame_20.setFrameShape(QFrame.StyledPanel)
         self.frame_20.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_13 = QHBoxLayout(self.frame_20)
-        self.horizontalLayout_13.setSpacing(20)
+        self.horizontalLayout_13.setSpacing(2)
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
         self.horizontalLayout_13.setContentsMargins(0, 0, 0, 0)
         self.frame = QFrame(self.frame_20)
         self.frame.setObjectName(u"frame")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy1)
         self.frame.setMaximumSize(QSize(16777215, 16777215))
+        font1 = QFont()
+        font1.setBold(False)
+        self.frame.setFont(font1)
         self.frame.setFrameShape(QFrame.NoFrame)
         self.frame.setFrameShadow(QFrame.Raised)
         self.verticalLayout_28 = QVBoxLayout(self.frame)
-        self.verticalLayout_28.setSpacing(20)
+        self.verticalLayout_28.setSpacing(10)
         self.verticalLayout_28.setObjectName(u"verticalLayout_28")
-        self.verticalLayout_28.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_28.setContentsMargins(20, 20, 20, 20)
         self.label_cadastrar_nova_categoria = QLabel(self.frame)
         self.label_cadastrar_nova_categoria.setObjectName(u"label_cadastrar_nova_categoria")
-        self.label_cadastrar_nova_categoria.setMaximumSize(QSize(16777215, 50))
+        self.label_cadastrar_nova_categoria.setMinimumSize(QSize(0, 100))
+        self.label_cadastrar_nova_categoria.setMaximumSize(QSize(16777215, 100))
         self.label_cadastrar_nova_categoria.setFont(font)
         self.label_cadastrar_nova_categoria.setMouseTracking(False)
 
@@ -249,7 +258,7 @@ class Ui_MainWindow(object):
         self.label_nome_categoria_produto.setMaximumSize(QSize(16777215, 30))
         self.label_nome_categoria_produto.setFont(font)
 
-        self.verticalLayout_28.addWidget(self.label_nome_categoria_produto, 0, Qt.AlignHCenter)
+        self.verticalLayout_28.addWidget(self.label_nome_categoria_produto, 0, Qt.AlignLeft)
 
         self.line_edit_nome_categoria_produto = QLineEdit(self.frame)
         self.line_edit_nome_categoria_produto.setObjectName(u"line_edit_nome_categoria_produto")
@@ -262,13 +271,20 @@ class Ui_MainWindow(object):
         self.label_descricao_categoria_produto.setMaximumSize(QSize(16777215, 30))
         self.label_descricao_categoria_produto.setFont(font)
 
-        self.verticalLayout_28.addWidget(self.label_descricao_categoria_produto, 0, Qt.AlignHCenter)
+        self.verticalLayout_28.addWidget(self.label_descricao_categoria_produto, 0, Qt.AlignLeft)
 
         self.text_edit_descricao_categoria_produto = QTextEdit(self.frame)
         self.text_edit_descricao_categoria_produto.setObjectName(u"text_edit_descricao_categoria_produto")
         self.text_edit_descricao_categoria_produto.setMaximumSize(QSize(16777215, 200))
 
         self.verticalLayout_28.addWidget(self.text_edit_descricao_categoria_produto)
+
+        self.push_button_cadastrar_categoria_produto = QPushButton(self.frame)
+        self.push_button_cadastrar_categoria_produto.setObjectName(u"push_button_cadastrar_categoria_produto")
+        self.push_button_cadastrar_categoria_produto.setMinimumSize(QSize(0, 35))
+        self.push_button_cadastrar_categoria_produto.setFont(font1)
+
+        self.verticalLayout_28.addWidget(self.push_button_cadastrar_categoria_produto)
 
 
         self.horizontalLayout_13.addWidget(self.frame)
@@ -279,21 +295,48 @@ class Ui_MainWindow(object):
         self.frame_21.setFrameShape(QFrame.NoFrame)
         self.frame_21.setFrameShadow(QFrame.Raised)
         self.verticalLayout_11 = QVBoxLayout(self.frame_21)
-        self.verticalLayout_11.setSpacing(0)
+        self.verticalLayout_11.setSpacing(10)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
-        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_11.setContentsMargins(20, 20, 20, 20)
         self.label_categorias_cadastradas = QLabel(self.frame_21)
         self.label_categorias_cadastradas.setObjectName(u"label_categorias_cadastradas")
-        self.label_categorias_cadastradas.setMaximumSize(QSize(16777215, 50))
+        self.label_categorias_cadastradas.setMaximumSize(QSize(16777215, 16777215))
         self.label_categorias_cadastradas.setFont(font)
 
-        self.verticalLayout_11.addWidget(self.label_categorias_cadastradas, 0, Qt.AlignHCenter)
+        self.verticalLayout_11.addWidget(self.label_categorias_cadastradas, 0, Qt.AlignLeft)
 
         self.list_view_categorias_cadastradas = QListView(self.frame_21)
         self.list_view_categorias_cadastradas.setObjectName(u"list_view_categorias_cadastradas")
-        self.list_view_categorias_cadastradas.setMaximumSize(QSize(16777215, 350))
+        self.list_view_categorias_cadastradas.setMaximumSize(QSize(16777215, 16777215))
 
         self.verticalLayout_11.addWidget(self.list_view_categorias_cadastradas)
+
+        self.frame_54 = QFrame(self.frame_21)
+        self.frame_54.setObjectName(u"frame_54")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.frame_54.sizePolicy().hasHeightForWidth())
+        self.frame_54.setSizePolicy(sizePolicy2)
+        self.frame_54.setFrameShape(QFrame.NoFrame)
+        self.frame_54.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_4 = QHBoxLayout(self.frame_54)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.push_button_remover_categoria = QPushButton(self.frame_54)
+        self.push_button_remover_categoria.setObjectName(u"push_button_remover_categoria")
+        self.push_button_remover_categoria.setMinimumSize(QSize(0, 40))
+
+        self.horizontalLayout_4.addWidget(self.push_button_remover_categoria)
+
+        self.push_button_editar_categoria = QPushButton(self.frame_54)
+        self.push_button_editar_categoria.setObjectName(u"push_button_editar_categoria")
+        self.push_button_editar_categoria.setMinimumSize(QSize(0, 40))
+
+        self.horizontalLayout_4.addWidget(self.push_button_editar_categoria)
+
+
+        self.verticalLayout_11.addWidget(self.frame_54)
 
 
         self.horizontalLayout_13.addWidget(self.frame_21)
@@ -301,57 +344,120 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.frame_20)
 
-        self.frame_36 = QFrame(self.tab_categoria)
-        self.frame_36.setObjectName(u"frame_36")
-        self.frame_36.setFrameShape(QFrame.NoFrame)
-        self.frame_36.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_30 = QHBoxLayout(self.frame_36)
-        self.horizontalLayout_30.setObjectName(u"horizontalLayout_30")
-        self.frame_52 = QFrame(self.frame_36)
-        self.frame_52.setObjectName(u"frame_52")
-        self.frame_52.setFrameShape(QFrame.NoFrame)
-        self.frame_52.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_29 = QHBoxLayout(self.frame_52)
-        self.horizontalLayout_29.setObjectName(u"horizontalLayout_29")
-        self.horizontalLayout_29.setContentsMargins(0, 0, 0, 0)
-        self.push_button_cadastrar_categoria_produto = QPushButton(self.frame_52)
-        self.push_button_cadastrar_categoria_produto.setObjectName(u"push_button_cadastrar_categoria_produto")
-        self.push_button_cadastrar_categoria_produto.setMinimumSize(QSize(0, 40))
-        font1 = QFont()
-        font1.setBold(False)
-        self.push_button_cadastrar_categoria_produto.setFont(font1)
-
-        self.horizontalLayout_29.addWidget(self.push_button_cadastrar_categoria_produto)
-
-
-        self.horizontalLayout_30.addWidget(self.frame_52)
-
-        self.frame_53 = QFrame(self.frame_36)
-        self.frame_53.setObjectName(u"frame_53")
-        self.frame_53.setFrameShape(QFrame.NoFrame)
-        self.frame_53.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_9 = QHBoxLayout(self.frame_53)
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
-        self.push_button_editar_categoria = QPushButton(self.frame_53)
-        self.push_button_editar_categoria.setObjectName(u"push_button_editar_categoria")
-        self.push_button_editar_categoria.setMinimumSize(QSize(0, 40))
-
-        self.horizontalLayout_9.addWidget(self.push_button_editar_categoria)
-
-        self.push_button_remover_categoria = QPushButton(self.frame_53)
-        self.push_button_remover_categoria.setObjectName(u"push_button_remover_categoria")
-        self.push_button_remover_categoria.setMinimumSize(QSize(0, 40))
-
-        self.horizontalLayout_9.addWidget(self.push_button_remover_categoria)
-
-
-        self.horizontalLayout_30.addWidget(self.frame_53)
-
-
-        self.verticalLayout_2.addWidget(self.frame_36)
-
         self.tab_widget.addTab(self.tab_categoria, "")
+        self.tab_adicionais = QWidget()
+        self.tab_adicionais.setObjectName(u"tab_adicionais")
+        self.verticalLayout_5 = QVBoxLayout(self.tab_adicionais)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(20, 20, 20, 20)
+        self.frame_14 = QFrame(self.tab_adicionais)
+        self.frame_14.setObjectName(u"frame_14")
+        self.frame_14.setStyleSheet(u"#frame_14 {\n"
+"    border: 0px;\n"
+"}")
+        self.frame_14.setFrameShape(QFrame.NoFrame)
+        self.frame_14.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_20 = QHBoxLayout(self.frame_14)
+        self.horizontalLayout_20.setSpacing(2)
+        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
+        self.horizontalLayout_20.setContentsMargins(0, 0, 0, 0)
+        self.frame_4 = QFrame(self.frame_14)
+        self.frame_4.setObjectName(u"frame_4")
+        sizePolicy.setHeightForWidth(self.frame_4.sizePolicy().hasHeightForWidth())
+        self.frame_4.setSizePolicy(sizePolicy)
+        self.frame_4.setFont(font1)
+        self.frame_4.setFrameShape(QFrame.NoFrame)
+        self.frame_4.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_8 = QVBoxLayout(self.frame_4)
+        self.verticalLayout_8.setSpacing(10)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayout_8.setContentsMargins(20, 20, 20, 20)
+        self.label_novo_adicional = QLabel(self.frame_4)
+        self.label_novo_adicional.setObjectName(u"label_novo_adicional")
+        self.label_novo_adicional.setMinimumSize(QSize(0, 100))
+        self.label_novo_adicional.setMaximumSize(QSize(16777215, 100))
+        self.label_novo_adicional.setFont(font)
+
+        self.verticalLayout_8.addWidget(self.label_novo_adicional, 0, Qt.AlignHCenter)
+
+        self.label_nome_adicional = QLabel(self.frame_4)
+        self.label_nome_adicional.setObjectName(u"label_nome_adicional")
+        self.label_nome_adicional.setFont(font)
+
+        self.verticalLayout_8.addWidget(self.label_nome_adicional)
+
+        self.line_edit_nome_adicional = QLineEdit(self.frame_4)
+        self.line_edit_nome_adicional.setObjectName(u"line_edit_nome_adicional")
+        self.line_edit_nome_adicional.setMinimumSize(QSize(0, 35))
+
+        self.verticalLayout_8.addWidget(self.line_edit_nome_adicional)
+
+        self.label_preco_adicional = QLabel(self.frame_4)
+        self.label_preco_adicional.setObjectName(u"label_preco_adicional")
+        self.label_preco_adicional.setFont(font)
+
+        self.verticalLayout_8.addWidget(self.label_preco_adicional)
+
+        self.double_spin_box_preco_adicional = QDoubleSpinBox(self.frame_4)
+        self.double_spin_box_preco_adicional.setObjectName(u"double_spin_box_preco_adicional")
+        self.double_spin_box_preco_adicional.setMinimumSize(QSize(0, 35))
+
+        self.verticalLayout_8.addWidget(self.double_spin_box_preco_adicional)
+
+        self.label_descricao_adicional = QLabel(self.frame_4)
+        self.label_descricao_adicional.setObjectName(u"label_descricao_adicional")
+        self.label_descricao_adicional.setFont(font)
+
+        self.verticalLayout_8.addWidget(self.label_descricao_adicional)
+
+        self.text_edit_descricao_adicional = QTextEdit(self.frame_4)
+        self.text_edit_descricao_adicional.setObjectName(u"text_edit_descricao_adicional")
+        self.text_edit_descricao_adicional.setMaximumSize(QSize(16777215, 200))
+
+        self.verticalLayout_8.addWidget(self.text_edit_descricao_adicional)
+
+        self.push_button_cadastrar_adicional = QPushButton(self.frame_4)
+        self.push_button_cadastrar_adicional.setObjectName(u"push_button_cadastrar_adicional")
+        self.push_button_cadastrar_adicional.setMinimumSize(QSize(0, 35))
+        self.push_button_cadastrar_adicional.setFont(font1)
+
+        self.verticalLayout_8.addWidget(self.push_button_cadastrar_adicional)
+
+
+        self.horizontalLayout_20.addWidget(self.frame_4)
+
+        self.frame_23 = QFrame(self.frame_14)
+        self.frame_23.setObjectName(u"frame_23")
+        self.frame_23.setFrameShape(QFrame.NoFrame)
+        self.frame_23.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_21 = QVBoxLayout(self.frame_23)
+        self.verticalLayout_21.setSpacing(10)
+        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
+        self.verticalLayout_21.setContentsMargins(20, 20, 20, 20)
+        self.label_adicionais_cadastrados = QLabel(self.frame_23)
+        self.label_adicionais_cadastrados.setObjectName(u"label_adicionais_cadastrados")
+        self.label_adicionais_cadastrados.setFont(font)
+
+        self.verticalLayout_21.addWidget(self.label_adicionais_cadastrados)
+
+        self.list_view_adicionais = QListView(self.frame_23)
+        self.list_view_adicionais.setObjectName(u"list_view_adicionais")
+
+        self.verticalLayout_21.addWidget(self.list_view_adicionais)
+
+        self.push_button_remover_adicional = QPushButton(self.frame_23)
+        self.push_button_remover_adicional.setObjectName(u"push_button_remover_adicional")
+        self.push_button_remover_adicional.setMinimumSize(QSize(0, 35))
+
+        self.verticalLayout_21.addWidget(self.push_button_remover_adicional)
+
+
+        self.horizontalLayout_20.addWidget(self.frame_23)
+
+
+        self.verticalLayout_5.addWidget(self.frame_14)
+
+        self.tab_widget.addTab(self.tab_adicionais, "")
         self.tab_produto = QWidget()
         self.tab_produto.setObjectName(u"tab_produto")
         self.verticalLayout_7 = QVBoxLayout(self.tab_produto)
@@ -903,11 +1009,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setContentsMargins(2, 2, -1, 2)
         self.scroll_area_column_1_pedido = QScrollArea(self.frame_11)
         self.scroll_area_column_1_pedido.setObjectName(u"scroll_area_column_1_pedido")
-        sizePolicy1 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.scroll_area_column_1_pedido.sizePolicy().hasHeightForWidth())
-        self.scroll_area_column_1_pedido.setSizePolicy(sizePolicy1)
+        sizePolicy3 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.scroll_area_column_1_pedido.sizePolicy().hasHeightForWidth())
+        self.scroll_area_column_1_pedido.setSizePolicy(sizePolicy3)
         self.scroll_area_column_1_pedido.setMinimumSize(QSize(0, 300))
         self.scroll_area_column_1_pedido.setStyleSheet(u"QLineEdit {\n"
 "    padding-left: 5px;\n"
@@ -915,7 +1021,7 @@ class Ui_MainWindow(object):
         self.scroll_area_column_1_pedido.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 310, 500))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 320, 500))
         self.verticalLayout_20 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
         self.label_cliente_pedido = QLabel(self.scrollAreaWidgetContents_2)
@@ -1061,8 +1167,8 @@ class Ui_MainWindow(object):
 
         self.scroll_area_column_2_pedido = QScrollArea(self.frame_11)
         self.scroll_area_column_2_pedido.setObjectName(u"scroll_area_column_2_pedido")
-        sizePolicy1.setHeightForWidth(self.scroll_area_column_2_pedido.sizePolicy().hasHeightForWidth())
-        self.scroll_area_column_2_pedido.setSizePolicy(sizePolicy1)
+        sizePolicy3.setHeightForWidth(self.scroll_area_column_2_pedido.sizePolicy().hasHeightForWidth())
+        self.scroll_area_column_2_pedido.setSizePolicy(sizePolicy3)
         self.scroll_area_column_2_pedido.setMinimumSize(QSize(300, 0))
         self.scroll_area_column_2_pedido.setFrameShape(QFrame.StyledPanel)
         self.scroll_area_column_2_pedido.setWidgetResizable(True)
@@ -1277,8 +1383,8 @@ class Ui_MainWindow(object):
         self.frame_31 = QFrame(self.frame_column_3_pedido)
         self.frame_31.setObjectName(u"frame_31")
         self.frame_31.setEnabled(True)
-        sizePolicy.setHeightForWidth(self.frame_31.sizePolicy().hasHeightForWidth())
-        self.frame_31.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.frame_31.sizePolicy().hasHeightForWidth())
+        self.frame_31.setSizePolicy(sizePolicy1)
         self.frame_31.setMinimumSize(QSize(0, 0))
         self.frame_31.setFrameShape(QFrame.StyledPanel)
         self.frame_31.setFrameShadow(QFrame.Raised)
@@ -1381,117 +1487,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addWidget(self.push_button_cadastrar_pedido)
 
         self.tab_widget.addTab(self.tab_pedido, "")
-        self.tab_adicionais = QWidget()
-        self.tab_adicionais.setObjectName(u"tab_adicionais")
-        self.verticalLayout_5 = QVBoxLayout(self.tab_adicionais)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalLayout_5.setContentsMargins(20, 20, 20, 20)
-        self.label_novo_adicional = QLabel(self.tab_adicionais)
-        self.label_novo_adicional.setObjectName(u"label_novo_adicional")
-        self.label_novo_adicional.setMinimumSize(QSize(0, 100))
-        self.label_novo_adicional.setMaximumSize(QSize(16777215, 100))
-        self.label_novo_adicional.setFont(font)
-
-        self.verticalLayout_5.addWidget(self.label_novo_adicional, 0, Qt.AlignHCenter)
-
-        self.frame_14 = QFrame(self.tab_adicionais)
-        self.frame_14.setObjectName(u"frame_14")
-        self.frame_14.setStyleSheet(u"#frame_14 {\n"
-"    border: 0px;\n"
-"}")
-        self.frame_14.setFrameShape(QFrame.NoFrame)
-        self.frame_14.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_20 = QHBoxLayout(self.frame_14)
-        self.horizontalLayout_20.setSpacing(2)
-        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
-        self.horizontalLayout_20.setContentsMargins(0, 0, 0, 0)
-        self.frame_4 = QFrame(self.frame_14)
-        self.frame_4.setObjectName(u"frame_4")
-        self.frame_4.setFont(font1)
-        self.frame_4.setFrameShape(QFrame.NoFrame)
-        self.frame_4.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_8 = QVBoxLayout(self.frame_4)
-        self.verticalLayout_8.setSpacing(10)
-        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
-        self.verticalLayout_8.setContentsMargins(20, 20, 20, 20)
-        self.label_nome_adicional = QLabel(self.frame_4)
-        self.label_nome_adicional.setObjectName(u"label_nome_adicional")
-        self.label_nome_adicional.setFont(font)
-
-        self.verticalLayout_8.addWidget(self.label_nome_adicional)
-
-        self.line_edit_nome_adicional = QLineEdit(self.frame_4)
-        self.line_edit_nome_adicional.setObjectName(u"line_edit_nome_adicional")
-        self.line_edit_nome_adicional.setMinimumSize(QSize(0, 35))
-
-        self.verticalLayout_8.addWidget(self.line_edit_nome_adicional)
-
-        self.label_preco_adicional = QLabel(self.frame_4)
-        self.label_preco_adicional.setObjectName(u"label_preco_adicional")
-        self.label_preco_adicional.setFont(font)
-
-        self.verticalLayout_8.addWidget(self.label_preco_adicional)
-
-        self.double_spin_box_preco_adicional = QDoubleSpinBox(self.frame_4)
-        self.double_spin_box_preco_adicional.setObjectName(u"double_spin_box_preco_adicional")
-        self.double_spin_box_preco_adicional.setMinimumSize(QSize(0, 35))
-
-        self.verticalLayout_8.addWidget(self.double_spin_box_preco_adicional)
-
-        self.label_descricao_adicional = QLabel(self.frame_4)
-        self.label_descricao_adicional.setObjectName(u"label_descricao_adicional")
-        self.label_descricao_adicional.setFont(font)
-
-        self.verticalLayout_8.addWidget(self.label_descricao_adicional)
-
-        self.text_edit_descricao_adicional = QTextEdit(self.frame_4)
-        self.text_edit_descricao_adicional.setObjectName(u"text_edit_descricao_adicional")
-        self.text_edit_descricao_adicional.setMaximumSize(QSize(16777215, 200))
-
-        self.verticalLayout_8.addWidget(self.text_edit_descricao_adicional)
-
-        self.push_button_cadastrar_adicional = QPushButton(self.frame_4)
-        self.push_button_cadastrar_adicional.setObjectName(u"push_button_cadastrar_adicional")
-        self.push_button_cadastrar_adicional.setMinimumSize(QSize(0, 35))
-        self.push_button_cadastrar_adicional.setFont(font1)
-
-        self.verticalLayout_8.addWidget(self.push_button_cadastrar_adicional)
-
-
-        self.horizontalLayout_20.addWidget(self.frame_4)
-
-        self.frame_23 = QFrame(self.frame_14)
-        self.frame_23.setObjectName(u"frame_23")
-        self.frame_23.setFrameShape(QFrame.NoFrame)
-        self.frame_23.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_21 = QVBoxLayout(self.frame_23)
-        self.verticalLayout_21.setSpacing(10)
-        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
-        self.verticalLayout_21.setContentsMargins(20, 20, 20, 20)
-        self.label_adicionais_cadastrados = QLabel(self.frame_23)
-        self.label_adicionais_cadastrados.setObjectName(u"label_adicionais_cadastrados")
-        self.label_adicionais_cadastrados.setFont(font)
-
-        self.verticalLayout_21.addWidget(self.label_adicionais_cadastrados)
-
-        self.list_view_adicionais = QListView(self.frame_23)
-        self.list_view_adicionais.setObjectName(u"list_view_adicionais")
-
-        self.verticalLayout_21.addWidget(self.list_view_adicionais)
-
-        self.push_button_remover_adicional = QPushButton(self.frame_23)
-        self.push_button_remover_adicional.setObjectName(u"push_button_remover_adicional")
-        self.push_button_remover_adicional.setMinimumSize(QSize(0, 35))
-
-        self.verticalLayout_21.addWidget(self.push_button_remover_adicional)
-
-
-        self.horizontalLayout_20.addWidget(self.frame_23)
-
-
-        self.verticalLayout_5.addWidget(self.frame_14)
-
-        self.tab_widget.addTab(self.tab_adicionais, "")
         self.tab_combos = QWidget()
         self.tab_combos.setObjectName(u"tab_combos")
         self.tab_widget.addTab(self.tab_combos, "")
@@ -1746,7 +1741,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tab_widget.setCurrentIndex(4)
+        self.tab_widget.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1782,11 +1777,19 @@ class Ui_MainWindow(object):
         self.label_nome_categoria_produto.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
         self.line_edit_nome_categoria_produto.setText("")
         self.label_descricao_categoria_produto.setText(QCoreApplication.translate("MainWindow", u"Descri\u00e7\u00e3o", None))
-        self.label_categorias_cadastradas.setText(QCoreApplication.translate("MainWindow", u"Categorias cadastradas", None))
         self.push_button_cadastrar_categoria_produto.setText(QCoreApplication.translate("MainWindow", u"Cadastrar categoria", None))
-        self.push_button_editar_categoria.setText(QCoreApplication.translate("MainWindow", u"Editar categoria", None))
+        self.label_categorias_cadastradas.setText(QCoreApplication.translate("MainWindow", u"Categorias cadastradas", None))
         self.push_button_remover_categoria.setText(QCoreApplication.translate("MainWindow", u"Remover categoria", None))
+        self.push_button_editar_categoria.setText(QCoreApplication.translate("MainWindow", u"Editar categoria", None))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_categoria), QCoreApplication.translate("MainWindow", u"Categoria", None))
+        self.label_novo_adicional.setText(QCoreApplication.translate("MainWindow", u"Cadastrar adicional", None))
+        self.label_nome_adicional.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
+        self.label_preco_adicional.setText(QCoreApplication.translate("MainWindow", u"Pre\u00e7o", None))
+        self.label_descricao_adicional.setText(QCoreApplication.translate("MainWindow", u"Descri\u00e7\u00e3o", None))
+        self.push_button_cadastrar_adicional.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
+        self.label_adicionais_cadastrados.setText(QCoreApplication.translate("MainWindow", u"Adicionais cadastrados", None))
+        self.push_button_remover_adicional.setText(QCoreApplication.translate("MainWindow", u"Remover Adicional", None))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_adicionais), QCoreApplication.translate("MainWindow", u"Adicionais", None))
         self.label_novo_produto.setText(QCoreApplication.translate("MainWindow", u"Produtos", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Cadastar Produto", None))
         self.label_preco_produto.setText(QCoreApplication.translate("MainWindow", u"Pre\u00e7o base", None))
@@ -1895,14 +1898,6 @@ class Ui_MainWindow(object):
         self.label_comentarios_pedido.setText(QCoreApplication.translate("MainWindow", u"Coment\u00e1rios do pedido", None))
         self.push_button_cadastrar_pedido.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_pedido), QCoreApplication.translate("MainWindow", u"Pedido", None))
-        self.label_novo_adicional.setText(QCoreApplication.translate("MainWindow", u"Adicionais", None))
-        self.label_nome_adicional.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
-        self.label_preco_adicional.setText(QCoreApplication.translate("MainWindow", u"Pre\u00e7o", None))
-        self.label_descricao_adicional.setText(QCoreApplication.translate("MainWindow", u"Descri\u00e7\u00e3o", None))
-        self.push_button_cadastrar_adicional.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
-        self.label_adicionais_cadastrados.setText(QCoreApplication.translate("MainWindow", u"Adicionais cadastrados", None))
-        self.push_button_remover_adicional.setText(QCoreApplication.translate("MainWindow", u"Remover Adicional", None))
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_adicionais), QCoreApplication.translate("MainWindow", u"Adicionais", None))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_combos), QCoreApplication.translate("MainWindow", u"Combos", None))
         self.push_button_cadastrar_cliente.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))
         self.line_edit_nome_cliente.setText("")

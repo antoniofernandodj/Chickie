@@ -38,7 +38,10 @@ class ProdutosListModel(QAbstractListModel):
         except Exception:
             return 'Escolha um item...'
 
-    def refresh(self, categoria_uuid: str):
+    def refresh(self, categoria_uuid: Optional[str] = None):
+        if categoria_uuid is None:
+            self._data = [Mock(nome='Escolha uma categoria...')]
+
         params = {'categoria_uuid': categoria_uuid}
         self._data = self.produto_service.get_all(params)
         self._data = [Mock(nome='Escolha um item...')] + self._data

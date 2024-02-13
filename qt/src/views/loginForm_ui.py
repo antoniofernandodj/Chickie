@@ -31,7 +31,15 @@ class Ui_MainWindow(object):
         self.action_sair.setObjectName(u"action_sair")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.centralwidget.setStyleSheet(u"")
+        self.centralwidget.setStyleSheet(u"QLineEdit {\n"
+"  border: 1px solid rgba(150, 150, 150, 0.4);\n"
+"  border-radius: 17px;\n"
+"}\n"
+"\n"
+"QLineEdit::hover {\n"
+"  border: 1px solid rgba(150, 220, 250, 1);\n"
+"  border-radius: 17px;\n"
+"}")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.frame = QFrame(self.centralwidget)

@@ -77,7 +77,7 @@ class ItensPedidoTableModel(QAbstractTableModel):
 
         for item in self.pedido.itens:
 
-            nomes_ingredientes = ''.join(
+            nomes_ingredientes = ', '.join(
                 list(map(ingrediente_nome, item.ingredientes))
             )
 

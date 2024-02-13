@@ -4,6 +4,7 @@ from PySide6.QtCore import QSize
 from src.controllers import LoginController
 from src.services import FileService as FS
 from src.config import settings
+from icon import icon
 
 # from PySide6.QtCore import Qt
 
@@ -28,7 +29,7 @@ class LoginWindow(QMainWindow):
             self.view.centralwidget.setStyleSheet(FS.get(style))
 
         pixmap = QPixmap()
-        pixmap.loadFromData(FS.get_bytes('icon-sm.png'))
+        pixmap.loadFromData(icon)
         self.view.label_title.setPixmap(pixmap)
         self.view.label_title.setBaseSize(QSize(16, 16))
 

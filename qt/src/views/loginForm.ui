@@ -18,7 +18,15 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true"/>
+    <string notr="true">QLineEdit {
+  border: 1px solid rgba(150, 150, 150, 0.4);
+  border-radius: 17px;
+}
+
+QLineEdit::hover {
+  border: 1px solid rgba(150, 220, 250, 1);
+  border-radius: 17px;
+}</string>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
