@@ -65,6 +65,3 @@ class LoginController:
         window = MainWindow(app=self.app)
         window.show()
         self.window.close()
-        del self.view
-        del self.window
-        del self

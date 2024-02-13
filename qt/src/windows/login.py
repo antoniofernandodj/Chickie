@@ -1,4 +1,6 @@
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtGui import QPixmap
+from PySide6.QtCore import QSize
 from src.controllers import LoginController
 from src.services import FileService as FS
 from src.config import settings
@@ -24,6 +26,11 @@ class LoginWindow(QMainWindow):
             self.view.frame.setStyleSheet(FS.get(style))
             style = 'src/styles/login.qss'
             self.view.centralwidget.setStyleSheet(FS.get(style))
+
+        pixmap = QPixmap()
+        pixmap.loadFromData(FS.get_bytes('icon-sm.png'))
+        self.view.label_title.setPixmap(pixmap)
+        self.view.label_title.setBaseSize(QSize(16, 16))
 
         self.resize(450, 600)
 
