@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QMessageBox, QTableView
+from PySide6.QtWidgets import QMessageBox
 from PySide6.QtGui import QCloseEvent
-from PySide6.QtCore import QTimer, QThread, Signal
+from PySide6.QtCore import QTimer
 from src.domain.services import AuthService, PedidoService
 from src.ui_models import (
     PedidosTableModel,
@@ -9,28 +9,11 @@ from src.ui_models import (
 )
 from contextlib import suppress
 import datetime
+from .pedidos_refresh_worker import RefreshWorker
 
 
 with suppress(ImportError):
     from src.windows import PedidosDialog
-
-
-class RefreshWorker(QThread):
-    finished = Signal()
-
-    def __init__(
-        self,
-        pedidos_model: PedidosTableModel,
-        table_view: QTableView
-    ):
-        super().__init__()
-        self.pedidos_model = pedidos_model
-        self.table_view = table_view
-
-    def run(self):
-        print('Non blocking operation...')
-        self.pedidos_model.refresh(self.table_view)
-        self.finished.emit()
 
 
 class PedidosController:
@@ -50,10 +33,9 @@ class PedidosController:
         )
         self.dialog.view.table_view_itens_pedido.setModel(self.itens_model)
 
-        self.worker = RefreshWorker(
-            self.pedidos_model,
-            self.dialog.view.table_view_pedidos
-        )
+        model = self.pedidos_model
+        view = self.dialog.view.table_view_pedidos
+        self.worker = RefreshWorker(model, view)
 
     def setupUi(self):
         self.dialog.view.table_view_pedidos.setModel(self.pedidos_model)

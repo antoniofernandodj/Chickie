@@ -556,7 +556,6 @@ class MainController(BaseController):
 
         ingredientes: List[IngredientesSelect] = []
         for uuid, value in self.ingrediente_container.select.items():
-            print(uuid, value)
             if value is None:
                 title = 'Aviso'
                 message = 'Favor, marcar todos os ingredientes!'

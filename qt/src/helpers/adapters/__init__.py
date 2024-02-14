@@ -17,8 +17,7 @@ class Adapter:
                     datetime.datetime.fromisoformat(truncated_data_hora)
                     .strftime('%d/%m/%Y %H:%M:%S')
                 )
-            except ValueError as error:
-                print({'error': error})
+            except ValueError:
                 return data_hora
 
     def get_size_str(self, max_size: int, item: Optional[Any]):
