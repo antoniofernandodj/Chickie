@@ -800,10 +800,11 @@ class MainController(BaseController):
                 item: CustomTableWidgetItem = (  # type: ignore
                     table_widget.item(row_number, column_number)
                 )
-                item_data: Data = item.get_stored_data()
-                row_items.append(item_data.value)
+                item_data = item.get_stored_data()
 
-            # 0: nome
+                row_items.append(item_data)
+
+            # 0: uuid
             # 1: preco
             # 2: quantidade
             # 3: subtotal

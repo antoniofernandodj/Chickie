@@ -64,6 +64,9 @@ class Ui_MainWindow(object):
         self.action_clientes.setObjectName(u"action_clientes")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
+        self.centralwidget.setStyleSheet(u"QLineEdit {\n"
+"  padding-left: 10px;\n"
+"}")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tab_widget = QTabWidget(self.centralwidget)
@@ -1021,7 +1024,7 @@ class Ui_MainWindow(object):
         self.scroll_area_column_1_pedido.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 320, 500))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 203, 357))
         self.verticalLayout_20 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
         self.label_cliente_pedido = QLabel(self.scrollAreaWidgetContents_2)
@@ -1319,7 +1322,7 @@ class Ui_MainWindow(object):
         self.scroll_area_ingredientes.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 264, 118))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 98, 118))
         self.scroll_area_ingredientes.setWidget(self.scrollAreaWidgetContents)
 
         self.verticalLayout_33.addWidget(self.scroll_area_ingredientes)
@@ -1784,6 +1787,7 @@ class Ui_MainWindow(object):
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_categoria), QCoreApplication.translate("MainWindow", u"Categoria", None))
         self.label_novo_adicional.setText(QCoreApplication.translate("MainWindow", u"Cadastrar adicional", None))
         self.label_nome_adicional.setText(QCoreApplication.translate("MainWindow", u"Nome", None))
+        self.line_edit_nome_adicional.setText("")
         self.label_preco_adicional.setText(QCoreApplication.translate("MainWindow", u"Pre\u00e7o", None))
         self.label_descricao_adicional.setText(QCoreApplication.translate("MainWindow", u"Descri\u00e7\u00e3o", None))
         self.push_button_cadastrar_adicional.setText(QCoreApplication.translate("MainWindow", u"Cadastrar", None))

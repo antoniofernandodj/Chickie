@@ -3,8 +3,12 @@ from .base_pedidos_model import BasePedidosTableModel
 
 
 class PedidosTableModel(BasePedidosTableModel):
-    def mode(self):
-        return False
+    reverse = False
+    mode = False
+
+    @property
+    def reverse_mode(self):
+        return True
 
     def concluir(self, index: QModelIndex | QPersistentModelIndex):
         uuid = self.get(index)

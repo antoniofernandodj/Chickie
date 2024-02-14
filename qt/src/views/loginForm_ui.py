@@ -37,7 +37,7 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QLineEdit::hover {\n"
-"  border: 1px solid rgba(150, 220, 250, 1);\n"
+"  border: 2px solid rgba(150, 220, 255, 1);\n"
 "  border-radius: 17px;\n"
 "}")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)

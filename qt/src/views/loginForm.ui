@@ -24,7 +24,7 @@
 }
 
 QLineEdit::hover {
-  border: 1px solid rgba(150, 220, 250, 1);
+  border: 2px solid rgba(150, 220, 255, 1);
   border-radius: 17px;
 }</string>
    </property>

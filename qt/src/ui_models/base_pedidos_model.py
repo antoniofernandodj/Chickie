@@ -5,20 +5,24 @@ from PySide6.QtCore import (
     Qt,
 )
 from PySide6.QtWidgets import QTableView, QHeaderView
-import datetime
 from src.domain.services import PedidoService
 from src.domain.data_models import PedidoGET, EnderecoEntrega  # noqa
 from pandas import DataFrame  # type: ignore
 from typing import Any, List, NoReturn, Optional  # noqa
 from typing_extensions import Never
+from src.helpers.adapters import AdapterTablePedidos
 
 
 class BasePedidosTableModel(QAbstractTableModel):
 
-    def __init__(self) -> None:
+    reverse: bool
+    mode: bool
+
+    def __init__(self, table_view: QTableView) -> None:
 
         super().__init__()
 
+        self.adapter = AdapterTablePedidos()
         self.pedidos_service = PedidoService()
         self.columns = [
             'ID',
@@ -27,87 +31,25 @@ class BasePedidosTableModel(QAbstractTableModel):
             'Comentários',
             'Endereço'
         ]
-        sizes = self.refresh()
-        self.sizes = sizes
+        self.refresh(table_view)
 
-    def mode(self):
-        raise NotImplementedError(
-            "Escolher um modo de concluído para o pedido, "
-            "Concluído == False ou Concluído == True."
+    def refresh(self, table_view: QTableView, reverse=False) -> list[int]:
+
+        pedidos: List[PedidoGET] = self.pedidos_service.get_all()
+
+        sizes, rows = self.adapter.adapt(
+            pedidos, mode=self.mode, reverse=self.reverse
+
         )
 
-    def refresh(self) -> list[int]:
-        pedidos: List[PedidoGET] = self.pedidos_service.get_all()
-        rows: List[List[Any]] = []
-
-        max_size_1 = 0
-        max_size_2 = 0
-        max_size_3 = 0
-        max_size_4 = 0
-        max_size_5 = 0
-
-        for pedido in pedidos:
-            if pedido.concluido is self.mode():
-
-                len_string = len(pedido.uuid or '')
-                if len_string > max_size_1:
-                    max_size_1 = len_string
-
-                len_string = len(self.formatar_data_hora(pedido.data_hora))
-                if len_string > max_size_2:
-                    max_size_2 = len_string
-
-                len_string = len(pedido.celular)
-                if len_string > max_size_3:
-                    max_size_3 = len_string
-
-                len_string = len(pedido.comentarios)
-                if len_string > max_size_4:
-                    max_size_4 = len_string
-
-                len_string = len(
-                    pedido.endereco.to_string() if pedido.endereco else ''
-                )
-                if len_string > max_size_5:
-                    max_size_5 = len_string
-
-                row = [
-                    pedido.uuid,
-                    self.formatar_data_hora(pedido.data_hora),
-                    pedido.celular,
-                    pedido.comentarios,
-                    pedido.endereco.to_string() if pedido.endereco else ''
-                ]
-
-                rows.append(row)
-
-        rows.sort(key=lambda row: row[1], reverse=False)
-
         index = [str(i) for i in range(len(rows))]
+
         self._data = DataFrame(rows, columns=self.columns, index=index)
+        self.set_size(table_view, sizes)
+
         self.layoutChanged.emit()
 
-        sizes = [
-            max_size_1,
-            max_size_2,
-            max_size_3,
-            max_size_4,
-            max_size_5
-        ]
-
         return sizes
-
-    def formatar_data_hora(self, data_hora: str | datetime.datetime) -> str:
-        if isinstance(data_hora, datetime.datetime):
-            return data_hora.strftime('%d/%m/%Y %H:%M:%S')
-        else:
-            try:
-                return (
-                    datetime.datetime.fromisoformat(data_hora)
-                    .strftime('%d/%m/%Y %H:%M:%S')
-                )
-            except ValueError:
-                return data_hora
 
     def data(
         self,
@@ -164,3 +106,6 @@ class BasePedidosTableModel(QAbstractTableModel):
                         return self.assert_never(arg)
 
         return None
+
+    def clear(self):
+        self._data = DataFrame([])

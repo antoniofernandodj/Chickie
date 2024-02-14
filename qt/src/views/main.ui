@@ -20,6 +20,11 @@
    <string>Chickie</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QLineEdit {
+  padding-left: 10px;
+}</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tab_widget">
@@ -791,6 +796,9 @@
                   <width>0</width>
                   <height>35</height>
                  </size>
+                </property>
+                <property name="text">
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -2171,8 +2179,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>320</width>
-                   <height>500</height>
+                   <width>203</width>
+                   <height>357</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2757,7 +2765,7 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>264</width>
+                          <width>98</width>
                           <height>118</height>
                          </rect>
                         </property>
