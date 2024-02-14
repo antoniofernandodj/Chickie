@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QTableView
 from PySide6.QtGui import QCloseEvent
-from PySide6.QtCore import QTimer, Qt, QThread, Signal
+from PySide6.QtCore import QTimer, QThread, Signal
 from src.domain.services import AuthService, PedidoService
 from src.ui_models import (
     PedidosTableModel,
@@ -18,7 +18,11 @@ with suppress(ImportError):
 class RefreshWorker(QThread):
     finished = Signal()
 
-    def __init__(self, pedidos_model, table_view):
+    def __init__(
+        self,
+        pedidos_model: PedidosTableModel,
+        table_view: QTableView
+    ):
         super().__init__()
         self.pedidos_model = pedidos_model
         self.table_view = table_view
@@ -102,8 +106,13 @@ class PedidosController:
         total = f'R${pedido.total:.2f}'.replace('.', ',')
         status = str(pedido.status_uuid or 'Pedido Realizado')
 
+        if isinstance(pedido.data_hora, str):
+            truncated_data_hora = pedido.data_hora.split('.', 1)[0]
+        else:
+            raise TypeError
+
         fmt_data_hora = datetime.datetime \
-            .fromisoformat(str(pedido.data_hora)) \
+            .fromisoformat(str(truncated_data_hora)) \
             .strftime('%d/%m/%Y %H:%M:%S')
 
         self.dialog.view.line_edit_data_hora.setText(fmt_data_hora)

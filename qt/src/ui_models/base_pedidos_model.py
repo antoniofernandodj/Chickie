@@ -6,7 +6,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QTableView, QHeaderView
 from src.domain.services import PedidoService
-from src.domain.data_models import PedidoGET, EnderecoEntrega  # noqa
+from src.domain.data_models import PedidoGET  # noqa
 from pandas import DataFrame  # type: ignore
 from typing import Any, List, NoReturn, Optional  # noqa
 from typing_extensions import Never
@@ -22,6 +22,7 @@ class BasePedidosTableModel(QAbstractTableModel):
 
         super().__init__()
 
+        self._data = DataFrame([])
         self.adapter = AdapterTablePedidos()
         self.pedidos_service = PedidoService()
         self.columns = [
@@ -44,7 +45,13 @@ class BasePedidosTableModel(QAbstractTableModel):
 
         index = [str(i) for i in range(len(rows))]
 
-        self._data = DataFrame(rows, columns=self.columns, index=index)
+        _data = DataFrame(rows, columns=self.columns, index=index)
+
+        if _data.equals(self._data):
+            self.set_size(table_view, sizes)
+            return sizes
+
+        self._data = _data
         self.set_size(table_view, sizes)
 
         self.layoutChanged.emit()
