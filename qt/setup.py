@@ -1,5 +1,5 @@
-from setuptools import setup, find_packages
-from cx_Freeze import setup, Executable
+from setuptools import setup, find_packages  # type: ignore
+from cx_Freeze import setup, Executable  # type: ignore
 
 # Lista de dependências
 install_requires = [
