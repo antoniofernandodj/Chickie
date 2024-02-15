@@ -47,7 +47,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab_status">
        <attribute name="title">
@@ -67,7 +67,7 @@
          <number>20</number>
         </property>
         <item>
-         <widget class="QFrame" name="frame_main_status">
+         <widget class="QFrame" name="frame_34">
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
@@ -91,7 +91,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QFrame" name="frame_novo_status">
+            <widget class="QFrame" name="frame_9">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -115,7 +115,7 @@
                <number>20</number>
               </property>
               <item alignment="Qt::AlignHCenter">
-               <widget class="QLabel" name="label_novo_status">
+               <widget class="QLabel" name="label_5">
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
@@ -192,7 +192,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_status_cadastrados">
+            <widget class="QFrame" name="frame_35">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -250,7 +250,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_main_buttons_status">
+         <widget class="QFrame" name="frame_49">
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
@@ -259,7 +259,7 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_28">
            <item>
-            <widget class="QFrame" name="frame_button_status">
+            <widget class="QFrame" name="frame_50">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -299,7 +299,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_buttons2_status">
+            <widget class="QFrame" name="frame_51">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -374,7 +374,7 @@
          <number>20</number>
         </property>
         <item>
-         <widget class="QFrame" name="frame_main_categorias">
+         <widget class="QFrame" name="frame_20">
           <property name="styleSheet">
            <string notr="true">#frame_20 {
     border: 0px;
@@ -403,7 +403,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QFrame" name="frame_nova_categoria">
+            <widget class="QFrame" name="frame">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -690,7 +690,7 @@
          <number>20</number>
         </property>
         <item>
-         <widget class="QFrame" name="frame_main_adicionais">
+         <widget class="QFrame" name="frame_14">
           <property name="styleSheet">
            <string notr="true">#frame_14 {
     border: 0px;
@@ -868,7 +868,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_adicionais_cadastrados">
+            <widget class="QFrame" name="frame_23">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -966,7 +966,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_main_produtos">
+         <widget class="QFrame" name="frame_37">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -1002,7 +1002,7 @@
                <number>0</number>
               </property>
               <item alignment="Qt::AlignHCenter">
-               <widget class="QLabel" name="label_cadastrar_produto">
+               <widget class="QLabel" name="label_6">
                 <property name="font">
                  <font>
                   <bold>true</bold>
@@ -1489,7 +1489,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_produtos_cadastrados">
+            <widget class="QFrame" name="frame_22">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -1513,7 +1513,7 @@
                <number>0</number>
               </property>
               <item alignment="Qt::AlignHCenter">
-               <widget class="QLabel" name="label_produtos_cadastrados">
+               <widget class="QLabel" name="label_18">
                 <property name="font">
                  <font>
                   <bold>true</bold>
@@ -1528,7 +1528,7 @@
                <widget class="QListView" name="list_view_produtos_cadastrados"/>
               </item>
               <item>
-               <widget class="QFrame" name="frame_buttons_produtos">
+               <widget class="QFrame" name="frame_32">
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
                 </property>
@@ -1549,7 +1549,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="push_button_editar_produto">
+                  <widget class="QPushButton" name="pushButton_2">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -2027,7 +2027,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_precos_cadastrados">
+         <widget class="QFrame" name="frame_24">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -2096,7 +2096,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QFrame" name="frame_main_novo_pedido">
+         <widget class="QFrame" name="frame_10">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -2126,7 +2126,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_submain_novo_pedido">
+            <widget class="QFrame" name="frame_11">
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -2292,7 +2292,7 @@
                   <item>
                    <layout class="QHBoxLayout" name="horizontal_layout_4">
                     <item>
-                     <widget class="QLabel" name="label_cep">
+                     <widget class="QLabel" name="label_7">
                       <property name="text">
                        <string>CEP</string>
                       </property>
@@ -2477,7 +2477,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>284</width>
-                   <height>508</height>
+                   <height>2166</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -2497,90 +2497,148 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QLabel" name="label_item_pedido">
-                       <property name="font">
-                        <font>
-                         <bold>true</bold>
-                        </font>
+                      <widget class="QFrame" name="frame_qtd_sabores">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
                        </property>
-                       <property name="text">
-                        <string>Item</string>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
                        </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_9">
+                        <property name="spacing">
+                         <number>10</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>4</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>4</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="label_sabores">
+                          <property name="font">
+                           <font>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                          <property name="text">
+                           <string>Qtd. Sabores</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QGroupBox" name="groupBox">
+                          <property name="title">
+                           <string/>
+                          </property>
+                          <layout class="QHBoxLayout" name="horizontalLayout_29">
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QRadioButton" name="radio_button_1">
+                             <property name="text">
+                              <string>1</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QRadioButton" name="radio_button_2">
+                             <property name="text">
+                              <string>2</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QRadioButton" name="radio_button_3">
+                             <property name="text">
+                              <string>3</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QRadioButton" name="radio_button_4">
+                             <property name="text">
+                              <string>4</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
                      <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_12">
-                       <item>
-                        <widget class="QLabel" name="label_4">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>30</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Categoria</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="combo_box_categoria_pedido">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>30</height>
-                          </size>
-                         </property>
-                         <item>
-                          <property name="text">
-                           <string>Pizzas</string>
+                      <widget class="QFrame" name="frame_36">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_46">
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="label_item_pedido">
+                          <property name="font">
+                           <font>
+                            <bold>true</bold>
+                           </font>
                           </property>
-                         </item>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_10">
-                       <item>
-                        <widget class="QLabel" name="label_3">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>30</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Produto</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="combo_box_item_pedido">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>30</height>
-                          </size>
-                         </property>
-                         <item>
                           <property name="text">
-                           <string>Escolha ...</string>
+                           <string>Item</string>
                           </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>Pizza fulana</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>Pizza beutrana</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                      </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_12">
+                          <item>
+                           <widget class="QLabel" name="label_4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>30</height>
+                             </size>
+                            </property>
+                            <property name="text">
+                             <string>Categoria</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QComboBox" name="combo_box_categoria_pedido">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>30</height>
+                             </size>
+                            </property>
+                            <item>
+                             <property name="text">
+                              <string>Pizzas</string>
+                             </property>
+                            </item>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                      <item>
                       <layout class="QHBoxLayout" name="horizontal_layout_7">
@@ -2615,106 +2673,844 @@
                        </item>
                       </layout>
                      </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QFrame" name="frame_45">
-                    <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_33">
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
                      <item>
-                      <widget class="QLabel" name="label_ingredientes_pedido">
-                       <property name="font">
-                        <font>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>Ingredientes</string>
+                      <widget class="Line" name="line">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QScrollArea" name="scroll_area_ingredientes">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>120</height>
-                        </size>
+                      <widget class="QFrame" name="frame_observacoes">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
                        </property>
-                       <property name="widgetResizable">
-                        <bool>true</bool>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
                        </property>
-                       <widget class="QWidget" name="scrollAreaWidgetContents">
-                        <property name="geometry">
-                         <rect>
-                          <x>0</x>
-                          <y>0</y>
-                          <width>264</width>
-                          <height>118</height>
-                         </rect>
+                       <layout class="QVBoxLayout" name="verticalLayout_34">
+                        <property name="leftMargin">
+                         <number>0</number>
                         </property>
-                       </widget>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QFrame" name="frame_observacoes_item_pedido">
-                    <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_34">
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QLabel" name="label_observacoes_pedido">
-                       <property name="font">
-                        <font>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>Observações</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QTextEdit" name="text_edit_observacao_item">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>60</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>16777215</width>
-                         <height>50</height>
-                        </size>
-                       </property>
-                       <property name="placeholderText">
-                        <string>Observações</string>
-                       </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QFrame" name="frame_44">
+                          <property name="frameShape">
+                           <enum>QFrame::NoFrame</enum>
+                          </property>
+                          <property name="frameShadow">
+                           <enum>QFrame::Raised</enum>
+                          </property>
+                          <layout class="QVBoxLayout" name="verticalLayout_78">
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QFrame" name="frame_sabor_1">
+                             <property name="frameShape">
+                              <enum>QFrame::NoFrame</enum>
+                             </property>
+                             <property name="frameShadow">
+                              <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_75">
+                              <property name="leftMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="rightMargin">
+                               <number>0</number>
+                              </property>
+                              <item alignment="Qt::AlignHCenter">
+                               <widget class="QLabel" name="label_39">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>40</height>
+                                 </size>
+                                </property>
+                                <property name="font">
+                                 <font>
+                                  <bold>true</bold>
+                                 </font>
+                                </property>
+                                <property name="text">
+                                 <string>Sabor 1</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <layout class="QHBoxLayout" name="horizontalLayout_42">
+                                <item>
+                                 <widget class="QLabel" name="label_40">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="text">
+                                   <string>Produto</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QComboBox" name="combo_box_item_pedido_12">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <item>
+                                   <property name="text">
+                                    <string>Escolha ...</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza fulana</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza beutrana</string>
+                                   </property>
+                                  </item>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </item>
+                              <item>
+                               <widget class="QFrame" name="frame_adicionais_12">
+                                <property name="frameShape">
+                                 <enum>QFrame::NoFrame</enum>
+                                </property>
+                                <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                                </property>
+                                <layout class="QVBoxLayout" name="verticalLayout_76">
+                                 <property name="leftMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <property name="rightMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <item>
+                                  <layout class="QHBoxLayout" name="horizontal_layout_29"/>
+                                 </item>
+                                 <item>
+                                  <widget class="QListWidget" name="list_widget_adicionais_pedido_12">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>120</height>
+                                    </size>
+                                   </property>
+                                   <property name="maximumSize">
+                                    <size>
+                                     <width>16777215</width>
+                                     <height>16777215</height>
+                                    </size>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QFrame" name="frame_55">
+                                   <property name="frameShape">
+                                    <enum>QFrame::NoFrame</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QVBoxLayout" name="verticalLayout_77">
+                                    <property name="leftMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                     <number>4</number>
+                                    </property>
+                                    <item>
+                                     <widget class="QLabel" name="label_ingredientes_pedido_12">
+                                      <property name="font">
+                                       <font>
+                                        <bold>true</bold>
+                                       </font>
+                                      </property>
+                                      <property name="text">
+                                       <string>Ingredientes</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QScrollArea" name="scroll_area_ingredientes_12">
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>120</height>
+                                       </size>
+                                      </property>
+                                      <property name="widgetResizable">
+                                       <bool>true</bool>
+                                      </property>
+                                      <widget class="QWidget" name="scrollAreaWidgetContents_13">
+                                       <property name="geometry">
+                                        <rect>
+                                         <x>0</x>
+                                         <y>0</y>
+                                         <width>264</width>
+                                         <height>118</height>
+                                        </rect>
+                                       </property>
+                                      </widget>
+                                     </widget>
+                                    </item>
+                                   </layout>
+                                  </widget>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="Line" name="line_2">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QFrame" name="frame_52">
+                          <property name="frameShape">
+                           <enum>QFrame::NoFrame</enum>
+                          </property>
+                          <property name="frameShadow">
+                           <enum>QFrame::Raised</enum>
+                          </property>
+                          <layout class="QVBoxLayout" name="verticalLayout_82">
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QFrame" name="frame_sabor_2">
+                             <property name="frameShape">
+                              <enum>QFrame::NoFrame</enum>
+                             </property>
+                             <property name="frameShadow">
+                              <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_79">
+                              <property name="leftMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="rightMargin">
+                               <number>0</number>
+                              </property>
+                              <item alignment="Qt::AlignHCenter">
+                               <widget class="QLabel" name="label_41">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>40</height>
+                                 </size>
+                                </property>
+                                <property name="font">
+                                 <font>
+                                  <bold>true</bold>
+                                 </font>
+                                </property>
+                                <property name="text">
+                                 <string>Sabor 2</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <layout class="QHBoxLayout" name="horizontalLayout_43">
+                                <item>
+                                 <widget class="QLabel" name="label_42">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="text">
+                                   <string>Produto</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QComboBox" name="combo_box_item_pedido_13">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <item>
+                                   <property name="text">
+                                    <string>Escolha ...</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza fulana</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza beutrana</string>
+                                   </property>
+                                  </item>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </item>
+                              <item>
+                               <widget class="QFrame" name="frame_adicionais_13">
+                                <property name="frameShape">
+                                 <enum>QFrame::NoFrame</enum>
+                                </property>
+                                <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                                </property>
+                                <layout class="QVBoxLayout" name="verticalLayout_80">
+                                 <property name="leftMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <property name="rightMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <item>
+                                  <layout class="QHBoxLayout" name="horizontal_layout_30"/>
+                                 </item>
+                                 <item>
+                                  <widget class="QListWidget" name="list_widget_adicionais_pedido_13">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>120</height>
+                                    </size>
+                                   </property>
+                                   <property name="maximumSize">
+                                    <size>
+                                     <width>16777215</width>
+                                     <height>16777215</height>
+                                    </size>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QFrame" name="frame_56">
+                                   <property name="frameShape">
+                                    <enum>QFrame::NoFrame</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QVBoxLayout" name="verticalLayout_81">
+                                    <property name="leftMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                     <number>4</number>
+                                    </property>
+                                    <item>
+                                     <widget class="QLabel" name="label_ingredientes_pedido_13">
+                                      <property name="font">
+                                       <font>
+                                        <bold>true</bold>
+                                       </font>
+                                      </property>
+                                      <property name="text">
+                                       <string>Ingredientes</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QScrollArea" name="scroll_area_ingredientes_13">
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>120</height>
+                                       </size>
+                                      </property>
+                                      <property name="widgetResizable">
+                                       <bool>true</bool>
+                                      </property>
+                                      <widget class="QWidget" name="scrollAreaWidgetContents_14">
+                                       <property name="geometry">
+                                        <rect>
+                                         <x>0</x>
+                                         <y>0</y>
+                                         <width>264</width>
+                                         <height>118</height>
+                                        </rect>
+                                       </property>
+                                      </widget>
+                                     </widget>
+                                    </item>
+                                   </layout>
+                                  </widget>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QFrame" name="frame_65">
+                          <property name="frameShape">
+                           <enum>QFrame::NoFrame</enum>
+                          </property>
+                          <property name="frameShadow">
+                           <enum>QFrame::Raised</enum>
+                          </property>
+                          <layout class="QVBoxLayout" name="verticalLayout_86">
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="Line" name="line_5">
+                             <property name="orientation">
+                              <enum>Qt::Horizontal</enum>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QFrame" name="frame_sabor_3">
+                             <property name="frameShape">
+                              <enum>QFrame::NoFrame</enum>
+                             </property>
+                             <property name="frameShadow">
+                              <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_83">
+                              <property name="leftMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="rightMargin">
+                               <number>0</number>
+                              </property>
+                              <item alignment="Qt::AlignHCenter">
+                               <widget class="QLabel" name="label_43">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>40</height>
+                                 </size>
+                                </property>
+                                <property name="font">
+                                 <font>
+                                  <bold>true</bold>
+                                 </font>
+                                </property>
+                                <property name="text">
+                                 <string>Sabor 3</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <layout class="QHBoxLayout" name="horizontalLayout_44">
+                                <item>
+                                 <widget class="QLabel" name="label_44">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="text">
+                                   <string>Produto</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QComboBox" name="combo_box_item_pedido_14">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <item>
+                                   <property name="text">
+                                    <string>Escolha ...</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza fulana</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza beutrana</string>
+                                   </property>
+                                  </item>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </item>
+                              <item>
+                               <widget class="QFrame" name="frame_adicionais_14">
+                                <property name="frameShape">
+                                 <enum>QFrame::NoFrame</enum>
+                                </property>
+                                <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                                </property>
+                                <layout class="QVBoxLayout" name="verticalLayout_84">
+                                 <property name="leftMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <property name="rightMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <item>
+                                  <layout class="QHBoxLayout" name="horizontal_layout_31"/>
+                                 </item>
+                                 <item>
+                                  <widget class="QListWidget" name="list_widget_adicionais_pedido_14">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>120</height>
+                                    </size>
+                                   </property>
+                                   <property name="maximumSize">
+                                    <size>
+                                     <width>16777215</width>
+                                     <height>16777215</height>
+                                    </size>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QFrame" name="frame_66">
+                                   <property name="frameShape">
+                                    <enum>QFrame::NoFrame</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QVBoxLayout" name="verticalLayout_85">
+                                    <property name="leftMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                     <number>4</number>
+                                    </property>
+                                    <item>
+                                     <widget class="QLabel" name="label_ingredientes_pedido_14">
+                                      <property name="font">
+                                       <font>
+                                        <bold>true</bold>
+                                       </font>
+                                      </property>
+                                      <property name="text">
+                                       <string>Ingredientes</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QScrollArea" name="scroll_area_ingredientes_14">
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>120</height>
+                                       </size>
+                                      </property>
+                                      <property name="widgetResizable">
+                                       <bool>true</bool>
+                                      </property>
+                                      <widget class="QWidget" name="scrollAreaWidgetContents_15">
+                                       <property name="geometry">
+                                        <rect>
+                                         <x>0</x>
+                                         <y>0</y>
+                                         <width>264</width>
+                                         <height>118</height>
+                                        </rect>
+                                       </property>
+                                      </widget>
+                                     </widget>
+                                    </item>
+                                   </layout>
+                                  </widget>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="Line" name="line_6">
+                             <property name="orientation">
+                              <enum>Qt::Horizontal</enum>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QFrame" name="frame_67">
+                          <property name="frameShape">
+                           <enum>QFrame::NoFrame</enum>
+                          </property>
+                          <property name="frameShadow">
+                           <enum>QFrame::Plain</enum>
+                          </property>
+                          <layout class="QVBoxLayout" name="verticalLayout_90">
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QFrame" name="frame_sabor_4">
+                             <property name="frameShape">
+                              <enum>QFrame::NoFrame</enum>
+                             </property>
+                             <property name="frameShadow">
+                              <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_87">
+                              <property name="leftMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="rightMargin">
+                               <number>0</number>
+                              </property>
+                              <item alignment="Qt::AlignHCenter">
+                               <widget class="QLabel" name="label_45">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>40</height>
+                                 </size>
+                                </property>
+                                <property name="font">
+                                 <font>
+                                  <bold>true</bold>
+                                 </font>
+                                </property>
+                                <property name="text">
+                                 <string>Sabor 4</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <layout class="QHBoxLayout" name="horizontalLayout_45">
+                                <item>
+                                 <widget class="QLabel" name="label_46">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="text">
+                                   <string>Produto</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QComboBox" name="combo_box_item_pedido_15">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <item>
+                                   <property name="text">
+                                    <string>Escolha ...</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza fulana</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Pizza beutrana</string>
+                                   </property>
+                                  </item>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </item>
+                              <item>
+                               <widget class="QFrame" name="frame_adicionais_15">
+                                <property name="frameShape">
+                                 <enum>QFrame::NoFrame</enum>
+                                </property>
+                                <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                                </property>
+                                <layout class="QVBoxLayout" name="verticalLayout_88">
+                                 <property name="leftMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <property name="rightMargin">
+                                  <number>0</number>
+                                 </property>
+                                 <item>
+                                  <layout class="QHBoxLayout" name="horizontal_layout_32"/>
+                                 </item>
+                                 <item>
+                                  <widget class="QListWidget" name="list_widget_adicionais_pedido_15">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>120</height>
+                                    </size>
+                                   </property>
+                                   <property name="maximumSize">
+                                    <size>
+                                     <width>16777215</width>
+                                     <height>16777215</height>
+                                    </size>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QFrame" name="frame_68">
+                                   <property name="frameShape">
+                                    <enum>QFrame::NoFrame</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QVBoxLayout" name="verticalLayout_89">
+                                    <property name="leftMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                     <number>0</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                     <number>4</number>
+                                    </property>
+                                    <item>
+                                     <widget class="QLabel" name="label_ingredientes_pedido_15">
+                                      <property name="font">
+                                       <font>
+                                        <bold>true</bold>
+                                       </font>
+                                      </property>
+                                      <property name="text">
+                                       <string>Ingredientes</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QScrollArea" name="scroll_area_ingredientes_15">
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>120</height>
+                                       </size>
+                                      </property>
+                                      <property name="widgetResizable">
+                                       <bool>true</bool>
+                                      </property>
+                                      <widget class="QWidget" name="scrollAreaWidgetContents_16">
+                                       <property name="geometry">
+                                        <rect>
+                                         <x>0</x>
+                                         <y>0</y>
+                                         <width>264</width>
+                                         <height>118</height>
+                                        </rect>
+                                       </property>
+                                      </widget>
+                                     </widget>
+                                    </item>
+                                   </layout>
+                                  </widget>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="Line" name="line_7">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_observacoes_pedido">
+                          <property name="font">
+                           <font>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                          <property name="text">
+                           <string>Observações</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QTextEdit" name="text_edit_observacao_item">
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>60</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>16777215</width>
+                            <height>50</height>
+                           </size>
+                          </property>
+                          <property name="placeholderText">
+                           <string>Observações</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
                     </layout>
@@ -2827,7 +3623,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLabel" name="label_itens_pedido">
+                  <widget class="QLabel" name="label_13">
                    <property name="font">
                     <font>
                      <bold>true</bold>
@@ -2873,7 +3669,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QFrame" name="frame_total_pedido">
+                  <widget class="QFrame" name="frame_16">
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
@@ -3011,7 +3807,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QFrame" name="frame_form_dados_novo_cliente">
+         <widget class="QFrame" name="frame_15">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -3032,7 +3828,7 @@
             <number>2</number>
            </property>
            <item>
-            <widget class="QFrame" name="frame_nome_cliente">
+            <widget class="QFrame" name="frame_41">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -3455,7 +4251,7 @@
          </widget>
         </item>
         <item row="6" column="0">
-         <spacer name="vertical_spacer_cliente">
+         <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
