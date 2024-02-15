@@ -415,7 +415,6 @@ class MainController(BaseController):
     def itens_pedido_refresh(self) -> None:
         self.view.label_image.setPixmap(QPixmap())
         self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
-        self.view.list_widget_adicionais_pedido.clear()
         categoria_uuid = self.view.combo_box_categoria_pedido.currentData()
         self.produtos_model.refresh(categoria_uuid)
 
@@ -428,14 +427,12 @@ class MainController(BaseController):
 
     def refresh_produtos(self) -> None:
         self.ingrediente_container.setup(self.view.scroll_area_ingredientes)
-        self.view.list_widget_adicionais_pedido.clear()
 
         categoria_uuid = self.view.combo_box_categoria_produto.currentData()
         self.produtos_model.refresh(categoria_uuid)
 
     def refresh_ingredientes(self) -> None:
         self.view.label_image.setPixmap(QPixmap())
-        self.view.list_widget_adicionais_pedido.clear()
 
         produto_uuid: str = self.view.combo_box_item_pedido.currentData()
         produto = self.produto_service.get(produto_uuid)
@@ -449,7 +446,6 @@ class MainController(BaseController):
         if produto_uuid is None:
             scroll_area = self.view.scroll_area_ingredientes
             self.ingrediente_container.setup(scroll_area)
-            self.view.list_widget_adicionais_pedido.clear()
             return
 
         ingredientes = self.ingrediente_service.get_all({
@@ -614,7 +610,6 @@ class MainController(BaseController):
 
         self.view.text_edit_observacao_item.clear()
         self.view.spin_box_item_pedido.setValue(1)
-        self.view.spin_box_quantidade_acicionais.setValue(0)
 
         parent = self.view.scroll_area_ingredientes
 
@@ -890,7 +885,6 @@ class MainController(BaseController):
         self.view.table_widget_item_pedido.setRowCount(0)
 
         self.view.label_image.setPixmap(QPixmap())
-        self.view.list_widget_adicionais_pedido.clear()
         scroll_area = self.view.scroll_area_ingredientes
         self.ingrediente_container.setup(scroll_area)
 
