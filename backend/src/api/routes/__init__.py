@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from src.worker import send_email
 from . import (  # noqa
     __info__,
     categorias,
@@ -33,6 +34,17 @@ def init_app(app: FastAPI) -> None:
     app.include_router(status.router)
 
     __info__.init_app(app)
+
+    @app.get('/teste')
+    def teste_endpoint():
+
+        result = send_email.delay({
+            'subject': 'subject',
+            'from': 'from'
+        })
+
+        print({'apiresult': result})
+        return {'msg': 'ok'}
 
     # router.include_router(entregadores.router)
     # router.include_router(avaliacoes_de_lojas.router)

@@ -7,13 +7,11 @@ version: '3'
 
 services:
 
-  api-dev:
+  api-dev:  # port 8010
     container_name: api-dev
     build:
       context: backend
       dockerfile: dockerfiles/Dockerfile.dev
-    ports:
-      - "8010:8010"
     volumes:
       - ./backend/src:/home/chickie/backend/src
     command: bash -c "
@@ -32,17 +30,35 @@ services:
     environment:
       - WATCHFILES_FORCE_POLLING=true
 
-  client-angular-dev:
+  flower:  # port 5555
+    image: mher/flower:0.9.5
+    env_file:
+      - ./infra.secrets.toml
+    network_mode: "host"
+    restart: on-failure
+
+
+  client-angular-dev:  # port 4200
     build:
       context: frontend-angular
       dockerfile: dockerfiles/Dockerfile.dev
     volumes:
       - ./frontend-angular/:/usr/app/
-    ports:
-      - "4200:4200"
+    network_mode: host
     depends_on:
       - api-dev
 
+  broker:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+
+    network_mode: "host"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
 
 
   # client-angular-prod:

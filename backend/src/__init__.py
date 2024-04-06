@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from . import worker  # noqa
 
 
 def create_app(args: list) -> FastAPI:
